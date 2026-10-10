@@ -1,0 +1,95 @@
+import type { Notes } from "./types";
+
+export const PROBABILITY_NOTES: Notes = {
+  "basic-probability": {
+    explain:
+      "When every outcome is equally likely, probability is just favorable outcomes over total outcomes. Make sure the outcomes really are equally likely: for two dice, list ordered pairs, not sums.",
+    proof: "If there are $n$ equally likely outcomes, each has probability $\\frac1n$. An event made of $f$ of them has probability $f \\cdot \\frac1n$.",
+  },
+  complement: {
+    explain:
+      "The chance something happens at least once is one minus the chance it never happens. \"Never\" is usually a single product of probabilities, which is much easier than adding up all the \"at least once\" cases.",
+    proof: "\"At least one\" and \"none\" are opposite events: exactly one of them happens, so their probabilities add to $1$.",
+  },
+  "binomial-probability": {
+    explain:
+      "For $n$ independent tries, each succeeding with probability $p$, the chance of exactly $k$ successes is the number of ways to choose which tries succeed, times the probability of any one such pattern.",
+    proof:
+      "Any specific pattern with $k$ successes and $n - k$ failures has probability $p^k(1 - p)^{n-k}$ by independence. There are $\\binom nk$ such patterns, and they can't happen together, so add them.",
+  },
+  "expected-value": {
+    explain:
+      "Expected value is the long-run average: each outcome times its probability, added up. Linearity, $E[X + Y] = E[X] + E[Y]$, holds even when the variables are dependent, so break a count into yes/no indicators and add their probabilities.",
+    proof:
+      "$E[X + Y] = \\sum (x + y)P(x, y) = \\sum xP(x, y) + \\sum yP(x, y)$. Summing out the other variable leaves $E[X] + E[Y]$; no independence is needed.",
+  },
+  "conditional-probability": {
+    explain:
+      "Knowing that $B$ happened shrinks the world to just the outcomes in $B$. The probability of $A$ given $B$ is the part of $B$ where $A$ also happens, as a fraction of $B$.",
+    proof: "With equally likely outcomes, restricting to $B$ leaves $|B|$ outcomes, $|A \\cap B|$ of them favorable: $\\frac{|A \\cap B|}{|B|} = \\frac{P(A \\cap B)}{P(B)}$. This becomes the definition in general.",
+  },
+  bayes: {
+    explain:
+      "Bayes' theorem flips a conditional probability around: from \"positive test given sick\" to \"sick given positive test.\" The answer is often surprisingly small when the condition is rare, because false positives outnumber true ones.",
+    proof: "By the definition of conditional probability, $P(A \\cap B) = P(A \\mid B)P(B)$ and also $P(A \\cap B) = P(B \\mid A)P(A)$. Set them equal and divide by $P(B)$.",
+  },
+  "geometric-distribution": {
+    explain:
+      "If each try succeeds with probability $p$, you need $\\frac1p$ tries on average to get the first success. A $\\frac16$ chance means $6$ rolls on average.",
+    proof:
+      "Let $E$ be the expected number of tries. The first try always counts; with probability $1 - p$ it fails and you start over: $E = 1 + (1 - p)E$, so $E = \\frac1p$.",
+  },
+  "independent-events": {
+    explain:
+      "When events don't influence each other, the chance they all happen is the product of their chances. Coin flips, die rolls, and drawing with replacement are independent; drawing without replacement is not.",
+    proof: "Independence means knowing $B$ doesn't change $A$'s chance: $P(A \\mid B) = P(A)$. Then $P(A \\cap B) = P(A \\mid B)P(B) = P(A)P(B)$.",
+  },
+  "addition-rule": {
+    explain:
+      "The chance of $A$ or $B$ is the chance of $A$ plus the chance of $B$, minus the overlap so it isn't counted twice. If the events can't both happen, the overlap is zero and you just add.",
+    proof: "The outcomes in both $A$ and $B$ are included once in $P(A)$ and once in $P(B)$. Subtracting $P(A \\cap B)$ counts them exactly once.",
+  },
+  "geometric-probability": {
+    explain:
+      "When a point is chosen uniformly from a region, the probability of landing in a part is that part's share of the total length, area, or volume. Draw the region and compute areas.",
+    proof: "\"Uniformly at random\" means the probability of landing in a region is proportional to its size. Normalizing so the whole space has probability $1$ gives favorable size over total size.",
+  },
+  variance: {
+    explain:
+      "Variance measures spread: the average squared distance from the mean. The shortcut is \"mean of the squares minus square of the mean.\" A yes/no variable with probability $p$ has variance $p(1 - p)$.",
+    proof:
+      "$\\operatorname{Var}(X) = E[(X - \\mu)^2] = E[X^2] - 2\\mu E[X] + \\mu^2 = E[X^2] - \\mu^2$, using linearity and $E[X] = \\mu$.",
+  },
+  "binomial-expectation": {
+    explain:
+      "The expected number of successes in $n$ tries with success probability $p$ is $np$. No need to use the binomial formula: it falls straight out of linearity of expectation.",
+    proof: "Write the count as $X_1 + \\cdots + X_n$, where $X_i$ is $1$ if try $i$ succeeds. Each has $E[X_i] = p$, so the sum has expectation $np$.",
+  },
+  hypergeometric: {
+    explain:
+      "When drawing without replacement, count instead of multiplying: ways to choose the special items you want, times ways to choose the rest, over all ways to draw. Committees and card hands work this way.",
+    proof:
+      "All $\\binom Nn$ draws are equally likely. A draw with exactly $k$ special items picks $k$ of the $K$ special ones and $n - k$ of the $N - K$ others: $\\binom Kk\\binom{N-K}{n-k}$ ways.",
+  },
+  odds: {
+    explain:
+      "Odds compare the chance of happening to the chance of not happening, instead of to the whole. Odds of $a : b$ in favor mean probability $\\frac{a}{a+b}$.",
+    proof: "By definition, odds in favor are $\\frac{P(\\text{happens})}{P(\\text{doesn't})} = \\frac{p}{1-p}$. If that equals $\\frac ab$, solving gives $p = \\frac{a}{a+b}$.",
+  },
+  "gamblers-ruin": {
+    explain:
+      "In a fair game moving one step up or down, the chance of reaching $N$ before $0$ from position $k$ is just $\\frac kN$. Fair games have no drift, so the answer is proportional to how far along you start.",
+    proof:
+      "Let $P_k$ be the probability from position $k$. Then $P_k = \\frac12P_{k-1} + \\frac12P_{k+1}$, so the values are evenly spaced, with $P_0 = 0$ and $P_N = 1$. Evenly spaced from $0$ to $1$ gives $P_k = \\frac kN$.",
+  },
+  "all-different": {
+    explain:
+      "The chance that $k$ independent picks from $n$ options are all different is $\\frac nn \\cdot \\frac{n-1}{n} \\cdots \\frac{n-k+1}{n}$. Its complement is the birthday problem: with $23$ people, a shared birthday is more likely than not.",
+    proof: "The first pick can be anything. Each later pick must avoid the earlier ones: the $i$th pick has $n - i + 1$ allowed options out of $n$. Multiply by independence.",
+  },
+  symmetry: {
+    explain:
+      "When two players are in identical situations, \"first beats second\" and \"second beats first\" are equally likely. So each is half of what's left after removing ties. Look for symmetry before doing any casework.",
+    proof: "$P(X > Y) + P(X < Y) + P(X = Y) = 1$, and swapping the identical $X$ and $Y$ shows $P(X > Y) = P(X < Y)$. So each equals $\\frac{1 - P(X = Y)}{2}$.",
+  },
+};
