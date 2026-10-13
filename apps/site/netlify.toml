@@ -1,8 +1,9 @@
 # The main site and demo. In Netlify, choose "apps/site" under "Project to deploy".
 # `npm install` in this folder installs the whole workspace from the repo root.
 [build]
-  command = "npm run build"
-  publish = ".next"
+  # Netlify runs this from the repo root, and the publish path is relative to it too.
+  command = "npm run build -w @lemmory/site"
+  publish = "apps/site/.next"
 
 [build.environment]
   NODE_VERSION = "22"
