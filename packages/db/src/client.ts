@@ -16,7 +16,9 @@ export const cleanEnv = (v: string | undefined) => v?.trim().replace(/^["']+|["'
  * apps/<app> or packages/<pkg> when run through npm workspaces.
  */
 export const DATABASE_URL = cleanEnv(process.env.DATABASE_URL) ?? "file:../../data/lemmory.db";
-const DATABASE_AUTH_TOKEN = cleanEnv(process.env.DATABASE_AUTH_TOKEN);
+// Tokens never contain whitespace, so drop any that came along with a paste (a space or
+// line break inside the token makes Turso answer "HTTP status 400").
+export const DATABASE_AUTH_TOKEN = cleanEnv(process.env.DATABASE_AUTH_TOKEN)?.replace(/\s+/g, "");
 
 function localClient(): Client {
   try {

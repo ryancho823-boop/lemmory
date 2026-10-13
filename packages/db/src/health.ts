@@ -7,15 +7,14 @@ function describe(raw: string | undefined) {
   const notes = [];
   if (raw !== raw.trim()) notes.push("has spaces or line breaks at the ends (cleaned automatically)");
   if (/^\s*["']|["']\s*$/.test(raw)) notes.push("wrapped in quotes (cleaned automatically)");
-  if (/\s/.test(raw.trim())) notes.push("has a space or line break in the middle: re-paste it");
+  if (/\s/.test(raw.trim())) notes.push("has a space or line break in the middle (removed automatically for the token)");
   return notes.length ? `set, but ${notes.join("; ")}` : "set";
 }
 
 /** A quick check of the database setup, safe to show publicly (no secrets). */
 export async function databaseHealth() {
-  const { cleanEnv } = await import("./client");
+  const { cleanEnv, DATABASE_AUTH_TOKEN: token } = await import("./client");
   const url = cleanEnv(process.env.DATABASE_URL);
-  const token = cleanEnv(process.env.DATABASE_AUTH_TOKEN);
   let host = "";
   try {
     host = url ? new URL(url).host : "";
