@@ -39,7 +39,7 @@ The sample accounts, all for local development only, are listed at the top of `p
 | `/users` | Who it's for, pricing, how we verify each group, FAQ |
 | `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class saved in the browser. **Skip to tomorrow** shows the scheduler working. |
 
-**Sign up / Log in** go to the teacher and student sites: localhost while developing, the Netlify addresses in DEPLOY.md once live (override with `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL`).
+**Sign up / Log in** go to the teacher and student sites: localhost while developing, the Vercel addresses in DEPLOY.md on Vercel (override with `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL`).
 
 The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser.
 
@@ -53,7 +53,7 @@ The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in 
 
 ## Deploying
 
-See [DEPLOY.md](DEPLOY.md): a Turso database, then one Netlify site per folder.
+See [DEPLOY.md](DEPLOY.md): a Turso database, then one Vercel project per folder.
 
 ## Not built yet
 

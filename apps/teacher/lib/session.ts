@@ -26,5 +26,5 @@ export const getClass = cache(async (classId: string) => {
 
 /** The student site, for the join link teachers share. Override with NEXT_PUBLIC_STUDENT_URL. */
 export const studentUrl = (
-  process.env.NEXT_PUBLIC_STUDENT_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://lemmory-student.netlify.app")
+  process.env.NEXT_PUBLIC_STUDENT_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://lemmory-student.vercel.app")
 ).replace(/\/$/, "");
