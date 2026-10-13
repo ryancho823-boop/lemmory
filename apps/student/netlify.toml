@@ -1,5 +1,4 @@
-# The student site. Create its Netlify site with Base directory = apps/student
-# (Netlify then reads this file and ignores the netlify.toml at the repo root).
+# The student site. In Netlify, choose "apps/student" under "Project to deploy".
 # Suggested Netlify site name: lemmory-student
 [build]
   command = "npm run build"

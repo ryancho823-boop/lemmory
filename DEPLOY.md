@@ -4,7 +4,7 @@ Three websites, all from this one GitHub repo, plus one database:
 
 | Website | Folder | Netlify site name | Address |
 | --- | --- | --- | --- |
-| Main site + demo | `apps/site` | `lemmory` (you already have it) | https://lemmory.netlify.app |
+| Main site + demo | `apps/site` | `lemmory` | https://lemmory.netlify.app |
 | Teacher site | `apps/teacher` | `lemmory-teacher` | https://lemmory-teacher.netlify.app |
 | Student site | `apps/student` | `lemmory-student` | https://lemmory-student.netlify.app |
 | Database | Turso | `lemmory` | `libsql://…turso.io` |
@@ -44,23 +44,22 @@ Never run `npm run db:seed` for production. That's the fake sample class, for yo
 ## Part 2: The teacher site on Netlify
 
 1. Go to **app.netlify.com** → **Add new site** (or **Add new project**) → **Import an existing project** → **GitHub** → **lemmory**.
-2. On the settings screen before you deploy:
-   - **Base directory**: `apps/teacher`
-   - Leave the build command and publish directory as Netlify fills them in. `apps/teacher/netlify.toml` takes over.
-   - If Netlify asks which package or site to deploy, pick `apps/teacher`.
+2. On the **Review configuration** screen:
+   - **Project name**: `lemmory-teacher`
+   - **Project to deploy**: `apps/teacher`
+   - Leave the branch (`main`), build command (`npm run build`) and publish directory (`.next`) as they are.
 3. On the same screen, click **Add environment variables** and add two:
    - `DATABASE_URL`: the `libsql://…` URL
    - `DATABASE_AUTH_TOKEN`: the token
 4. Click **Deploy**.
-5. Rename it: **Site configuration → General → Site details → Change site name** → `lemmory-teacher`.
 
 ## Part 3: The student site on Netlify
 
-The same steps as Part 2, but with **Base directory** `apps/student`, and rename it to `lemmory-student`. It needs the same two database variables.
+The same steps as Part 2, with **Project name** `lemmory-student` and **Project to deploy** `apps/student`. It needs the same two database variables.
 
 ## Part 4: The main site
 
-You already have it. Pushing to GitHub redeploys it automatically. Nothing to set: its Sign up and Log in buttons already point at `lemmory-teacher` and `lemmory-student`.
+Import the repo the same way, with **Project name** `lemmory` and **Project to deploy** `apps/site`. It needs no environment variables: its Sign up and Log in buttons already point at `lemmory-teacher` and `lemmory-student`.
 
 ## If a Netlify name is taken
 

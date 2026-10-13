@@ -1,5 +1,0 @@
-# The main site's Netlify settings (the existing "lemmory" site, with no base directory
-# set in Netlify). The teacher and student sites set their own Base directory
-# (apps/teacher, apps/student) and use the netlify.toml in that folder instead.
-[build]
-  base = "apps/site"

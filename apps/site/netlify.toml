@@ -1,5 +1,5 @@
-# The main site and demo. Netlify starts in this folder (see the netlify.toml at the
-# repo root); `npm install` here installs the whole workspace from the repo root.
+# The main site and demo. In Netlify, choose "apps/site" under "Project to deploy".
+# `npm install` in this folder installs the whole workspace from the repo root.
 [build]
   command = "npm run build"
   publish = ".next"

@@ -1,5 +1,4 @@
-# The teacher site. Create its Netlify site with Base directory = apps/teacher
-# (Netlify then reads this file and ignores the netlify.toml at the repo root).
+# The teacher site. In Netlify, choose "apps/teacher" under "Project to deploy".
 # Suggested Netlify site name: lemmory-teacher
 [build]
   command = "npm run build"
