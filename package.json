@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "tsx scripts/build-demo-bank.ts",
     "dev": "next dev",
+    "prebuild": "tsx scripts/build-demo-bank.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

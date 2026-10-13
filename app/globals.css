@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* Headings read calmer at semibold than at a heavy 800. */
+  --font-weight-extrabold: 600;
   --color-ink: #0f1121;
   --color-canvas: #f6f6f9;
   --color-line: #e7e7ef;
@@ -26,6 +28,7 @@
 }
 
 body {
+  font-size: 16.5px;
   background: var(--color-canvas);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
@@ -39,7 +42,8 @@ body {
   h4,
   .font-extrabold {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    font-variation-settings: "SOFT" 50;
+    letter-spacing: -0.01em;
   }
 }
 

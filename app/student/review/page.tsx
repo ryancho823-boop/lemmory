@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
-import { FORMULA_BY_ID, type Problem } from "@/lib/formulas";
+import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { setupApply } from "@/lib/practice";
 import { InfoTip } from "@/components/InfoTip";
 import { useStore } from "@/lib/store";
@@ -67,7 +67,7 @@ export default function ReviewPage() {
     const extra = finished.length - cards;
     const s = streak(you.doneDays, today);
     return (
-      <div className="mx-auto grid max-w-5xl items-start gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mx-auto grid max-w-5xl items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Panel className="rise p-8 text-center">
           <CheckCircle2 size={52} className="mx-auto text-good" />
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight">{nothingDue ? "Nothing due today" : "Done for today"}</h1>
@@ -107,7 +107,6 @@ export default function ReviewPage() {
           <InfoTip align="left">Missed cards come back until you get them right.</InfoTip>
         </p>
         <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{queue.length} cards</h1>
-        <p className="mt-2 text-ink/60">About {Math.max(2, Math.round(queue.length * 0.5))} minutes</p>
         <div className="mt-6 flex justify-center gap-2 text-sm">
           <Chip n={queue.length - fresh - apply} label="recall" />
           <Chip n={apply} label="application" />

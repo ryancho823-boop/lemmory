@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
 import { cx } from "@/components/ui";
+import { SIGNUP_URL } from "@/lib/links";
 
 const TABS = [
   { href: "/", label: "Overview" },
-  { href: "/academies", label: "For academies" },
+  { href: "/users", label: "For users" },
 ];
 
 export function SiteHeader() {
@@ -33,9 +34,17 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <Link href="/demo" className="ml-auto inline-flex h-10 items-center gap-2 rounded-xl bg-lemon px-4 text-sm font-bold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105 md:ml-0">
-          View live demo <ArrowRight size={16} />
-        </Link>
+        <div className="ml-auto flex items-center gap-2 md:ml-0">
+          <Link href="/login" className="hidden h-10 items-center rounded-xl px-3 text-sm font-semibold text-ink/70 hover:bg-ink/5 hover:text-ink sm:inline-flex">
+            Log in
+          </Link>
+          <Link href="/demo" className="hidden h-10 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold hover:border-ink/30 sm:inline-flex">
+            Live demo
+          </Link>
+          <a href={SIGNUP_URL} className="inline-flex h-10 items-center gap-2 rounded-xl bg-lemon px-4 text-sm font-bold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105">
+            Sign up <ArrowRight size={16} />
+          </a>
+        </div>
       </div>
       <nav className="flex gap-1 overflow-x-auto px-4 pb-2.5 md:hidden">
         {TABS.map((t) => (
@@ -89,6 +98,12 @@ export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a
             Teacher demo <ArrowRight size={18} />
           </Link>
         </div>
+        <p className="relative mt-6 text-ink/70">
+          Ready for your own class?{" "}
+          <a href={SIGNUP_URL} className="font-semibold text-ink underline">
+            Sign up for a free pilot
+          </a>
+        </p>
       </div>
     </section>
   );

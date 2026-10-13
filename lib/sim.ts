@@ -3,7 +3,7 @@
 // difficulty x FSRS's predicted recall). So every dashboard number is computed from
 // review logs, the same way it would be for real students.
 
-import { FORMULA_BY_ID, FORMULAS, type Level } from "./formulas";
+import { FORMULA_BY_ID, FORMULAS, type Level } from "./bank";
 import { type Card, isNew, newCard, retrievability, review } from "./srs";
 
 export const NEW_PER_DAY = 6;

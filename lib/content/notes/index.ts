@@ -1,6 +1,7 @@
 import { ALGEBRA_NOTES } from "./algebra";
 import { CALCULUS_NOTES } from "./calculus";
 import { COMBINATORICS_NOTES } from "./combinatorics";
+import { EXTRA_NOTES } from "./extra";
 import { GEOMETRY_NOTES } from "./geometry";
 import { NUMBER_THEORY_NOTES } from "./numberTheory";
 import { PROBABILITY_NOTES } from "./probability";
@@ -17,4 +18,5 @@ export const NOTES: Notes = {
   ...COMBINATORICS_NOTES,
   ...PROBABILITY_NOTES,
   ...CALCULUS_NOTES,
+  ...EXTRA_NOTES,
 };

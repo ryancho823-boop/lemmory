@@ -18,8 +18,10 @@ import {
   Zap,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { CLASS_NAME, YOU } from "@/lib/sim";
+import { YOU } from "@/lib/sim";
 import { streak } from "@/lib/analytics";
+import { DEMO_MAX_DAYS } from "@/lib/demo";
+import { SIGNUP_URL } from "@/lib/links";
 import { Avatar, cx } from "../ui";
 
 type Role = "student" | "teacher";
@@ -71,12 +73,13 @@ export function AppShell({ role, children }: { role: Role; children: React.React
   const { ready, you, today, doneToday, nextDay, reset, state } = useStore();
   const s = streak(you.doneDays, today);
   const items = NAV[role];
+  const atLimit = state.dayOffset >= DEMO_MAX_DAYS;
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? path === href || (href === "/student" && path === "/student/review") : path === href || path.startsWith(href + "/");
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[256px_1fr]">
+    <div className="min-h-screen lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
       {/* Sidebar */}
       <div className="hidden border-r border-line bg-white lg:block">
       <aside className="sticky top-0 flex h-screen flex-col px-4 py-5">
@@ -123,15 +126,28 @@ export function AppShell({ role, children }: { role: Role; children: React.React
 
         <div className="mt-auto space-y-3">
           <div className="rounded-xl border border-dashed border-ink/15 p-3">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-ink/40">Demo controls</p>
+            <p className="text-sm font-semibold">Demo controls</p>
             <p className="mt-1 text-xs text-ink/50">
               {ready ? fmtDay(today) : "\u00a0"}
               {state.dayOffset > 0 && ` · ${state.dayOffset} day${state.dayOffset === 1 ? "" : "s"} ahead`}
             </p>
             <div className="mt-2 grid gap-1">
-              <button onClick={nextDay} className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-ink/70 hover:bg-ink/5">
+              <button
+                onClick={nextDay}
+                disabled={atLimit}
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-ink/70 hover:bg-ink/5 disabled:pointer-events-none disabled:opacity-40"
+              >
                 <FastForward size={15} /> Skip to tomorrow
               </button>
+              {atLimit && (
+                <p className="px-2 text-xs text-ink/50">
+                  The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
+                  <a href={SIGNUP_URL} className="font-semibold text-ink underline">
+                    Start a pilot
+                  </a>{" "}
+                  to use it with a real class.
+                </p>
+              )}
               <button
                 onClick={() => confirm("Reset all demo data?") && reset()}
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-ink/70 hover:bg-ink/5"
@@ -144,10 +160,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
             {role === "student" ? (
               <>
                 <Avatar name={YOU.name} you />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">{YOU.name}</p>
-                  <p className="text-xs text-ink/50">{CLASS_NAME}</p>
-                </div>
+                <p className="min-w-0 flex-1 truncate text-sm font-semibold">{YOU.name}</p>
                 {ready && (
                   <span className={cx("flex items-center gap-1 text-sm font-bold", s ? "text-ink" : "text-ink/35")}>
                     <Flame size={16} className={s ? "fill-lemon-deep text-lemon-deep" : ""} />
@@ -160,10 +173,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
                 <span className="grid size-8 place-items-center rounded-full bg-ink text-white">
                   <GraduationCap size={16} />
                 </span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold">Ms. Chen</p>
-                  <p className="text-xs text-ink/50">{CLASS_NAME}</p>
-                </div>
+                <p className="min-w-0 truncate text-sm font-semibold">Ms. Chen</p>
               </>
             )}
           </div>
@@ -184,7 +194,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
               </Link>
             ))}
           </div>
-          <button onClick={nextDay} aria-label="Skip to tomorrow" className="rounded-lg p-1.5 text-ink/50 hover:bg-ink/5">
+          <button onClick={nextDay} disabled={atLimit} aria-label="Skip to tomorrow" className="rounded-lg p-1.5 text-ink/50 hover:bg-ink/5 disabled:opacity-30">
             <FastForward size={18} />
           </button>
         </div>

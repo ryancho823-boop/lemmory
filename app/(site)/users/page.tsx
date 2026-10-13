@@ -1,8 +1,10 @@
 import { BarChart3, CalendarCheck, ChevronDown, MousePointerClick, Users } from "lucide-react";
-import { FORMULAS } from "@/lib/formulas";
+import { TOTAL_FORMULAS } from "@/lib/bank";
 import { PageIntro } from "@/components/site/SiteChrome";
+import { SIGNUP_URL, STUDENT_URL } from "@/lib/links";
+import { PILOT_DAYS, TIERS } from "@/lib/pricing";
 
-export const metadata = { title: "For academies · Lemmory" };
+export const metadata = { title: "For users · Lemmory" };
 
 const BENEFITS = [
   { icon: MousePointerClick, title: "One-click assignments", body: "Pick formulas from the bank as the course covers them. Scheduling handles the rest." },
@@ -20,13 +22,19 @@ const PREVIEW = [
   { name: "Arithmetic Series", v: 0.88 },
 ];
 
-const AUDIENCES = [
-  { who: "Competition math academies", price: "Per class", body: "Our first customers. One deal brings in a whole class, and better contest results are your best marketing." },
-  { who: "School math clubs", price: "Free or low-cost", body: "A ready-made formula bank and daily practice for AMC prep, run by a club leader." },
-  { who: "Individual students", price: "Free core", body: "The formula bank and daily practice on your own. Students who like it can ask their academy to adopt it." },
-];
-
 const FAQ = [
+  {
+    q: "Why are there different prices?",
+    a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is capped at $40 per class a month. Individual students pay $2 a month for their own deck.",
+  },
+  {
+    q: "How do you know a math club is really a school club?",
+    a: "Club sign-ups need a school email address and the school's name, and we confirm with the school before the club price applies. A program that charges students tuition counts as an academy.",
+  },
+  {
+    q: "Could an academy just have its students buy the $2 plan?",
+    a: "Students could, but the teacher would lose everything that makes Lemmory useful for a class: assigning formulas, class analytics, and the leaderboard. Individual accounts can't be grouped into a class.",
+  },
   {
     q: "How long does it take students each day?",
     a: "About five minutes. Each day's review only includes the cards that are due, usually 5 to 15.",
@@ -53,7 +61,7 @@ const FAQ = [
   },
   {
     q: "Which contests does it cover?",
-    a: `${FORMULAS.length} formulas spanning AMC 8, AMC 10/12 and AIME across algebra, geometry, trigonometry, number theory, combinatorics and probability, plus calculus for tournament calculus rounds.`,
+    a: `${TOTAL_FORMULAS} formulas spanning AMC 8, AMC 10/12 and AIME across algebra, geometry, trigonometry, number theory, combinatorics and probability, plus calculus for tournament calculus rounds.`,
   },
   {
     q: "Does it replace our curriculum?",
@@ -61,14 +69,14 @@ const FAQ = [
   },
 ];
 
-export default function Academies() {
+export default function ForUsers() {
   return (
     <div>
       <section className="px-5 pb-20 pt-16 sm:pt-20">
         <PageIntro
-          eyebrow="For academies"
-          title="A retention tool that runs between classes"
-          sub="Better contest results are an academy's best marketing. Lemmory keeps every student sharp, with no extra work for teachers."
+          eyebrow="For users"
+          title="For academies, math clubs, and students"
+          sub="A retention tool that runs between classes, with no extra work for teachers. Every plan starts with a free pilot."
         />
         <div className="mx-auto mt-14 grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {BENEFITS.map((b) => (
@@ -113,14 +121,30 @@ export default function Academies() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <h2 className="text-center text-3xl font-extrabold tracking-tight">Who it&apos;s for</h2>
+      <section id="pricing" className="mx-auto max-w-6xl px-5 py-20">
+        <h2 className="text-center text-3xl font-extrabold">Pricing</h2>
+        <p className="mx-auto mt-3 max-w-xl text-center text-ink/75">
+          Teachers start with a free {PILOT_DAYS}-day pilot. Students in a paid class never pay.
+        </p>
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {AUDIENCES.map((a) => (
-            <div key={a.who} className="flex flex-col rounded-3xl border border-line p-7">
-              <span className="self-start rounded-full bg-lemon-soft px-2.5 py-1 text-xs font-bold">{a.price}</span>
-              <h3 className="mt-4 text-lg font-bold tracking-tight">{a.who}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink/60">{a.body}</p>
+          {TIERS.map((t) => (
+            <div key={t.id} className="flex flex-col rounded-2xl border-2 border-lemon bg-white p-7">
+              <h3 className="text-lg font-semibold">{t.who}</h3>
+              <p className="mt-4">
+                <span className="text-4xl font-extrabold">{t.price}</span> <span className="text-ink/70">{t.per}</span>
+              </p>
+              {t.note && <p className="mt-1 font-semibold">{t.note}</p>}
+              <p className="mt-3 leading-relaxed text-ink/75">{t.body}</p>
+              <div className="mt-5 flex-1 rounded-xl bg-canvas p-4">
+                <p className="text-sm font-semibold">How we check</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink/75">{t.verify}</p>
+              </div>
+              <a
+                href={t.id === "student" ? `${STUDENT_URL}/join` : SIGNUP_URL}
+                className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-ink px-4 font-semibold text-white hover:bg-ink/85"
+              >
+                {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}
+              </a>
             </div>
           ))}
         </div>

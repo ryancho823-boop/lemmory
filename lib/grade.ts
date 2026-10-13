@@ -113,3 +113,63 @@ function number(answer: string, input: string): boolean {
   const got = evaluate(input, {});
   return want !== null && got !== null && close(want, got);
 }
+
+/** Shortest input (ignoring spaces) that is checked for typos, so a lone wrong letter isn't hinted. */
+const MIN_TYPO_LENGTH = 3;
+
+/**
+ * Indexes of letters the student typed, skipping LaTeX command names like `\sin`
+ * so a typo fix never edits a command into something else.
+ */
+function letterPositions(latex: string) {
+  const out: number[] = [];
+  for (let i = 0; i < latex.length; i++) {
+    if (latex[i] === "\\") {
+      i++;
+      while (i + 1 < latex.length && /[a-zA-Z]/.test(latex[i + 1])) i++;
+      continue;
+    }
+    if (/[a-zA-Z]/.test(latex[i])) out.push(i);
+  }
+  return out;
+}
+
+/** Every string one letter away from `latex`: one letter swapped, dropped, or added. */
+function oneLetterEdits(latex: string, vars: string[]) {
+  const edits = new Set<string>();
+  const letters = letterPositions(latex);
+  for (const i of letters) {
+    edits.add(latex.slice(0, i) + latex.slice(i + 1));
+    for (const v of vars) if (v !== latex[i]) edits.add(latex.slice(0, i) + v + latex.slice(i + 1));
+  }
+  // Insert a variable at any spot outside a command name.
+  const inCommand = new Set<number>();
+  for (let i = 0; i < latex.length; i++) {
+    if (latex[i] !== "\\") continue;
+    let j = i + 1;
+    while (j < latex.length && /[a-zA-Z]/.test(latex[j])) inCommand.add(j++);
+  }
+  for (let i = 0; i <= latex.length; i++) {
+    if (inCommand.has(i)) continue;
+    for (const v of vars) edits.add(latex.slice(0, i) + v + latex.slice(i));
+  }
+  edits.delete(latex);
+  return [...edits];
+}
+
+/**
+ * When a recall answer is wrong, is it one letter away from right? Catches slips like
+ * typing `b` for `a` or a stray extra letter. Returns the corrected LaTeX, or null.
+ */
+export function findTypo(blank: RecallBlank, input: string): string | null {
+  return scoped(() => {
+    for (const v of Object.keys(blank.vars)) ce().declare(v, "real");
+    const clean = normalize(input);
+    if (clean.replace(/\s+/g, "").length < MIN_TYPO_LENGTH) return null;
+    if (recall(blank, clean)) return null;
+    for (const candidate of oneLetterEdits(clean, Object.keys(blank.vars))) {
+      if (recall(blank, candidate)) return candidate;
+    }
+    return null;
+  });
+}

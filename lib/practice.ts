@@ -1,4 +1,4 @@
-import { FORMULAS, FORMULA_BY_ID, type Formula } from "./formulas";
+import { FORMULAS, FORMULA_BY_ID, type Formula } from "./bank";
 
 export function shuffle<T>(xs: T[]) {
   const a = [...xs];

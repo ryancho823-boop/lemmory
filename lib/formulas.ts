@@ -13,17 +13,23 @@ import { GEOMETRY_2 } from "./content/more/geometry";
 import { NUMBER_THEORY_2 } from "./content/more/numberTheory";
 import { PROBABILITY_2 } from "./content/more/probability";
 import { TRIG_2 } from "./content/more/trig";
-import type { Formula, Topic } from "./content/types";
+import { ALGEBRA_3 } from "./content/extra/algebra";
+import { GEOMETRY_3 } from "./content/extra/geometry";
+import { TRIG_3 } from "./content/extra/trig";
+import type { Formula } from "./content/types";
 
 export * from "./content/types";
 
 export const FORMULAS: Formula[] = [
   ...ALGEBRA,
   ...ALGEBRA_2,
+  ...ALGEBRA_3,
   ...GEOMETRY,
   ...GEOMETRY_2,
+  ...GEOMETRY_3,
   ...TRIG,
   ...TRIG_2,
+  ...TRIG_3,
   ...NUMBER_THEORY,
   ...NUMBER_THEORY_2,
   ...COMBINATORICS,
@@ -35,18 +41,3 @@ export const FORMULAS: Formula[] = [
 ];
 
 export const FORMULA_BY_ID: Record<string, Formula> = Object.fromEntries(FORMULAS.map((f) => [f.id, f]));
-
-/**
- * Topic identity colors, chosen to be clearly different with normal color vision
- * (every pair passes the palette validator's normal-vision floor). Seven hues can't all
- * stay apart under color blindness, so topic names are always shown next to the color.
- */
-export const TOPIC_COLOR: Record<Topic, string> = {
-  Algebra: "#2563eb",
-  Geometry: "#e11d48",
-  Trigonometry: "#16a34a",
-  "Number Theory": "#f59e0b",
-  Combinatorics: "#9333ea",
-  Probability: "#06b6d4",
-  Calculus: "#a16207",
-};

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, RotateCcw } from "lucide-react";
-import { FORMULA_BY_ID } from "@/lib/formulas";
+import { FORMULA_BY_ID } from "@/lib/bank";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
 import { Button, Segmented } from "@/components/ui";
@@ -10,7 +10,7 @@ import { Button, Segmented } from "@/components/ui";
 type Mode = "apply" | "recall";
 
 const PROBLEM = FORMULA_BY_ID["power-of-a-point"].problems[0];
-const OPTIONS = ["stewart", "power-of-a-point", "ptolemy", "inscribed-angle"];
+const OPTIONS = ["law-of-cosines", "power-of-a-point", "pythagorean", "inscribed-angle"];
 
 /** The real review cards, embedded so visitors can try them without opening the demo. */
 export function TryIt() {

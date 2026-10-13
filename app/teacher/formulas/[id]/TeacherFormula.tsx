@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
-import { FORMULA_BY_ID } from "@/lib/formulas";
+import { FORMULA_BY_ID } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { formulaAcrossClass } from "@/lib/analytics";
 import { isMastered } from "@/lib/srs";
@@ -57,10 +57,10 @@ export function TeacherFormula({ id }: { id: string }) {
 
       <StatStrip
         items={[
-          { label: "Right on first try", value: pct(c.accuracy), hint: "Class, last 14 days" },
-          { label: "Recall mode", value: pct(c.recall), hint: "Typing the formula" },
-          { label: "Application mode", value: pct(c.apply), hint: "Spotting it in a problem" },
-          { label: "In application", value: `${c.inApply}/${c.rows.length}`, hint: `${c.mastered} mastered` },
+          { label: "Right on first try", value: pct(c.accuracy), hint: "Whole class, last 14 days." },
+          { label: "Recall mode", value: pct(c.recall), hint: "Typing the formula from memory." },
+          { label: "Application mode", value: pct(c.apply), hint: "Picking it for a problem, then solving." },
+          { label: "In application", value: `${c.inApply}/${c.rows.length}`, hint: `${c.mastered} have mastered it.` },
         ]}
       />
 

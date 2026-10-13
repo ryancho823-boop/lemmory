@@ -1,5 +1,5 @@
 import { FORMULAS, FORMULA_BY_ID } from "../lib/formulas";
-import { gradeRecall, gradeNumber } from "../lib/grade";
+import { gradeRecall, gradeNumber, findTypo } from "../lib/grade";
 import { NOTES } from "../lib/content/notes";
 import katex from "katex";
 let fail = 0;
@@ -36,6 +36,14 @@ const cases: [string, number, string, boolean][] = [
   ["product-rule", 0, "uq+vp", true], ["pythagorean-identity", 0, "\\sin^2x+\\cos^2x", false],
 ];
 for (const [id, i, s, exp] of cases) if (g(id, i, s) !== exp) { fail++; console.log("CASE", id, s, "expected", exp); }
+// One-letter slips get a typo hint; real mistakes and right answers don't.
+const typoCases: [string, number, string, boolean][] = [
+  ["sum-of-cubes", 0, "(a+b)(a^2-ab+c^2)", true], ["sum-of-cubes", 0, "(a+b)(a^2-abb+b^2)", true],
+  ["sum-of-cubes", 0, "(a-b)(a^2+ab+b^2)", false], ["sum-of-cubes", 0, "(a+b)(a^2-ab+b^2)", false],
+  ["double-angle", 1, "1-2\\sin^2y", true], ["double-angle", 1, "1-2\\cos^2x", false],
+];
+for (const [id, i, s, exp] of typoCases)
+  if ((findTypo(FORMULA_BY_ID[id].recall[i], s) !== null) !== exp) { fail++; console.log("TYPO CASE", id, s, "expected", exp); }
 // Every formula needs an explanation and a proof, with balanced, renderable math.
 for (const f of FORMULAS) {
   const n = NOTES[f.id];

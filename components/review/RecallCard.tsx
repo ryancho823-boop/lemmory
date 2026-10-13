@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import type { Formula } from "@/lib/formulas";
-import { gradeRecall } from "@/lib/grade";
+import { findTypo, gradeRecall } from "@/lib/grade";
 import { MathInput, type MathInputHandle } from "@/components/MathInput";
 import { Rich, Tex } from "@/components/Tex";
 import { Button, StageTag, TopicTag } from "@/components/ui";
@@ -11,6 +11,9 @@ import { Button, StageTag, TopicTag } from "@/components/ui";
 export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (correct: boolean) => void }) {
   const [values, setValues] = useState<string[]>(() => formula.recall.map(() => ""));
   const [results, setResults] = useState<boolean[] | null>(null);
+  // Boxes that look one letter off. Each card gets one free retry to fix a slip.
+  const [typos, setTypos] = useState<boolean[] | null>(null);
+  const [typoChecked, setTypoChecked] = useState(false);
   // The toolbar stays under the last-focused box so the layout never jumps mid-click.
   const [active, setActive] = useState(0);
   const inputs = useRef<(MathInputHandle | null)[]>([]);
@@ -18,7 +21,18 @@ export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (cor
 
   const check = (latest = values) => {
     if (results) return onDone(allRight);
-    setResults(formula.recall.map((b, i) => gradeRecall(b, latest[i])));
+    const graded = formula.recall.map((b, i) => gradeRecall(b, latest[i]));
+    if (!typoChecked && !graded.every(Boolean)) {
+      setTypoChecked(true);
+      const found = formula.recall.map((b, i) => !graded[i] && findTypo(b, latest[i]) !== null);
+      if (found.some(Boolean)) {
+        setTypos(found);
+        inputs.current[found.indexOf(true)]?.focus();
+        return;
+      }
+    }
+    setTypos(null);
+    setResults(graded);
   };
 
   return (
@@ -47,7 +61,7 @@ export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (cor
                 disabled={!!results}
                 tools={!results && active === i}
                 onFocus={() => setActive(i)}
-                state={results ? (results[i] ? "right" : "wrong") : "idle"}
+                state={results ? (results[i] ? "right" : "wrong") : typos?.[i] ? "typo" : "idle"}
                 onChange={(v) => setValues((vs) => vs.map((x, j) => (j === i ? v : x)))}
                 onEnter={(v) =>
                   i < formula.recall.length - 1 && !results
@@ -55,6 +69,11 @@ export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (cor
                     : check(values.map((x, j) => (j === i ? v : x)))
                 }
               />
+              {!results && typos?.[i] && (
+                <p role="status" className="mt-1.5 text-sm font-semibold text-lemon-deep">
+                  Close. One letter looks off, so fix the typo and check again.
+                </p>
+              )}
               {results && !results[i] && (
                 <p className="mt-1.5 text-sm text-ink/70">
                   Answer: <Tex math={b.answer} />

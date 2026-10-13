@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpenCheck, CalendarClock, Check, Flame, MousePointerClick, Puzzle, Search, Timer } from "lucide-react";
-import { FORMULAS } from "@/lib/formulas";
+import { TOTAL_FORMULAS } from "@/lib/bank";
 import { Tex } from "@/components/Tex";
 import { DemoCTA } from "@/components/site/SiteChrome";
 import { TryIt } from "@/components/site/TryIt";
@@ -84,7 +84,7 @@ export default function Overview() {
             ["350,000+", "students take the AMC each year"],
             ["~6,000", "qualify for the AIME"],
             ["~500", "reach the USAMO and USAJMO"],
-            [`${FORMULAS.length}`, "formulas, AMC 8 to AIME"],
+            [`${TOTAL_FORMULAS}`, "formulas, AMC 8 to AIME"],
           ].map(([n, l], i) => (
             <div key={l} data-reveal style={{ "--d": `${i * 90}ms` } as React.CSSProperties} className="px-2 py-7 md:px-6">
               <p className="text-3xl font-extrabold tracking-tight">{n}</p>

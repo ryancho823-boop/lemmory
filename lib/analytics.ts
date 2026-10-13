@@ -1,4 +1,4 @@
-import { FORMULA_BY_ID, TOPICS, type Topic } from "./formulas";
+import { FORMULA_BY_ID, TOPICS, type Topic } from "./bank";
 import type { LogEntry, StudentRecord } from "./sim";
 import { type Card, isMastered, retrievability } from "./srs";
 

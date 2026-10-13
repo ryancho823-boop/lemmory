@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Zap } from "lucide-react";
-import { FORMULA_BY_ID, TOPICS, TOPIC_COLOR, type Problem, type Topic } from "@/lib/formulas";
+import { FORMULA_BY_ID, TOPICS, TOPIC_COLOR, type Problem, type Topic } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { setupApply, shuffle } from "@/lib/practice";
 import { isNew } from "@/lib/srs";

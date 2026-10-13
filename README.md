@@ -15,7 +15,7 @@ npm run check   # verify every formula's grading and every problem's answer
 | Route | What it is |
 | --- | --- |
 | `/` | Website: numbers, the problem, mission, how it works (with a live, clickable card), research |
-| `/academies` | What we sell, who it's for, FAQ |
+| `/users` | Who it's for, pricing and how we verify each group, FAQ |
 | `/demo` | Pick the student or teacher view |
 | `/student/*` | Home (start today's cards), deck, Practice all (pre-contest cram, not saved), formula bank, stats, leaderboard |
 | `/teacher/*` | Class overview, assigning formulas, per-formula and per-student analytics, leaderboard where the teacher can start a new game |
@@ -23,9 +23,19 @@ npm run check   # verify every formula's grading and every problem's answer
 Both views share one simulated class, so a review you finish as the student shows up in the teacher view.
 Use **Skip to tomorrow** in the sidebar to watch the scheduler work, and **Reset demo** to start over.
 
+## What the demo includes
+
+The demo is a sales tool, so it only ships a slice of the bank:
+
+- **22 of the 155 formulas** (`DEMO_IDS` in `lib/demo.ts`), with up to 2 problems each. The rest appear in the bank as locked names.
+- `scripts/build-demo-bank.ts` writes that slice to `lib/generated/demo-bank.json` before every `dev` and `build`. The app imports only that file, so the full bank never reaches the browser.
+- **Skip to tomorrow** stops 30 days past the real date (`DEMO_MAX_DAYS`).
+
+The real product (student and teacher sites, accounts, database) is in the separate `lemmory-app` repo.
+
 ## How it works
 
-- **Content** (`lib/content/`): 155 formulas in 7 topics. Each has recall prompts, a "when to use it" note, links to look-alike formulas, and at least 2 practice problems.
+- **Content** (`lib/content/`): 155 formulas in 7 topics (the demo shows 22; see above). Each has recall prompts, a "when to use it" note, links to look-alike formulas, and at least 2 practice problems.
 - **Grading** (`lib/grade.ts`): typed math is checked numerically with [Compute Engine](https://cortexjs.io/compute-engine/), so any equivalent form counts. Each prompt can also ban retyping the left-hand side or require a factored or expanded form.
 - **Scheduling** (`lib/srs.ts`): [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) with default parameters and a 90% target retention. Only the first attempt each day counts toward scheduling; misses come back until the student gets them right. A card moves from recall to application once its stability reaches 10 days.
 - **Points**: 10 per finished assigned card, however many tries it takes, plus a streak bonus for finishing the day's review (+5 per streak day, up to +100). Self-added cards and Practice all earn nothing. The teacher can start a new leaderboard game anytime; streaks and all-time points carry over.

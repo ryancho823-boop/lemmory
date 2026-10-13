@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronRight, Flame } from "lucide-react";
-import { TOPIC_COLOR } from "@/lib/formulas";
+import { TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { byTopic, recent, summary } from "@/lib/analytics";
 import { Avatar, PageHeader, Panel, Skeleton, cx, pct, relDay } from "@/components/ui";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LEVEL_LABEL, TOPIC_COLOR, type Formula, type Topic } from "@/lib/formulas";
+import { LEVEL_LABEL, TOPIC_COLOR, type Formula, type Topic } from "@/lib/bank";
 import type { Stage } from "@/lib/srs";
 import { InfoTip } from "./InfoTip";
 
@@ -15,11 +15,11 @@ export function PanelHeader({ title, sub, info, action }: { title: string; sub?:
   return (
     <div className="flex items-start justify-between gap-3 px-5 pt-5">
       <div className="min-w-0">
-        <h2 className="flex items-center gap-1 text-[15px] font-bold tracking-tight">
+        <h2 className="flex items-center gap-1 text-[17px] font-semibold">
           {title}
           {info && <InfoTip title={title} align="left">{info}</InfoTip>}
         </h2>
-        {sub && <p className="mt-0.5 text-sm text-ink/55">{sub}</p>}
+        {sub && <p className="mt-0.5 text-sm text-ink/70">{sub}</p>}
       </div>
       {action}
     </div>
@@ -30,12 +30,12 @@ export function PageHeader({ eyebrow, title, sub, info, action }: { eyebrow?: st
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        {eyebrow && <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-ink/45">{eyebrow}</p>}
-        <h1 className="flex items-center gap-1.5 text-[28px] font-extrabold leading-tight tracking-tight">
+        {eyebrow && <p className="mb-1 text-sm text-ink/70">{eyebrow}</p>}
+        <h1 className="flex items-center gap-1.5 text-[30px] font-extrabold leading-tight">
           {title}
           {info && <InfoTip title={title} align="left">{info}</InfoTip>}
         </h1>
-        {sub && <p className="mt-1 text-ink/60">{sub}</p>}
+        {sub && <p className="mt-1 text-ink/75">{sub}</p>}
       </div>
       {action}
     </div>
@@ -160,15 +160,21 @@ export function relDay(day: number, today: number) {
   return d > 0 ? `In ${d} days` : `${-d} days ago`;
 }
 
-/** One quiet row of headline numbers, instead of a wall of tiles. */
+/** One quiet row of headline numbers. Any extra detail sits behind an info button. */
 export function StatStrip({ items }: { items: { label: string; value: React.ReactNode; hint?: React.ReactNode }[] }) {
   return (
     <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-line bg-white sm:flex sm:divide-x sm:divide-line">
       {items.map((it) => (
         <div key={it.label} className="flex-1 border-line px-5 py-4 [&:nth-child(-n+2)]:border-b sm:border-b-0">
-          <p className="text-xs font-semibold text-ink/50">{it.label}</p>
-          <p className="mt-1 text-2xl font-extrabold tracking-tight tabular-nums">{it.value}</p>
-          {it.hint && <p className="mt-0.5 text-xs text-ink/45">{it.hint}</p>}
+          <p className="flex items-center gap-0.5 text-sm text-ink/70">
+            {it.label}
+            {it.hint && (
+              <InfoTip title={it.label} align="left">
+                {it.hint}
+              </InfoTip>
+            )}
+          </p>
+          <p className="mt-1 text-[28px] font-extrabold tabular-nums">{it.value}</p>
         </div>
       ))}
     </div>

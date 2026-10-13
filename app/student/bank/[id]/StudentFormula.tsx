@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { FORMULA_BY_ID } from "@/lib/formulas";
+import { FORMULA_BY_ID } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { accuracy } from "@/lib/analytics";
 import { isMastered, isNew } from "@/lib/srs";

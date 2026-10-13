@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/formulas";
+import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { CLASS_NAME, CONTEST, contestLabel } from "@/lib/sim";
+import { CLASS_NAME } from "@/lib/sim";
 import { byTopic, classFormulaHealth, recent, summary } from "@/lib/analytics";
 import { BarList } from "@/components/charts";
 import { Avatar, Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@/components/ui";
@@ -42,7 +42,6 @@ export default function TeacherOverview() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={ready ? contestLabel(today) : CONTEST}
         title={CLASS_NAME}
         sub={
           <span className="inline-flex items-center gap-1.5">
@@ -91,9 +90,8 @@ export default function TeacherOverview() {
                 <li key={s.id}>
                   <Link href={`/teacher/students/${s.id}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas">
                     <Avatar name={s.name} size={30} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{s.name}</span>
-                      <span className="block truncate text-xs text-ink/55">{detail}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold" title={detail}>
+                      {s.name}
                     </span>
                     <span
                       className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${

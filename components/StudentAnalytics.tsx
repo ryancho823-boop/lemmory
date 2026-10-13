@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/formulas";
+import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import {
   type Student,
   byTopic,
@@ -39,18 +39,18 @@ export function StudentAnalytics({
           {
             label: "Day streak",
             value: m.streak,
-            hint: m.doneToday ? "Done today" : "Not done yet today",
+            hint: m.doneToday ? "Today's review is done." : "Today's review isn't done yet.",
           },
-          { label: "Cards reviewed", value: m.reviews14, hint: "Last 14 days" },
+          { label: "Cards reviewed", value: m.reviews14, hint: "In the last 14 days." },
           {
             label: "Right on first try",
             value: pct(m.accuracy),
-            hint: `Recall ${pct(m.recallAccuracy)} · Application ${pct(m.applyAccuracy)}`,
+            hint: `Last 14 days. Recall ${pct(m.recallAccuracy)}, application ${pct(m.applyAccuracy)}.`,
           },
           {
             label: "Mastered",
             value: `${m.mastered}/${m.total}`,
-            hint: `${m.inApply} in application mode`,
+            hint: `${m.inApply} of ${m.total} cards are in application mode.`,
           },
         ]}
       />
@@ -59,11 +59,11 @@ export function StudentAnalytics({
         <Panel>
           <PanelHeader
             title="Needs work"
-            info="Right on the first try less than 70% of the time."
+            info="Right on the first try less than 70% of the time, over the last 4 weeks."
           />
           <ul className="mt-3 divide-y divide-line">
             {weak.length === 0 && (
-              <li className="px-5 py-6 text-sm text-ink/50">
+              <li className="px-5 py-6">
                 Nothing under 70%. Nice work.
               </li>
             )}
@@ -79,18 +79,9 @@ export function StudentAnalytics({
                       className="size-2 shrink-0 rounded-full"
                       style={{ background: TOPIC_COLOR[f.topic] }}
                     />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{f.name}</p>
-                      <p className="text-xs text-ink/50">
-                        Right first try {pct(w.accuracy)} of {w.n}
-                      </p>
-                    </div>
-                    <div className="w-24 text-right">
-                      <Meter value={w.retention} />
-                      <p className="mt-1 text-[11px] text-ink/50">
-                        {pct(w.retention)} recall
-                      </p>
-                    </div>
+                    <span className="min-w-0 flex-1 truncate font-semibold">{f.name}</span>
+                    <Meter value={w.accuracy} className="hidden w-20 xl:block" />
+                    <span className="w-10 text-right tabular-nums">{pct(w.accuracy)}</span>
                   </Link>
                 </li>
               );

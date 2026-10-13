@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { FORMULAS, FORMULA_BY_ID } from "@/lib/formulas";
+import { FORMULAS, FORMULA_BY_ID } from "@/lib/bank";
 import { StudentFormula } from "./StudentFormula";
 
 export function generateStaticParams() {

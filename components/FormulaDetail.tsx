@@ -1,6 +1,5 @@
 import { ChevronDown, Lightbulb, Sigma } from "lucide-react";
-import type { Formula } from "@/lib/formulas";
-import { NOTES } from "@/lib/content/notes";
+import { NOTES, type Formula } from "@/lib/bank";
 import { Rich, Tex } from "./Tex";
 import { LevelTag, Panel, TopicTag } from "./ui";
 
@@ -67,9 +66,6 @@ export function FormulaDetail({ f, aside, actions }: { f: Formula; aside?: React
                 <Rich text={example.solution} /> <b>Answer:</b> <Tex math={example.answer} />
               </p>
             </details>
-            <p className="mt-4 border-t border-line pt-3 text-xs text-ink/45">
-              {f.problems.length} problems rotate through application mode.
-            </p>
           </Panel>
         </div>
         <div className="space-y-5">{aside}</div>

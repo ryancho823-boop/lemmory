@@ -18,6 +18,21 @@ export const TOPICS: Topic[] = [
   "Probability",
   "Calculus",
 ];
+/**
+ * Topic identity colors, chosen to be clearly different with normal color vision
+ * (every pair passes the palette validator's normal-vision floor). Seven hues can't all
+ * stay apart under color blindness, so topic names are always shown next to the color.
+ */
+export const TOPIC_COLOR: Record<Topic, string> = {
+  Algebra: "#2563eb",
+  Geometry: "#e11d48",
+  Trigonometry: "#16a34a",
+  "Number Theory": "#f59e0b",
+  Combinatorics: "#9333ea",
+  Probability: "#06b6d4",
+  Calculus: "#a16207",
+};
+
 export const LEVELS: Level[] = ["AMC 8", "AMC 10", "AMC 12", "AIME", "Calculus"];
 
 /** "Calculus" covers the calculus rounds at tournaments like SMT and BMT. */

@@ -51,7 +51,7 @@ interface Props {
   tools?: boolean;
   autoFocus?: boolean;
   placeholder?: string;
-  state?: "idle" | "right" | "wrong";
+  state?: "idle" | "right" | "wrong" | "typo";
 }
 
 /** Desmos-style math input: type `/` for a fraction, `sqrt` for a root, `^` for powers. No LaTeX needed. */
@@ -117,6 +117,8 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
       ? "border-good bg-good/5"
       : state === "wrong"
         ? "border-bad bg-bad/5"
+        : state === "typo"
+          ? "border-warn bg-warn/5 focus-within:shadow-[0_0_0_4px_rgb(250_178_25/0.3)]"
         : "border-line bg-white focus-within:border-ink focus-within:shadow-[0_0_0_4px_rgb(255_212_59/0.35)]";
 
   return (

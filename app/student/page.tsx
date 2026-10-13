@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Flame } from "lucide-react";
-import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/formulas";
+import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CONTEST, contestLabel, YOU } from "@/lib/sim";
 import { streak, streakBonus, weakest } from "@/lib/analytics";
 import { isNew } from "@/lib/srs";
+import { InfoTip } from "@/components/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Button, Meter, Panel, PanelHeader, Skeleton, pct } from "@/components/ui";
 
@@ -23,39 +24,32 @@ export default function StudentHome() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-sm font-semibold text-ink/45">{ready ? contestLabel(today) : CONTEST}</p>
-        <h1 className="text-[28px] font-extrabold tracking-tight">Hi, {YOU.name.split(" ")[0]}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h1 className="text-[32px] font-extrabold">Hi, {YOU.name.split(" ")[0]}</h1>
+        <p className="rounded-full border border-line bg-white px-3 py-1 text-sm">{ready ? contestLabel(today) : CONTEST}</p>
       </div>
 
       {/* Do your cards */}
-      <section className="relative overflow-hidden rounded-3xl border border-lemon/60 bg-lemon-soft p-6 sm:p-8">
-        <div className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-lemon/50 blur-3xl" />
-        <div className="relative flex flex-wrap items-center justify-between gap-6">
+      <section className="rounded-2xl border border-lemon bg-lemon-soft p-6 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-6">
           {doneToday ? (
             <div className="flex items-center gap-4">
               <CheckCircle2 size={44} className="text-good" />
               <div>
-                <p className="text-2xl font-extrabold tracking-tight">{nothingDue ? "Nothing due today" : "You're done for today"}</p>
-                <p className="text-ink/60">
-                  {nothingDue
-                    ? `Your cards will come back when you need them. ${s}-day streak.`
-                    : `${s}-day streak. Come back tomorrow to keep it going.`}
-                </p>
+                <p className="text-2xl font-extrabold">{nothingDue ? "Nothing due today" : "You're done for today"}</p>
+                <p className="text-ink/75">{s}-day streak</p>
               </div>
             </div>
           ) : (
             <div>
-              <p className="text-sm font-bold text-lemon-deep">Do your cards</p>
-              <p className="mt-1 text-4xl font-extrabold tracking-tight">{queue.length} cards today</p>
-              <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-ink/60">
-                <span>About {Math.max(2, Math.round(queue.length * 0.5))} min</span>
-                <span>·</span>
-                <span>{fresh} new</span>
-                <span>·</span>
-                <span className="flex items-center gap-1 font-semibold text-ink/75">
-                  <Flame size={15} className="text-lemon-deep" /> +{bonus} streak bonus
-                </span>
+              <p className="flex items-center gap-1 text-4xl font-extrabold">
+                {queue.length} cards today
+                <InfoTip title="Today's cards" align="left">
+                  About {Math.max(2, Math.round(queue.length * 0.5))} minutes, {fresh} of them new.
+                </InfoTip>
+              </p>
+              <p className="mt-1.5 flex items-center gap-1 text-ink/75">
+                <Flame size={16} className="text-lemon-deep" /> +{bonus} streak bonus
               </p>
             </div>
           )}
@@ -67,11 +61,11 @@ export default function StudentHome() {
         </div>
       </section>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Panel>
           <PanelHeader
             title="Focus on these"
-            info="Formulas you get right on the first try less than 70% of the time."
+            info="Formulas you get right on the first try less than 70% of the time. The percent is how likely you are to remember each one today."
             action={
               <Link href="/student/stats" className="text-sm font-semibold text-ink/50 hover:text-ink">
                 My stats
@@ -79,21 +73,18 @@ export default function StudentHome() {
             }
           />
           <ul className="mt-3 divide-y divide-line">
-            {weak.length === 0 && <li className="px-5 py-6 text-sm text-ink/50">Nothing under 70%. Nice work.</li>}
+            {weak.length === 0 && <li className="px-5 py-6">Nothing under 70%. Nice work.</li>}
             {weak.map((w) => {
               const f = FORMULA_BY_ID[w.formulaId];
               return (
                 <li key={w.formulaId}>
                   <Link href={`/student/bank/${f.id}`} className="flex items-center gap-4 px-5 py-3.5 hover:bg-canvas">
                     <span className="size-2 shrink-0 rounded-full" style={{ background: TOPIC_COLOR[f.topic] }} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{f.name}</span>
-                      <span className="text-xs text-ink/50">{f.topic}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold" title={f.topic}>
+                      {f.name}
                     </span>
-                    <span className="w-24 text-right">
-                      <Meter value={w.retention} />
-                      <span className="mt-1 block text-[11px] text-ink/50">{pct(w.retention)} recall</span>
-                    </span>
+                    <Meter value={w.retention} className="hidden w-20 xl:block" />
+                    <span className="w-10 text-right tabular-nums">{pct(w.retention)}</span>
                   </Link>
                 </li>
               );

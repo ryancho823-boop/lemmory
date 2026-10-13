@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { X } from "lucide-react";
-import { FORMULAS, FORMULA_BY_ID, TOPICS, TOPIC_COLOR } from "@/lib/formulas";
+import { FORMULAS, FORMULA_BY_ID, TOPICS, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { type Card, mastery } from "@/lib/srs";
 import { Button, PageHeader, Segmented, Skeleton } from "@/components/ui";

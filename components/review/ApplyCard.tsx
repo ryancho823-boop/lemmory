@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
-import { FORMULA_BY_ID, type Problem } from "@/lib/formulas";
+import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { gradeNumber } from "@/lib/grade";
 import { MathInput } from "@/components/MathInput";
 import { Rich, Tex } from "@/components/Tex";
@@ -92,10 +92,18 @@ export function ApplyCard({ problem, options, onDone }: Props) {
           <span className="text-ink/60">
             <Rich text={FORMULA_BY_ID[problem.uses[0]].whenToUse} />
           </span>
+          {!pickRight && <span className="mt-1 block text-ink/60">This one will come back later.</span>}
         </p>
       )}
 
-      {pickRight !== null && (
+      {/* The wrong formula ends the card: no solving, and it comes back later. */}
+      {pickRight === false && (
+        <Button size="lg" className="rise mt-4" onClick={() => onDone(false, wrongPicks.length ? wrongPicks : undefined)}>
+          Continue
+        </Button>
+      )}
+
+      {pickRight && (
         <div className="rise">
           <div className="mt-8 flex items-center gap-2">
             <Step n={2} done={solveRight !== null} />

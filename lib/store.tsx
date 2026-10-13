@@ -4,11 +4,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { type Competition, type Student, pointsBetween } from "./analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "./srs";
+import { DEMO_MAX_DAYS } from "./demo";
 
 // Demo persistence: the demo student's data lives in localStorage; classmates are
 // re-simulated from the assignments. Swap for an API + database for real classes.
 
-const KEY = "lemmory:v3";
+const KEY = "lemmory:v4";
 
 interface Session {
   day: number;
@@ -269,6 +270,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const nextDay = useCallback(
     () =>
       setState((s) => {
+        if (s.dayOffset >= DEMO_MAX_DAYS) return s;
         const t = realToday() + s.dayOffset;
         // Record how many assigned cards were left undone before the day rolls over.
         const left = s.doneDays.includes(t)
