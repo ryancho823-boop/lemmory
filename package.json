@@ -7,12 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n site,app -c yellow,blue \"npm run dev -w @lemmory/site\" \"npm run dev -w @lemmory/app\"",
+    "dev": "concurrently -n site,student,teacher -c yellow,green,blue \"npm run dev -w @lemmory/site\" \"npm run dev -w @lemmory/student\" \"npm run dev -w @lemmory/teacher\"",
     "dev:site": "npm run dev -w @lemmory/site",
-    "dev:app": "npm run dev -w @lemmory/app",
-    "build": "npm run build -w @lemmory/site && npm run build -w @lemmory/app",
-    "lint": "npm run lint -w @lemmory/site && npm run lint -w @lemmory/app",
-    "typecheck": "tsc --noEmit -p apps/site && tsc --noEmit -p apps/app",
+    "dev:student": "npm run dev -w @lemmory/student",
+    "dev:teacher": "npm run dev -w @lemmory/teacher",
+    "build": "npm run build -w @lemmory/site && npm run build -w @lemmory/student && npm run build -w @lemmory/teacher",
+    "lint": "npm run lint -w @lemmory/site && npm run lint -w @lemmory/student && npm run lint -w @lemmory/teacher",
+    "typecheck": "tsc --noEmit -p apps/site && tsc --noEmit -p apps/student && tsc --noEmit -p apps/teacher",
     "check": "npm run check -w @lemmory/core",
     "db:generate": "npm run generate -w @lemmory/db",
     "db:migrate": "npm run migrate -w @lemmory/db",

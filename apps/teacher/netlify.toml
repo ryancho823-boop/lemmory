@@ -1,0 +1,12 @@
+# The teacher site. Create its Netlify site with Base directory = apps/teacher
+# (Netlify then reads this file and ignores the netlify.toml at the repo root).
+# Suggested Netlify site name: lemmory-teacher
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Set in Netlify (Site configuration > Environment variables), never in this file:
+  #   DATABASE_URL         libsql://<your-database>.turso.io
+  #   DATABASE_AUTH_TOKEN  the token from the Turso dashboard

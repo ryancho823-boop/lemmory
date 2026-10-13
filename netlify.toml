@@ -1,5 +1,5 @@
-# Netlify reads this file automatically, so nothing needs to be set in the Netlify
-# dashboard. It builds the main site and demo (apps/site). The settings for that
-# folder (build command, publish folder) are in apps/site/netlify.toml.
+# The main site's Netlify settings (the existing "lemmory" site, with no base directory
+# set in Netlify). The teacher and student sites set their own Base directory
+# (apps/teacher, apps/student) and use the netlify.toml in that folder instead.
 [build]
   base = "apps/site"

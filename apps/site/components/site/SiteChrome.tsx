@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
 import { cx } from "@/components/ui";
-import { LOGIN_URL, SIGNUP_URL } from "@/lib/links";
+import { SIGNUP_URL } from "@/lib/links";
 
 const TABS = [
   { href: "/", label: "Overview" },
@@ -35,9 +35,9 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <a href={LOGIN_URL} className="hidden h-10 items-center rounded-xl px-3 text-sm font-semibold text-ink/70 hover:bg-ink/5 hover:text-ink sm:inline-flex">
+          <Link href="/login" className="hidden h-10 items-center rounded-xl px-3 text-sm font-semibold text-ink/70 hover:bg-ink/5 hover:text-ink sm:inline-flex">
             Log in
-          </a>
+          </Link>
           <Link href="/demo" className="hidden h-10 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold hover:border-ink/30 sm:inline-flex">
             Live demo
           </Link>
