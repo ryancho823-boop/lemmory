@@ -14,11 +14,13 @@ interface Props {
   academy: { perStudent: number; body: string };
   club: { perStudent: number; classCap: number; body: string };
   current: Kind | null;
+  /** The free pilot can be used once. */
+  pilot: "available" | "current" | "used";
   /** Students across the teacher's classes, for the cost estimate. */
   students: number;
 }
 
-export function PlanPicker({ formulaCount, pilotDays, academy, club, current, students }: Props) {
+export function PlanPicker({ formulaCount, pilotDays, academy, club, current, pilot, students }: Props) {
   const [open, setOpen] = useState<"academy" | "club" | null>(null);
   const [pending, start] = useTransition();
   const included = [`All ${formulaCount} formulas`, "Unlimited classes and assigning", "Class and student analytics", "Leaderboard games"];
@@ -31,10 +33,10 @@ export function PlanPicker({ formulaCount, pilotDays, academy, club, current, st
           price="$0"
           per={`for ${pilotDays} days`}
           body="Try it with a real class before you decide."
-          active={current === "pilot"}
+          active={pilot === "current"}
           action={
-            <Button variant="outline" className="w-full" disabled={pending || current === "pilot"} onClick={() => start(() => startPilotAction())}>
-              {current === "pilot" ? "Current plan" : "Start free pilot"}
+            <Button variant="outline" className="w-full" disabled={pending || pilot !== "available"} onClick={() => start(() => startPilotAction())}>
+              {pilot === "current" ? "Current plan" : pilot === "used" ? "Already used" : "Start free pilot"}
             </Button>
           }
         />

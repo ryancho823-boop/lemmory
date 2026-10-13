@@ -14,7 +14,7 @@ export const PRICES = {
   student: { label: "Individual", monthly: 2, body: "Your own deck and daily review, with the full formula bank." },
 } as const;
 
-export const PILOT_DAYS = 30;
+export const PILOT_DAYS = 14;
 
 /**
  * Monthly cost, or null during a pilot. Academies pay per student, counting a student in
@@ -43,8 +43,31 @@ export async function getPlan(teacherId: string) {
   return (await db.select().from(plans).where(eq(plans.teacherId, teacherId)).get()) ?? null;
 }
 
+type PlanRow = typeof plans.$inferSelect;
+
+/**
+ * Where a teacher's plan stands right now:
+ * - "none": hasn't picked a plan yet
+ * - "pilot": on the free pilot (or a club waiting to be verified), until `endsAt`
+ * - "active": paid academy, or a verified club
+ * - "expired": the pilot ran out (or the club wasn't confirmed) and nothing's paid
+ */
+export function planState(plan: PlanRow | null, now = new Date()): { state: "none" | "pilot" | "active" | "expired"; endsAt: Date | null } {
+  if (!plan) return { state: "none", endsAt: null };
+  if (plan.kind === "academy" && plan.paidAt) return { state: "active", endsAt: null };
+  if (plan.kind === "club" && plan.clubStatus === "verified") return { state: "active", endsAt: null };
+  if (plan.kind === "club" && plan.clubStatus === "rejected") return { state: "expired", endsAt: plan.pilotEndsAt };
+  const live = !!plan.pilotEndsAt && plan.pilotEndsAt > now;
+  return { state: live ? "pilot" : "expired", endsAt: plan.pilotEndsAt };
+}
+
+/** A teacher gets one free pilot. Its end date is kept even after they switch plans. */
+export const pilotUsed = (plan: PlanRow | null) => !!plan?.pilotEndsAt;
+
 async function save(teacherId: string, values: Partial<typeof plans.$inferInsert> & { kind: PlanKind }) {
-  const row = { pilotEndsAt: null, paidAt: null, orgName: null, schoolEmail: null, clubStatus: null, ...values };
+  // Keep the pilot's end date across plan changes, so the pilot can't be restarted.
+  const existing = await getPlan(teacherId);
+  const row = { paidAt: null, orgName: null, schoolEmail: null, clubStatus: null, pilotEndsAt: existing?.pilotEndsAt ?? null, ...values };
   await db
     .insert(plans)
     .values({ teacherId, ...row })
@@ -53,8 +76,11 @@ async function save(teacherId: string, values: Partial<typeof plans.$inferInsert
 
 const pilotEnd = () => new Date(Date.now() + PILOT_DAYS * 86_400_000);
 
+/** Start the one free pilot. Returns false if this teacher already had it. */
 export async function startPilot(teacherId: string) {
+  if (pilotUsed(await getPlan(teacherId))) return false;
   await save(teacherId, { kind: "pilot", pilotEndsAt: pilotEnd() });
+  return true;
 }
 
 /** Simulated checkout for an academy. */
@@ -67,7 +93,21 @@ export async function checkoutAcademy(teacherId: string, orgName: string) {
  * confirms the club with the school (scripts/verify-club.ts).
  */
 export async function requestClub(teacherId: string, orgName: string, schoolEmail: string) {
-  await save(teacherId, { kind: "club", orgName, schoolEmail: schoolEmail.trim().toLowerCase(), clubStatus: "pending", pilotEndsAt: pilotEnd() });
+  // While the school is being checked, the club runs on its pilot (starting one if needed).
+  const existing = await getPlan(teacherId);
+  await save(teacherId, {
+    kind: "club",
+    orgName,
+    schoolEmail: schoolEmail.trim().toLowerCase(),
+    clubStatus: "pending",
+    pilotEndsAt: existing?.pilotEndsAt ?? pilotEnd(),
+  });
+}
+
+/** Can students in this teacher's classes do their reviews? */
+export async function teacherActive(teacherId: string) {
+  const { state } = planState(await getPlan(teacherId));
+  return state === "active" || state === "pilot";
 }
 
 export async function getStudentPlan(studentId: string) {

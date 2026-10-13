@@ -40,4 +40,4 @@ export const TIERS: Tier[] = [
   },
 ];
 
-export const PILOT_DAYS = 30;
+export const PILOT_DAYS = 14;

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Logo } from "@lemmory/ui/Shell";
 import { Panel } from "@lemmory/ui/ui";
-import { getClasses } from "@/lib/session";
+import { getClasses, requirePlan } from "@/lib/session";
 import { createClassAction } from "../../actions";
 import { ClassForm } from "../ClassForm";
 import { LogoutButton } from "../LogoutButton";
@@ -10,6 +10,7 @@ import { LogoutButton } from "../LogoutButton";
 export const metadata = { title: "New class · Lemmory for teachers" };
 
 export default async function NewClass() {
+  await requirePlan();
   const classes = await getClasses();
   return (
     <div className="min-h-screen bg-canvas">

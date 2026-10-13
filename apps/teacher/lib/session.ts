@@ -3,11 +3,23 @@ import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import { currentUser } from "@lemmory/db/auth";
 import { NotFound, listClasses, loadTeacherClass } from "@lemmory/db/teacher";
+import { getPlan, planState } from "@lemmory/db/billing";
 
 /** The signed-in teacher, or a redirect to the login page. */
 export const requireTeacher = cache(async () => {
   const user = await currentUser("teacher");
   if (!user) redirect("/login");
+  return user;
+});
+
+/**
+ * The signed-in teacher, if their plan lets them use Lemmory right now. New teachers and
+ * teachers whose free pilot ended are sent to the plan page.
+ */
+export const requirePlan = cache(async () => {
+  const user = await requireTeacher();
+  const { state } = planState(await getPlan(user.id));
+  if (state === "none" || state === "expired") redirect("/plan");
   return user;
 });
 

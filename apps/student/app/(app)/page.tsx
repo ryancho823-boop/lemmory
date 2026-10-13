@@ -34,7 +34,15 @@ export default async function StudentHome() {
         </Panel>
       )}
 
+      {!v.canReview && (
+        <Panel className="border-2 border-lemon p-6">
+          <p className="text-xl font-extrabold">Your class&apos;s free trial has ended</p>
+          <p className="mt-1 text-ink/75">Ask your teacher to pick a plan. Your cards and progress are saved and will be here when it&apos;s back.</p>
+        </Panel>
+      )}
+
       {/* Do your cards */}
+      {v.canReview && (
       <section className="rounded-2xl border border-lemon bg-lemon-soft p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-6">
           {v.doneToday ? (
@@ -67,6 +75,7 @@ export default async function StudentHome() {
           )}
         </div>
       </section>
+      )}
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Panel>

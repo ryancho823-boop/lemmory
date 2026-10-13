@@ -35,15 +35,16 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <Link href="/login" className="hidden h-10 items-center rounded-xl px-3 text-sm font-semibold text-ink/70 hover:bg-ink/5 hover:text-ink sm:inline-flex">
-            Log in
-          </Link>
           <Link href="/demo" className="hidden h-10 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold hover:border-ink/30 sm:inline-flex">
             Live demo
           </Link>
-          <a href={SIGNUP_URL} className="inline-flex h-10 items-center gap-2 rounded-xl bg-lemon px-4 text-sm font-bold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105">
-            Sign up <ArrowRight size={16} />
-          </a>
+          {/* One way in: the login page sends people without an account to sign up. */}
+          <Link
+            href="/login"
+            className="inline-flex h-10 items-center gap-2 rounded-xl bg-lemon px-4 text-sm font-bold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105"
+          >
+            Log in <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
       <nav className="flex gap-1 overflow-x-auto px-4 pb-2.5 md:hidden">

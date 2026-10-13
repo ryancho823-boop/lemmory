@@ -1,5 +1,5 @@
 import { ArrowRight, GraduationCap, UserRound } from "lucide-react";
-import { JOIN_URL, STUDENT_URL, TEACHER_URL } from "@/lib/links";
+import { STUDENT_URL, TEACHER_URL } from "@/lib/links";
 
 export const metadata = { title: "Log in · Lemmory" };
 
@@ -24,11 +24,8 @@ export default function LoginChooser() {
         ))}
       </div>
       <p className="mt-8 text-center text-ink/70">
-        Students without an account: ask your teacher for the class code, then{" "}
-        <a href={JOIN_URL} className="font-semibold text-ink underline">
-          join your class
-        </a>
-        .
+        No account yet? Pick one anyway. If we can&apos;t find you, we&apos;ll take you straight to sign-up. Students need a class code
+        from their teacher.
       </p>
     </section>
   );

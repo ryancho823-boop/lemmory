@@ -25,7 +25,7 @@ async function main() {
   if (!user) throw new Error(`No teacher with email ${email}`);
   await db
     .update(plans)
-    .set(reject ? { clubStatus: "rejected" } : { clubStatus: "verified", paidAt: new Date(), pilotEndsAt: null })
+    .set(reject ? { clubStatus: "rejected" } : { clubStatus: "verified", paidAt: new Date() })
     .where(and(eq(plans.teacherId, user.id), eq(plans.kind, "club")));
   console.log(reject ? `Rejected club pricing for ${email}.` : `Verified the club for ${email}. Club pricing now applies.`);
 }

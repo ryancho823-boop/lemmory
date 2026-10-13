@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
-import { checkLogin, createStudent } from "@lemmory/db/accounts";
+import { accountExists, checkLogin, createStudent } from "@lemmory/db/accounts";
 import { currentUser, endSession, startSession } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutStudent } from "@lemmory/db/billing";
@@ -23,6 +23,9 @@ import {
 } from "@lemmory/db/student";
 
 // Server actions are public endpoints: every one checks the session and its arguments.
+
+/** Carries the username from a failed login to the join form, without putting it in the URL. */
+const SIGNUP_HINT = "lemmory_signup_username";
 
 export type FormState = { error?: string; values?: Record<string, string> } | undefined;
 
@@ -51,7 +54,14 @@ const field = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const username = field(fd, "username");
   const id = await checkLogin("student", username, String(fd.get("password") ?? ""));
-  if (!id) return { error: "That username and password don't match.", values: { username } };
+  if (!id) {
+    // No account with that username: go join a class, with the username already filled in.
+    if (username && !(await accountExists("student", username))) {
+      (await cookies()).set(SIGNUP_HINT, username.toLowerCase(), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
+      redirect("/join?new=1");
+    }
+    return { error: "That password isn't right for this username.", values: { username } };
+  }
   await startSession(id, "student");
   redirect("/");
 }

@@ -3,14 +3,13 @@ import { redirect } from "next/navigation";
 import { ChevronRight, Plus } from "lucide-react";
 import { Logo } from "@lemmory/ui/Shell";
 import { Button, Panel } from "@lemmory/ui/ui";
-import { getPlan } from "@lemmory/db/billing";
-import { getClasses, requireTeacher } from "@/lib/session";
+import { getClasses, requirePlan } from "@/lib/session";
 import { LogoutButton } from "./LogoutButton";
 
 export default async function Classes() {
-  const [me, classes] = await Promise.all([requireTeacher(), getClasses()]);
-  // New teachers pick a plan, then make their first class.
-  if (!(await getPlan(me.id))) redirect("/plan");
+  // New teachers (and ones whose pilot ended) pick a plan first, then make their first class.
+  const me = await requirePlan();
+  const classes = await getClasses();
   if (classes.length === 0) redirect("/new");
   if (classes.length === 1) redirect(`/c/${classes[0].id}`);
   return (

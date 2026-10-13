@@ -1,9 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { checkLogin, createTeacher } from "@lemmory/db/accounts";
+import { accountExists, checkLogin, createTeacher } from "@lemmory/db/accounts";
 import { currentUser, endSession, startSession } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutAcademy, requestClub, schoolEmailProblem, startPilot } from "@lemmory/db/billing";
@@ -22,6 +23,9 @@ import {
 
 // Server actions are public endpoints: every one checks the session, and the db layer
 // checks that the class belongs to this teacher.
+
+/** Carries the email from a failed login to the sign-up form, without putting it in the URL. */
+const SIGNUP_HINT = "lemmory_signup_email";
 
 export type FormState = { error?: string; ok?: string; values?: Record<string, string> } | undefined;
 
@@ -43,7 +47,14 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const email = field(fd, "email");
   const id = await checkLogin("teacher", email, String(fd.get("password") ?? ""));
-  if (!id) return { error: "That email and password don't match.", values: { email } };
+  if (!id) {
+    // No account with that email: go make one, with the email already filled in.
+    if (email && !(await accountExists("teacher", email))) {
+      (await cookies()).set(SIGNUP_HINT, email, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
+      redirect("/signup?new=1");
+    }
+    return { error: "That password isn't right for this email.", values: { email } };
+  }
   await startSession(id, "teacher");
   redirect("/");
 }
@@ -69,7 +80,8 @@ export async function logout() {
 // ── plan ──
 
 export async function startPilotAction() {
-  await startPilot(await me());
+  // The pilot can only be used once; if it's been used, the plan page says so.
+  if (!(await startPilot(await me()))) redirect("/plan");
   redirect("/");
 }
 

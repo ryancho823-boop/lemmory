@@ -35,3 +35,14 @@ export async function checkLogin(role: "teacher" | "student", login: string, pas
   const ok = await verifyPassword(password, user?.hash ?? (await DUMMY));
   return ok && user && user.role === role ? user.id : null;
 }
+
+/** Is there an account with this login (email for teachers, username for students)? */
+export async function accountExists(role: "teacher" | "student", login: string) {
+  const key = login.trim().toLowerCase();
+  const user = await db
+    .select({ role: users.role })
+    .from(users)
+    .where(role === "teacher" ? eq(users.email, key) : eq(users.username, key))
+    .get();
+  return user?.role === role;
+}

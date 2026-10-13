@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { FORMULAS } from "@lemmory/core/formulas";
-import { PILOT_DAYS, PRICES, getPlan, monthlyCost } from "@lemmory/db/billing";
+import { PILOT_DAYS, PRICES, getPlan, monthlyCost, pilotUsed, planState } from "@lemmory/db/billing";
 import { Logo } from "@lemmory/ui/Shell";
 import { uniqueStudents } from "@lemmory/db/teacher";
 import { getClasses, requireTeacher } from "@/lib/session";
@@ -17,10 +17,13 @@ export default async function PlanPage() {
   const [plan, classes, students] = await Promise.all([getPlan(me.id), getClasses(), uniqueStudents(me.id)]);
   const sizes = classes.map((c) => c.students);
   const cost = plan ? monthlyCost(plan.kind, plan.clubStatus === "verified", sizes, students) : null;
+  const { state } = planState(plan);
 
   const status = !plan
     ? null
-    : plan.kind === "pilot"
+    : state === "expired" && plan.kind !== "club"
+      ? `Your free pilot ended on ${fmt(plan.pilotEndsAt)}. Pick a plan to keep going. Your classes and your students' progress are saved.`
+      : plan.kind === "pilot"
       ? `Free pilot until ${fmt(plan.pilotEndsAt)}.`
       : plan.kind === "academy"
         ? `Academy plan for ${plan.orgName}. ${students} students right now: $${cost} a month.`
@@ -28,7 +31,9 @@ export default async function PlanPage() {
           ? `School club plan for ${plan.orgName}, verified. ${students} students right now: $${cost} a month.`
           : plan.clubStatus === "rejected"
             ? `We couldn't confirm ${plan.orgName} as a school club. Choose the academy plan to keep going.`
-            : `Club pricing for ${plan.orgName} is waiting on verification. We'll confirm with ${plan.schoolEmail}. You're on a free pilot until ${fmt(plan.pilotEndsAt)}.`;
+            : state === "expired"
+              ? `Club pricing for ${plan.orgName} is still waiting on verification, and your free pilot ended on ${fmt(plan.pilotEndsAt)}. Choose the academy plan to keep going for now.`
+              : `Club pricing for ${plan.orgName} is waiting on verification. We'll confirm with ${plan.schoolEmail}. You're on a free pilot until ${fmt(plan.pilotEndsAt)}.`;
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -37,7 +42,7 @@ export default async function PlanPage() {
         <LogoutButton />
       </header>
       <main className="mx-auto max-w-5xl px-5 pb-20">
-        {plan && (
+        {plan && state !== "expired" && (
           <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-ink/60 hover:text-ink">
             <ArrowLeft size={15} /> {classes.length ? "Back to your classes" : "Continue"}
           </Link>
@@ -50,6 +55,7 @@ export default async function PlanPage() {
           academy={PRICES.academy}
           club={PRICES.club}
           current={plan?.kind ?? null}
+          pilot={state === "pilot" && plan?.kind === "pilot" ? "current" : pilotUsed(plan) ? "used" : "available"}
           students={students}
         />
       </main>

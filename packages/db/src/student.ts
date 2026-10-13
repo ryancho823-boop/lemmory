@@ -20,6 +20,7 @@ import {
 import type { StudentRecord } from "@lemmory/core/records";
 import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } from "@lemmory/core/session";
 import { isNew, newCard, review } from "@lemmory/core/srs";
+import { getStudentPlan, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, loadClass, loadRecords, settle } from "./records";
 import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
@@ -45,12 +46,25 @@ export interface StudentView {
   completedToday: number;
   doneToday: boolean;
   nothingDue: boolean;
+  /** False when every class's free pilot has ended unpaid: the student can't start reviews. */
+  canReview: boolean;
+}
+
+/**
+ * Can this student do reviews? Yes if any of their classes is on an active plan or pilot,
+ * if they pay for themselves, or if they aren't in a class (their own deck is free).
+ */
+export async function canStudentReview(studentId: string) {
+  const mine = await studentClasses(studentId);
+  if (!mine.length || (await getStudentPlan(studentId))) return true;
+  for (const teacherId of new Set(mine.map((c) => c.teacherId))) if (await teacherActive(teacherId)) return true;
+  return false;
 }
 
 /** The student's classes, oldest first. */
 export async function studentClasses(studentId: string, q: Tx | typeof db = db) {
   return q
-    .select({ id: classes.id, name: classes.name, timezone: classes.timezone, settledThrough: enrollments.settledThrough })
+    .select({ id: classes.id, name: classes.name, timezone: classes.timezone, teacherId: classes.teacherId, settledThrough: enrollments.settledThrough })
     .from(enrollments)
     .innerJoin(classes, eq(classes.id, enrollments.classId))
     .where(eq(enrollments.studentId, studentId))
@@ -84,6 +98,7 @@ export async function loadStudentView(user: { id: string; name: string; username
       queue: isDoneToday(record, today) ? [] : buildQueue(record.cards, session, today),
       completedToday: session.completed.length,
       doneToday: isDoneToday(record, today),
+      canReview: true,
       nothingDue: nothingDue(record, today),
     };
   }
@@ -105,6 +120,7 @@ export async function loadStudentView(user: { id: string; name: string; username
     queue: done ? [] : buildQueue(me.cards, session, today),
     completedToday: session.completed.length,
     doneToday: done,
+    canReview: await canStudentReview(user.id),
     nothingDue: nothingDue(me, today),
   };
 }
@@ -146,6 +162,8 @@ function formula(id: string) {
 /** The card to show next. In review mode it must be one of today's cards. */
 export async function promptFor(studentId: string, formulaId: string, mode: Mode): Promise<Prompt> {
   const f = formula(formulaId);
+  if (mode === "review" && !(await canStudentReview(studentId)))
+    throw new ReviewError("Your class's free trial has ended. Ask your teacher to pick a plan.");
   return db.transaction(async (q) => {
     const { today, record, session } = await context(q, studentId);
     const card = record.cards[formulaId];
