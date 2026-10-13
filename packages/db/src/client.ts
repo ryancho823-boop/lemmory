@@ -6,13 +6,17 @@ import { createClient as createWebClient } from "@libsql/client/web";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
+/** Values pasted into a host's dashboard often pick up spaces, line breaks or quotes. */
+export const cleanEnv = (v: string | undefined) => v?.trim().replace(/^["']+|["']+$/g, "").trim() || undefined;
+
 /**
  * Local development uses a SQLite file shared by the student and teacher sites. In
  * production, point DATABASE_URL at a hosted libSQL database (Turso) and set
  * DATABASE_AUTH_TOKEN. The default path is relative to the working directory, which is
  * apps/<app> or packages/<pkg> when run through npm workspaces.
  */
-export const DATABASE_URL = process.env.DATABASE_URL ?? "file:../../data/lemmory.db";
+export const DATABASE_URL = cleanEnv(process.env.DATABASE_URL) ?? "file:../../data/lemmory.db";
+const DATABASE_AUTH_TOKEN = cleanEnv(process.env.DATABASE_AUTH_TOKEN);
 
 function localClient(): Client {
   try {
@@ -30,7 +34,7 @@ function localClient(): Client {
 function connect() {
   const client = DATABASE_URL.startsWith("file:")
     ? localClient()
-    : createWebClient({ url: DATABASE_URL, authToken: process.env.DATABASE_AUTH_TOKEN });
+    : createWebClient({ url: DATABASE_URL, authToken: DATABASE_AUTH_TOKEN });
   return drizzle(client, { schema });
 }
 
