@@ -1,11 +1,10 @@
-# Netlify site 1: the main site and demo (lemmory.com).
-# In Netlify, set "Base directory" to the repo root (leave it blank) and
-# "Package directory" to apps/site. This file is read from the package directory.
+# The main site and demo. Netlify starts in this folder (see the netlify.toml at the
+# repo root); `npm install` here installs the whole workspace from the repo root.
 [build]
-  command = "npm run build -w @lemmory/site"
-  publish = "apps/site/.next"
+  command = "npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
-  # Set NEXT_PUBLIC_APP_URL in Netlify (Site settings > Environment variables) to the app's
-  # address, e.g. https://app.lemmory.com, so Sign up / Log in point at it.
+  # Later, when the app is online: set NEXT_PUBLIC_APP_URL in Netlify (Site configuration >
+  # Environment variables) so Sign up / Log in go to it instead of /get-started.

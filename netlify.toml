@@ -1,0 +1,5 @@
+# Netlify reads this file automatically, so nothing needs to be set in the Netlify
+# dashboard. It builds the main site and demo (apps/site). The settings for that
+# folder (build command, publish folder) are in apps/site/netlify.toml.
+[build]
+  base = "apps/site"
