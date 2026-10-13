@@ -2,33 +2,34 @@
   "name": "lemmory",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "predev": "tsx scripts/build-demo-bank.ts",
-    "dev": "next dev",
-    "prebuild": "tsx scripts/build-demo-bank.ts",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "check": "tsx scripts/check-content.ts"
-  },
-  "dependencies": {
-    "@cortex-js/compute-engine": "^0.151.0",
-    "@types/katex": "^0.16.8",
-    "katex": "^0.19.0",
-    "lucide-react": "^1.53.0",
-    "mathlive": "^0.111.0",
-    "next": "16.4.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "ts-fsrs": "^5.4.2"
+    "dev": "concurrently -n site,app -c yellow,blue \"npm run dev -w @lemmory/site\" \"npm run dev -w @lemmory/app\"",
+    "dev:site": "npm run dev -w @lemmory/site",
+    "dev:app": "npm run dev -w @lemmory/app",
+    "build": "npm run build -w @lemmory/site && npm run build -w @lemmory/app",
+    "lint": "npm run lint -w @lemmory/site && npm run lint -w @lemmory/app",
+    "typecheck": "tsc --noEmit -p apps/site && tsc --noEmit -p apps/app",
+    "check": "npm run check -w @lemmory/core",
+    "db:generate": "npm run generate -w @lemmory/db",
+    "db:migrate": "npm run migrate -w @lemmory/db",
+    "db:seed": "npm run seed -w @lemmory/db",
+    "club:verify": "npm run club:verify -w @lemmory/db --",
+    "setup": "npm run db:migrate && npm run db:seed"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/katex": "^0.16.8",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "katex": "^0.19.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5"

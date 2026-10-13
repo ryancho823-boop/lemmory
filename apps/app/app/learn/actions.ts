@@ -1,0 +1,141 @@
+"use server";
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { refresh } from "next/cache";
+import { createStudent } from "@lemmory/db/accounts";
+import { currentUser, endSession, startSession } from "@lemmory/db/auth";
+import { PASSWORD_MIN } from "@lemmory/db/password";
+import { checkoutStudent } from "@lemmory/db/billing";
+import {
+  type Mode,
+  ReviewError,
+  addToDeck,
+  answerPick,
+  answerRecall,
+  answerSolve,
+  findClassByCode,
+  finishIfEmpty,
+  joinClass,
+  studentClasses,
+  promptFor,
+  removeFromDeck,
+} from "@lemmory/db/student";
+
+// Server actions are public endpoints: every one checks the session and its arguments.
+
+export type FormState = { error?: string; values?: Record<string, string> } | undefined;
+
+async function me() {
+  const user = await currentUser("student");
+  if (!user) throw new ReviewError("Signed out. Log in again.");
+  return user.id;
+}
+
+const str = (v: unknown, max = 200): string => {
+  if (typeof v !== "string" || v.length > max) throw new ReviewError("Bad request");
+  return v;
+};
+const strs = (v: unknown, maxItems = 8): string[] => {
+  if (!Array.isArray(v) || v.length > maxItems) throw new ReviewError("Bad request");
+  return v.map((x) => str(x, 500));
+};
+const mode = (v: unknown): Mode => {
+  if (v !== "review" && v !== "practice") throw new ReviewError("Bad request");
+  return v;
+};
+const field = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
+
+// ── accounts ──
+
+export async function signup(_: FormState, fd: FormData): Promise<FormState> {
+  const values = { code: field(fd, "code").toUpperCase(), name: field(fd, "name"), username: field(fd, "username").toLowerCase() };
+  const password = String(fd.get("password") ?? "");
+  const fail = (error: string) => ({ error, values });
+  const klass = await findClassByCode(values.code);
+  if (!klass) return fail("No class has that code. Check with your teacher.");
+  if (values.name.length < 2 || values.name.length > 60) return fail("Enter your name as your teacher knows it.");
+  if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
+  if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
+  const id = await createStudent(values.name, values.username, password);
+  if (!id) return fail("That username is taken. Try another.");
+  await joinClass(id, klass.id);
+  await startSession(id, "student");
+  redirect("/learn");
+}
+
+const CLASS_COOKIE = "lemmory_class";
+const showClass = async (classId: string) =>
+  (await cookies()).set(CLASS_COOKIE, classId, { httpOnly: true, sameSite: "lax", path: "/learn", maxAge: 365 * 86_400 });
+
+/** A signed-in student joins another class, and the app switches to it. */
+export async function joinWithCode(_: FormState, fd: FormData): Promise<FormState> {
+  const studentId = await me();
+  const code = field(fd, "code").toUpperCase();
+  const klass = await findClassByCode(code);
+  if (!klass) return { error: "No class has that code. Check with your teacher.", values: { code } };
+  await joinClass(studentId, klass.id);
+  await showClass(klass.id);
+  redirect("/learn");
+}
+
+/** Show a different one of the student's classes (leaderboard, contest). Their deck is shared. */
+export async function switchClass(classId: unknown) {
+  const studentId = await me();
+  const id = str(classId);
+  if (!(await studentClasses(studentId)).some((c) => c.id === id)) throw new ReviewError("Not in that class");
+  await showClass(id);
+  refresh();
+}
+
+/** Simulated checkout for the individual plan. Nothing is charged. */
+export async function buyStudentPlan() {
+  await checkoutStudent(await me());
+  refresh();
+}
+
+export async function logout() {
+  await endSession("student");
+  redirect("/login");
+}
+
+// ── review ──
+
+export async function getPrompt(formulaId: unknown, m: unknown) {
+  return promptFor(await me(), str(formulaId), mode(m));
+}
+
+export async function checkRecall(formulaId: unknown, inputs: unknown, m: unknown, typoUsed: unknown) {
+  const r = await answerRecall(await me(), str(formulaId), strs(inputs), mode(m), typoUsed === true);
+  if (r.outcome?.finished) refresh();
+  return r;
+}
+
+export async function checkPick(formulaId: unknown, problemId: unknown, picked: unknown, m: unknown) {
+  const r = await answerPick(await me(), str(formulaId), str(problemId), strs(picked), mode(m));
+  if (r.outcome?.finished) refresh();
+  return r;
+}
+
+export async function checkSolve(formulaId: unknown, problemId: unknown, picked: unknown, input: unknown, m: unknown) {
+  const r = await answerSolve(await me(), str(formulaId), str(problemId), strs(picked), str(input, 500), mode(m));
+  if (r.outcome?.finished) refresh();
+  return r;
+}
+
+export async function markDone() {
+  await finishIfEmpty(await me());
+  refresh();
+}
+
+// ── deck ──
+
+export async function addCard(formulaId: unknown) {
+  await addToDeck(await me(), str(formulaId));
+  refresh();
+}
+
+export async function removeCard(formulaId: unknown) {
+  await removeFromDeck(await me(), str(formulaId));
+  refresh();
+}

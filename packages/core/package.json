@@ -1,0 +1,17 @@
+{
+  "name": "@lemmory/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts",
+    "./content/notes": "./src/content/notes/index.ts"
+  },
+  "scripts": {
+    "check": "tsx scripts/check-content.ts"
+  },
+  "dependencies": {
+    "@cortex-js/compute-engine": "^0.151.0",
+    "ts-fsrs": "^5.4.2"
+  }
+}

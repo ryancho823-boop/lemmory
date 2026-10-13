@@ -2,42 +2,90 @@
 
 Remember every formula. Know when to use it. Spaced-repetition practice for competition math academies.
 
+One repo, two websites:
+
+| | Folder | Local URL | What it is |
+| --- | --- | --- | --- |
+| **Site** | `apps/site` | http://localhost:3000 | Main website, pricing ("For users"), and the no-login demo |
+| **App** | `apps/app` | http://localhost:3001 | The real product: one login for teachers (`/teach`) and students (`/learn`) |
+
+Shared code lives in `packages/`:
+
+```
+packages/core   Formula bank (187 formulas), FSRS scheduling, grading, analytics. No React, no database.
+packages/ui     React components and theme shared by both sites
+packages/db     Database schema, migrations, sign-in, and every read and write the app makes
+```
+
 ## Run it
 
 ```bash
 npm install
-npm run dev     # http://localhost:3000
+npm run setup   # create data/lemmory.db with a sample class
+npm run dev     # both sites (or dev:site / dev:app)
 npm run check   # verify every formula's grading and every problem's answer
 ```
 
-## Pages
+The sample accounts, all for local development only, are listed at the top of `packages/db/scripts/seed.ts`. `npm run db:seed` resets the database to the sample data at any time.
+
+## The site (`apps/site`)
 
 | Route | What it is |
 | --- | --- |
-| `/` | Website: numbers, the problem, mission, how it works (with a live, clickable card), research |
-| `/users` | Who it's for, pricing and how we verify each group, FAQ |
-| `/demo` | Pick the student or teacher view |
-| `/student/*` | Home (start today's cards), deck, Practice all (pre-contest cram, not saved), formula bank, stats, leaderboard |
-| `/teacher/*` | Class overview, assigning formulas, per-formula and per-student analytics, leaderboard where the teacher can start a new game |
+| `/` | Website: the problem, how it works (with a live card), research |
+| `/users` | Who it's for, pricing, how we verify each group, FAQ |
+| `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class saved in the browser. **Skip to tomorrow** shows the scheduler working. |
 
-Both views share one simulated class, so a review you finish as the student shows up in the teacher view.
-Use **Skip to tomorrow** in the sidebar to watch the scheduler work, and **Reset demo** to start over.
+The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser. Sign up and Log in send people to the app (`NEXT_PUBLIC_APP_URL`).
 
-## What the demo includes
+## The app (`apps/app`)
 
-The demo is a sales tool, so it only ships a slice of the bank:
+- **One login** at `/login`: an email signs in a teacher, a username signs in a student. `/signup` makes a teacher account; `/join` makes a student account from a class code.
+- **Teachers** (`/teach`): sign up, pick a plan, create classes, share the join code, assign formulas, and see class and student analytics. Switch classes from the sidebar.
+- **Students** (`/learn`): daily review, deck, Practice all, formula bank, stats, leaderboard. A student can be in several classes (switch from the sidebar); their deck is shared across them.
+- **Grading happens on the server.** The browser only gets the prompt, so answers can't be read ahead of time and points can't be faked. Only the first attempt each day goes to FSRS. Picking the wrong formula ends an application card; it comes back later.
+- **Plans** (`packages/db/src/billing.ts`): academies $3/student/month, school clubs $3/student capped at $40/class/month after the school is confirmed, individual students $2/month. **Checkout is simulated**: nothing is charged until a payment provider (e.g. Stripe) is connected. List and approve club requests with `npm run club:verify`.
+- **Days** run midnight to midnight in each class's time zone. Past days are filled in when a class loads, so nothing has to run on a schedule.
 
-- **22 of the 155 formulas** (`DEMO_IDS` in `lib/demo.ts`), with up to 2 problems each. The rest appear in the bank as locked names.
-- `scripts/build-demo-bank.ts` writes that slice to `lib/generated/demo-bank.json` before every `dev` and `build`. The app imports only that file, so the full bank never reaches the browser.
-- **Skip to tomorrow** stops 30 days past the real date (`DEMO_MAX_DAYS`).
+## Deploying
 
-The real product (student and teacher sites, accounts, database) is in the separate `lemmory-app` repo.
+### 1. Database (Turso)
 
-## How it works
+Locally the app uses a SQLite file (`data/lemmory.db`). Hosts like Netlify can't keep files, so production needs a hosted database. Turso runs the same database engine, so no code changes are needed.
 
-- **Content** (`lib/content/`): 155 formulas in 7 topics (the demo shows 22; see above). Each has recall prompts, a "when to use it" note, links to look-alike formulas, and at least 2 practice problems.
-- **Grading** (`lib/grade.ts`): typed math is checked numerically with [Compute Engine](https://cortexjs.io/compute-engine/), so any equivalent form counts. Each prompt can also ban retyping the left-hand side or require a factored or expanded form.
-- **Scheduling** (`lib/srs.ts`): [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) with default parameters and a 90% target retention. Only the first attempt each day counts toward scheduling; misses come back until the student gets them right. A card moves from recall to application once its stability reaches 10 days.
-- **Points**: 10 per finished assigned card, however many tries it takes, plus a streak bonus for finishing the day's review (+5 per streak day, up to +100). Self-added cards and Practice all earn nothing. The teacher can start a new leaderboard game anytime; streaks and all-time points carry over.
-- **Simulated class** (`lib/sim.ts`): 12 classmates run the real scheduler day by day, with a seeded model deciding whether each answer is right. Every chart is computed from review logs (`lib/analytics.ts`).
-- **State** (`lib/store.tsx`): the demo student's data is saved in `localStorage`. A real version would need accounts and a database.
+```bash
+brew install tursodatabase/tap/turso
+turso auth signup
+turso db create lemmory
+turso db show lemmory --url
+turso db tokens create lemmory
+```
+
+Then create the tables (use the URL and token from the commands above):
+
+```bash
+DATABASE_URL="libsql://…" DATABASE_AUTH_TOKEN="…" npm run db:migrate
+```
+
+Don't run `db:seed` against production: it deletes everything first (it refuses unless you pass `--force`).
+
+### 2. Netlify: two sites from this repo
+
+Create two Netlify sites, both from this GitHub repo:
+
+| | Package directory | Environment variables |
+| --- | --- | --- |
+| Site | `apps/site` | `NEXT_PUBLIC_APP_URL` = the app's address, e.g. `https://app.lemmory.com` |
+| App | `apps/app` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
+
+For each: **Add new site → Import an existing project → GitHub → lemmory**. Leave **Base directory** empty and set **Package directory** as above. The build command and publish directory come from each folder's `netlify.toml`. Add the environment variables under **Site configuration → Environment variables**, then redeploy.
+
+## Not built yet
+
+- Real payments (Stripe Checkout and a webhook in place of the simulated checkout), and blocking reviews when a pilot runs out
+- An admin page for approving clubs (it's a command for now)
+- Rate limiting on login and sign-up; teacher password reset by email
+- Academy accounts with several teachers
+- Teacher-made formulas and problems
+- A weekly email to teachers and a daily reminder to students
+- A privacy and COPPA review before onboarding under-13 students

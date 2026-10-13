@@ -1,0 +1,21 @@
+{
+  "name": "@lemmory/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./review/*": "./src/review/*.tsx",
+    "./theme.css": "./src/theme.css",
+    "./*": "./src/*.tsx"
+  },
+  "dependencies": {
+    "@lemmory/core": "*",
+    "katex": "^0.19.0",
+    "lucide-react": "^1.53.0",
+    "mathlive": "^0.111.0"
+  },
+  "peerDependencies": {
+    "next": "16.4.0",
+    "react": "19.3.0"
+  }
+}
