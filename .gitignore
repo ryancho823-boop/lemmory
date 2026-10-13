@@ -19,6 +19,7 @@ apps/site/lib/generated/
 # env files (.env.example is the template)
 .env*
 !.env.example
+!.env.turso.example
 
 # misc
 .DS_Store

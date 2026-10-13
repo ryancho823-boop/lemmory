@@ -36,7 +36,9 @@ The sample accounts, all for local development only, are listed at the top of `p
 | `/users` | Who it's for, pricing, how we verify each group, FAQ |
 | `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class saved in the browser. **Skip to tomorrow** shows the scheduler working. |
 
-The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser. Sign up and Log in send people to the app (`NEXT_PUBLIC_APP_URL`).
+**Sign up / Log in.** When `NEXT_PUBLIC_APP_URL` is set, these go to the app. Until the app is online, the live site sends people to `/get-started` instead: a sign-up form handled by Netlify Forms (no database needed). In Netlify, turn on **Forms → Enable form detection** once, and add an email notification under **Forms → Form notifications** if you want each sign-up emailed to you.
+
+The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser.
 
 ## The app (`apps/app`)
 
@@ -61,11 +63,13 @@ turso db show lemmory --url
 turso db tokens create lemmory
 ```
 
-Then create the tables (use the URL and token from the commands above):
+Then create the tables: copy `.env.turso.example` to `.env.turso`, paste in the URL and token from the commands above (or from the Turso website), and run:
 
 ```bash
-DATABASE_URL="libsql://…" DATABASE_AUTH_TOKEN="…" npm run db:migrate
+npm run db:migrate:prod
 ```
+
+`.env.turso` is never committed. Approve club requests on the live database with `npm run club:verify:prod`.
 
 Don't run `db:seed` against production: it deletes everything first (it refuses unless you pass `--force`).
 

@@ -10,7 +10,9 @@
     "generate": "drizzle-kit generate",
     "migrate": "tsx scripts/migrate.ts",
     "seed": "tsx scripts/seed.ts",
-    "club:verify": "tsx scripts/verify-club.ts"
+    "club:verify": "tsx scripts/verify-club.ts",
+    "migrate:prod": "tsx --env-file=../../.env.turso scripts/migrate.ts",
+    "club:verify:prod": "tsx --env-file=../../.env.turso scripts/verify-club.ts"
   },
   "dependencies": {
     "@lemmory/core": "*",

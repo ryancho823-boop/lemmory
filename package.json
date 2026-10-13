@@ -16,8 +16,10 @@
     "check": "npm run check -w @lemmory/core",
     "db:generate": "npm run generate -w @lemmory/db",
     "db:migrate": "npm run migrate -w @lemmory/db",
+    "db:migrate:prod": "npm run migrate:prod -w @lemmory/db",
     "db:seed": "npm run seed -w @lemmory/db",
     "club:verify": "npm run club:verify -w @lemmory/db --",
+    "club:verify:prod": "npm run club:verify:prod -w @lemmory/db --",
     "setup": "npm run db:migrate && npm run db:seed"
   },
   "devDependencies": {
