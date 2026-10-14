@@ -2,22 +2,20 @@
 
 Remember every formula. Know when to use it. Spaced-repetition practice for competition math academies.
 
-One repo, three websites:
+One repo, three websites. The student and teacher sites share one database.
 
-| | Folder | Local URL | What it is |
+| Website | Folder | Local URL | What it is |
 | --- | --- | --- | --- |
-| **Site** | `apps/site` | http://localhost:3000 | Main website, pricing ("For users"), and the no-login demo |
-| **Student site** | `apps/student` | http://localhost:3001 | Students: daily review, deck, formula bank, stats, leaderboard |
-| **Teacher site** | `apps/teacher` | http://localhost:3002 | Teachers: plans, classes, assigning, analytics |
-
-The student and teacher sites share one database. **To put it all online, follow [DEPLOY.md](DEPLOY.md).**
+| **Main site** | `apps/site` | http://localhost:3000 | The pitch, pricing ("For users"), the log-in chooser, and the no-login demo |
+| **Student site** | `apps/student` | http://localhost:3001 | Students sign up with a class code and do their daily review |
+| **Teacher site** | `apps/teacher` | http://localhost:3002 | Teachers pick a plan, create classes, assign formulas, and see analytics |
 
 Shared code lives in `packages/`:
 
 ```
-packages/core   Formula bank (187 formulas), FSRS scheduling, grading, analytics. No React, no database.
-packages/ui     React components and theme shared by both sites
-packages/db     Database schema, migrations, sign-in, and every read and write the app makes
+packages/core   Formula bank (187 formulas, 378 problems), FSRS scheduling, grading, analytics. No React, no database.
+packages/ui     React components, theme and the app icon, shared by all three sites
+packages/db     Database schema, migrations, accounts and sessions, plans, and every read and write the sites make
 ```
 
 ## Run it
@@ -26,41 +24,81 @@ packages/db     Database schema, migrations, sign-in, and every read and write t
 npm install
 npm run setup   # create data/lemmory.db with a sample class
 npm run dev     # all three sites (or dev:site / dev:student / dev:teacher)
-npm run check   # verify every formula's grading and every problem's answer
 ```
 
-The sample accounts, all for local development only, are listed at the top of `packages/db/scripts/seed.ts`. `npm run db:seed` resets the database to the sample data at any time.
+The sample accounts (local only) are listed at the top of `packages/db/scripts/seed.ts`. `npm run db:seed` resets the local database to the sample data at any time.
 
-## The site (`apps/site`)
+Other commands:
+
+| Command | What it does |
+| --- | --- |
+| `npm run check` | Verifies every formula's grading and every problem's answer |
+| `npm run typecheck` / `npm run lint` / `npm run build` | All three sites |
+| `npm run db:generate` | Writes a migration after a change to `packages/db/src/schema.ts` |
+| `npm run club:verify` | Lists school clubs waiting for club pricing; add a teacher's email to approve one |
+
+## Logging in and signing up
+
+- **Log in.** The main site's only button is **Log in** (`/login`), which asks "teacher or student?" and opens that site's login page: "Teacher log in" (email) or "Student log in" (username). Each has a **New? Sign up** link.
+- **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, name, username, password. The switch links between the two sites.
+- **No account yet.** Logging in with an email or username that doesn't exist goes to sign-up with it filled in (carried in a short-lived cookie, not the URL).
+- Already-logged-in visitors skip the login page. Sessions last 30 days.
+
+Locally the sites link to each other on localhost. Online they use the addresses in `apps/site/lib/links.ts`, `apps/teacher/lib/session.ts` and `apps/student/lib/links.ts`, which `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL` override.
+
+## The main site (`apps/site`)
 
 | Route | What it is |
 | --- | --- |
-| `/` | Website: the problem, how it works (with a live card), research |
-| `/users` | Who it's for, pricing, how we verify each group, FAQ |
-| `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class saved in the browser. **Skip to tomorrow** shows the scheduler working. |
+| `/` | The problem, how it works (with a live card to try), research |
+| `/users` | Who it's for, pricing, how we verify each group, FAQ (`/academies` redirects here) |
+| `/login` | Teacher or student? |
+| `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class of 13 saved in the browser. **Skip to tomorrow** shows the scheduler working (up to 30 days ahead). |
 
-**Sign up / Log in** go to the teacher and student sites: localhost while developing, the Vercel addresses in DEPLOY.md on Vercel (override with `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL`).
+The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser. The other formulas show as locked names.
 
-The demo is a sales tool, so it only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`). Before every `dev` and `build`, `scripts/build-demo-bank.ts` copies that slice out of `packages/core`, and the site imports only the copy, so the rest of the bank never reaches the browser.
+## The teacher site (`apps/teacher`)
 
-## The student and teacher sites
+- Sign up → pick a plan → create a class → share its code or join link → assign formulas.
+- Pages: Overview (who finished today, what the class is forgetting, who needs attention), Assign formulas, Formula analytics (accuracy, recall vs. application, mix-ups), Students (per-student stats, password reset, remove), Leaderboard (start a new game), Class settings (contest date, time zone, new join code), Plan & billing.
+- A teacher can run several classes and switch between them from the sidebar.
 
-- **Teachers** (`apps/teacher`) sign in with an email: sign up, pick a plan, create classes, share the join code, assign formulas, and see class and student analytics. Switch classes from the sidebar.
-- **Students** (`apps/student`) sign in with a username, and join with a class code at `/join`. Daily review, deck, Practice all, formula bank, stats, leaderboard. A student can be in several classes (switch from the sidebar); their deck is shared across them.
-- **Grading happens on the server.** The browser only gets the prompt, so answers can't be read ahead of time and points can't be faked. Only the first attempt each day goes to FSRS. Picking the wrong formula ends an application card; it comes back later.
-- **Plans** (`packages/db/src/billing.ts`): academies $3/student/month, school clubs $3/student capped at $40/class/month after the school is confirmed, individual students $2/month. **Checkout is simulated**: nothing is charged until a payment provider (e.g. Stripe) is connected. List and approve club requests with `npm run club:verify`.
+## The student site (`apps/student`)
+
+- Sign up with a class code. Pages: Home (today's cards), Review, My deck, Practice all (cram mode, not recorded), Formula bank, My stats, Leaderboard, My classes.
+- A student can be in several classes (switch from the sidebar). Their deck is shared across all of them.
+- **Recall cards:** type the formula with Desmos-style input; any equivalent form counts, and a one-letter typo gets one free retry.
+- **Application cards:** pick the formula(s) a problem needs, then solve it. A wrong pick ends the card, and it comes back later.
+- **Points:** 10 per assigned card, plus a streak bonus (+5 per streak day, up to +100). Self-added cards earn nothing.
+
+## How it works
+
+- **Scheduling.** [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) with a 90% target retention. Only the first attempt each day counts; misses come back until they're right. At most 6 new cards a day. A card moves from recall to application once its stability reaches 10 days.
+- **Grading happens on the server.** The browser only gets the prompt, so answers can't be read ahead of time and points can't be faked. Typed math is checked numerically with [Compute Engine](https://cortexjs.io/compute-engine/).
 - **Days** run midnight to midnight in each class's time zone. Past days are filled in when a class loads, so nothing has to run on a schedule.
+- **Privacy.** Students sign up with a username, no email. Students see classmates only as leaderboard rows, never their review history.
+
+## Plans (`packages/db/src/billing.ts`)
+
+| Plan | Price | Notes |
+| --- | --- | --- |
+| Free pilot | $0 for 14 days | Once per teacher; it can't be restarted |
+| Academy | $3 per student per month | A student in two of the teacher's classes counts once |
+| School math club | $3 per student, capped at $40 per class per month | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
+| Individual student | $2 per month | For students not in a class |
+
+When a pilot ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.
 
 ## Deploying
 
-See [DEPLOY.md](DEPLOY.md): a Turso database, then one Vercel project per folder.
+See [DEPLOY.md](DEPLOY.md). Each site has a `/health` page (student and teacher) that shows whether the database is reachable, without revealing any secrets.
 
 ## Not built yet
 
-- Real payments (Stripe Checkout and a webhook in place of the simulated checkout), and blocking reviews when a pilot runs out
-- An admin page for approving clubs (it's a command for now)
+- Real payments in place of the simulated checkout
+- An admin page for approving school clubs (it's a command for now)
 - Rate limiting on login and sign-up; teacher password reset by email
 - Academy accounts with several teachers
 - Teacher-made formulas and problems
 - A weekly email to teachers and a daily reminder to students
-- A privacy and COPPA review before onboarding under-13 students
+- A privacy and COPPA review before onboarding students under 13
