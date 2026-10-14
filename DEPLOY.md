@@ -25,7 +25,7 @@ For each site: **vercel.com → Add New → Project → import `lemmory`**, then
 | Project | Root Directory | Environment Variables |
 | --- | --- | --- |
 | Main site | `apps/site` | none |
-| Teacher site | `apps/teacher` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
+| Teacher site | `apps/teacher` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `RESEND_API_KEY`, `EMAIL_FROM`, `CRON_SECRET` |
 | Student site | `apps/student` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
 
 Leave everything else as Vercel detects it (Next.js). For the variables, check **Production** and **Preview** and leave **Development** unchecked. Mark the token **Sensitive**.
@@ -39,6 +39,16 @@ grep '^DATABASE_AUTH_TOKEN=' ~/Downloads/Projects/Lemmory/.env.turso | cut -d= -
 The database address is the `DATABASE_URL=` line in the same file.
 
 After adding or changing a variable, redeploy: **Deployments → ⋯ on the latest one → Redeploy**.
+
+## Email (teacher site)
+
+Password-reset links and the Monday email to teachers are sent with [Resend](https://resend.com):
+
+1. Make a Resend account, add and verify your domain, and create an API key.
+2. On the teacher project, set `RESEND_API_KEY` (mark it **Sensitive**) and `EMAIL_FROM`, for example `Lemmory <hello@yourdomain.com>`. Until a domain is verified, Resend only delivers to your own address.
+3. Set `CRON_SECRET` to any long random string (`openssl rand -hex 32`). Vercel sends it with the scheduled call to `/api/cron/weekly-report` (set up by `apps/teacher/vercel.json`, Mondays 15:00 UTC), and the page refuses any call without it.
+
+Without `RESEND_API_KEY` everything else works, but no email is sent: "Forgot password" says it sent a link and nothing arrives.
 
 ## Check that it works
 

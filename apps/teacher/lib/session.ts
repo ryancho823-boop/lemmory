@@ -40,3 +40,8 @@ export const getClass = cache(async (classId: string) => {
 export const studentUrl = (
   process.env.NEXT_PUBLIC_STUDENT_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://lemmory-student.vercel.app")
 ).replace(/\/$/, "");
+
+/** This site, for links in emails. Override with NEXT_PUBLIC_TEACHER_URL. */
+export const teacherUrl = (
+  process.env.NEXT_PUBLIC_TEACHER_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3002" : "https://lemmory-teacher.vercel.app")
+).replace(/\/$/, "");
