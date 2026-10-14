@@ -2,10 +2,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { currentUser } from "@lemmory/db/auth";
-import { AuthFrame } from "@lemmory/ui/Shell";
+import { AuthFrame, RoleToggle } from "@lemmory/ui/Shell";
+import { teacherUrl } from "@/lib/links";
 import { JoinForm } from "./JoinForm";
 
-export const metadata = { title: "Join your class · Lemmory" };
+export const metadata = { title: "Sign up · Lemmory" };
 
 export default async function JoinPage({ searchParams }: PageProps<"/join">) {
   if (await currentUser("student")) redirect("/class");
@@ -15,14 +16,18 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
   const username = fromLogin ? ((await cookies()).get("lemmory_signup_username")?.value ?? "") : "";
   return (
     <AuthFrame
-      tag="Student"
-      title="Join your class"
-      sub={fromLogin ? "We couldn't find that username, so let's make your account. Your teacher gives you the class code." : "Your teacher gives you the class code."}
+      title="Sign up"
+      sub={
+        fromLogin
+          ? "We couldn't find that username, so let's make your account. Your teacher gives you the class code."
+          : "As a student you'll need the class code from your teacher."
+      }
+      top={<RoleToggle current="student" teacherHref={`${teacherUrl}/signup`} studentHref="/join" />}
       foot={
         <>
           Already have an account?{" "}
           <Link href="/login" className="font-semibold text-ink underline">
-            Log in
+            Student log in
           </Link>
         </>
       }

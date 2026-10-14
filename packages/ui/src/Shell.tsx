@@ -132,8 +132,45 @@ export function Shell({
   );
 }
 
-/** Centered card for sign-in and sign-up pages. */
-export function AuthFrame({ tag, title, sub, children, foot }: { tag?: string; title: string; sub?: React.ReactNode; children: React.ReactNode; foot?: React.ReactNode }) {
+/**
+ * The Teacher | Student switch at the top of the sign-up page. Teachers and students sign
+ * up on different sites, so each side is a link to the other site's sign-up page.
+ */
+export function RoleToggle({ current, teacherHref, studentHref }: { current: "teacher" | "student"; teacherHref: string; studentHref: string }) {
+  const option = (role: "teacher" | "student", label: string, href: string) =>
+    role === current ? (
+      <span aria-current="page" className="rounded-lg bg-white px-3 py-1.5 text-center text-sm font-semibold text-ink shadow-sm">
+        {label}
+      </span>
+    ) : (
+      <a href={href} className="rounded-lg px-3 py-1.5 text-center text-sm font-semibold text-ink/60 hover:text-ink">
+        {label}
+      </a>
+    );
+  return (
+    <div className="grid grid-cols-2 rounded-xl bg-ink/5 p-1" role="group" aria-label="I'm signing up as">
+      {option("teacher", "Teacher", teacherHref)}
+      {option("student", "Student", studentHref)}
+    </div>
+  );
+}
+
+/** Centered card for sign-in and sign-up pages. `top` sits above the title (e.g. a RoleToggle). */
+export function AuthFrame({
+  tag,
+  title,
+  sub,
+  top,
+  children,
+  foot,
+}: {
+  tag?: string;
+  title: string;
+  sub?: React.ReactNode;
+  top?: React.ReactNode;
+  children: React.ReactNode;
+  foot?: React.ReactNode;
+}) {
   return (
     <div className="grid min-h-screen place-items-center bg-canvas px-4 py-10">
       <div className="w-full max-w-sm">
@@ -141,11 +178,12 @@ export function AuthFrame({ tag, title, sub, children, foot }: { tag?: string; t
           <Logo tag={tag} />
         </div>
         <div className="mt-8 rounded-3xl border border-line bg-white p-7 shadow-[0_30px_70px_-40px_rgb(15_17_33/0.35)]">
-          <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
-          {sub && <p className="mt-1 text-sm text-ink/55">{sub}</p>}
+          {top && <div className="mb-6">{top}</div>}
+          <h1 className="text-2xl font-extrabold">{title}</h1>
+          {sub && <p className="mt-1 text-ink/75">{sub}</p>}
           <div className="mt-6">{children}</div>
         </div>
-        {foot && <p className="mt-5 text-center text-sm text-ink/55">{foot}</p>}
+        {foot && <div className="mt-5 space-y-1 text-center text-sm text-ink/70">{foot}</div>}
       </div>
     </div>
   );

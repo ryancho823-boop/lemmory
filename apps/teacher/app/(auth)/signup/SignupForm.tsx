@@ -14,7 +14,7 @@ export function SignupForm({ email }: { email: string }) {
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending ? "Creating…" : "Create account"}
+        {pending ? "Signing up…" : "Sign up"}
       </Button>
     </form>
   );
