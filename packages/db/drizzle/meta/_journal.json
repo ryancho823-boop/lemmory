@@ -29,6 +29,13 @@
       "when": 1792020464316,
       "tag": "0003_password_resets_kick_out_prefs",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792112744561,
+      "tag": "0004_email_confirmation_reset_codes",
+      "breakpoints": true
     }
   ]
 }

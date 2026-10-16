@@ -5,10 +5,17 @@ import { currentUser } from "@lemmory/db/auth";
 import { NotFound, listClasses, loadTeacherClass } from "@lemmory/db/teacher";
 import { getPlan, planState } from "@lemmory/db/billing";
 
-/** The signed-in teacher, or a redirect to the login page. */
-export const requireTeacher = cache(async () => {
+/** The signed-in teacher, confirmed or not, or a redirect to the login page. */
+export const requireSignedIn = cache(async () => {
   const user = await currentUser("teacher");
   if (!user) redirect("/login");
+  return user;
+});
+
+/** The signed-in teacher, or a redirect: to log in, or to confirm their email first. */
+export const requireTeacher = cache(async () => {
+  const user = await requireSignedIn();
+  if (!user.emailVerified) redirect("/verify");
   return user;
 });
 

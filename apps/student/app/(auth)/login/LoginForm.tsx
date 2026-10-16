@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
@@ -15,7 +16,11 @@ export function LoginForm() {
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Logging in…" : "Log in"}
       </Button>
-      <p className="text-center text-xs text-ink/45">Forgot your password? Your teacher can reset it.</p>
+      <p className="text-center text-sm">
+        <Link href="/forgot" className="font-semibold text-ink/70 underline hover:text-ink">
+          Forgot your password?
+        </Link>
+      </p>
     </form>
   );
 }

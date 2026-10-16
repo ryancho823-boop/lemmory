@@ -5,7 +5,8 @@ import { pointsBetween } from "@lemmory/core/analytics";
 import { dayInZone } from "@lemmory/core/days";
 import { isNew } from "@lemmory/core/srs";
 import { db } from "./client";
-import { hashPassword, newId, newJoinCode } from "./password";
+import { createStudentResetCode } from "./accounts";
+import { newId, newJoinCode } from "./password";
 import { addAssignedCards, classToday, loadClass, loadRecords, toCard } from "./records";
 import { assignments, cards, classBans, classes, enrollments, sessions, users } from "./schema";
 
@@ -196,12 +197,11 @@ export async function letBackIn(teacherId: string, classId: string, studentId: s
   await db.delete(classBans).where(and(eq(classBans.classId, classId), eq(classBans.studentId, studentId)));
 }
 
-/** Students forget passwords. The teacher can set a new one and signs them out everywhere. */
-export async function resetStudentPassword(teacherId: string, classId: string, studentId: string, password: string) {
+/**
+ * Students forget passwords. The teacher gets a one-time code to give the student, who uses
+ * it to choose a new password themselves, so the teacher never knows it.
+ */
+export async function makeStudentResetCode(teacherId: string, classId: string, studentId: string) {
   await enrolled(teacherId, classId, studentId);
-  await db
-    .update(users)
-    .set({ passwordHash: await hashPassword(password) })
-    .where(eq(users.id, studentId));
-  await db.delete(sessions).where(eq(sessions.userId, studentId));
+  return createStudentResetCode(studentId, teacherId);
 }

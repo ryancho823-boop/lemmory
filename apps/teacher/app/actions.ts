@@ -4,7 +4,17 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { RESET_MINUTES, accountExists, checkLogin, createPasswordReset, createTeacher, resetPasswordWithToken } from "@lemmory/db/accounts";
+import {
+  CONFIRM_HOURS,
+  RESET_MINUTES,
+  accountExists,
+  checkLogin,
+  createEmailConfirmation,
+  createPasswordReset,
+  createTeacher,
+  resetLinkRole,
+  resetPasswordWithToken,
+} from "@lemmory/db/accounts";
 import { currentUser, endSession, startSession } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutAcademy, requestClub, schoolEmailProblem, startPilot } from "@lemmory/db/billing";
@@ -19,7 +29,7 @@ import {
   newClassCode,
   newGame,
   removeStudent,
-  resetStudentPassword,
+  makeStudentResetCode,
   startNextWeek,
   unassign,
   updateClass,
@@ -34,10 +44,39 @@ const SIGNUP_HINT = "lemmory_signup_email";
 
 export type FormState = { error?: string; ok?: string; values?: Record<string, string> } | undefined;
 
+/** The signed-in teacher's id. Teachers who haven't confirmed their email can't act yet. */
 async function me() {
   const user = await currentUser("teacher");
   if (!user) redirect("/login");
+  if (!user.emailVerified) redirect("/verify");
   return user.id;
+}
+
+/** Email a teacher the link that confirms their address. False if one went out in the last minute. */
+async function sendConfirmation(userId: string, name: string, email: string) {
+  const token = await createEmailConfirmation(userId, email);
+  if (!token) return false;
+  const link = `${teacherUrl}/confirm?token=${token}`;
+  await sendMail({
+    to: email,
+    subject: "Confirm your Lemmory email",
+    text: `Hi ${name},\n\nConfirm this is your email to finish setting up your Lemmory teacher account:\n\n${link}\n\nThe link works once, for ${CONFIRM_HOURS} hours. If you didn't sign up, ignore this email and the account won't be usable.`,
+    html: mailHtml(
+      `<p style="margin:0 0 16px">Hi ${escapeHtml(name)}, confirm this is your email to finish setting up your Lemmory teacher account.</p>
+<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Confirm my email</a>
+<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${CONFIRM_HOURS} hours. If you didn't sign up, ignore this email and the account won't be usable.</p>`,
+    ),
+  });
+  return true;
+}
+
+/** "Send it again" on the confirm-your-email page. */
+export async function resendConfirmation(): Promise<FormState> {
+  const user = await currentUser("teacher");
+  if (!user?.email) redirect("/login");
+  if (user.emailVerified) redirect("/");
+  const sent = await sendConfirmation(user.id, user.name, user.email);
+  return sent ? { ok: `Sent a new link to ${user.email}.` } : { error: "We just sent one. Wait a minute before asking again." };
 }
 
 const str = (v: unknown, max = 200): string => {
@@ -74,7 +113,9 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const id = await createTeacher(values.name, values.email, password);
   if (!id) return fail("There's already an account with that email. Log in instead.");
   await startSession(id, "teacher");
-  redirect("/plan");
+  // The account works once they click the link we email them.
+  await sendConfirmation(id, values.name, values.email);
+  redirect("/verify");
 }
 
 export async function logout() {
@@ -107,7 +148,9 @@ export async function resetPassword(token: string, _: FormState, fd: FormData): 
   const password = String(fd.get("password") ?? "");
   if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
   if (password !== String(fd.get("confirm") ?? "")) return { error: "The two passwords don't match." };
-  const id = await resetPasswordWithToken(str(token, 100), password);
+  // A student's link only works on the student site.
+  const t = str(token, 100);
+  const id = (await resetLinkRole(t)) === "teacher" ? await resetPasswordWithToken(t, password) : null;
   if (!id) return { error: "This link has expired or was already used. Ask for a new one." };
   await startSession(id, "teacher");
   redirect("/");
@@ -226,10 +269,11 @@ export async function letBackInAction(classId: unknown, studentId: unknown) {
   refresh();
 }
 
-export async function resetPasswordAction(classId: string, studentId: string, _: FormState, fd: FormData): Promise<FormState> {
-  const teacherId = await me();
-  const password = String(fd.get("password") ?? "");
-  if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
-  await resetStudentPassword(teacherId, str(classId), str(studentId), password);
-  return { ok: "Password changed. Give it to the student; they've been signed out everywhere." };
+/**
+ * A one-time code the teacher gives a student who forgot their password. The student uses it
+ * on the student site to choose a new password, so the teacher never learns it.
+ */
+export async function resetCodeAction(classId: unknown, studentId: unknown) {
+  const { code, expiresAt } = await makeStudentResetCode(await me(), str(classId), str(studentId));
+  return { code, expiresAt: expiresAt.toISOString() };
 }

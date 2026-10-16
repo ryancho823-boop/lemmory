@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { studentInfo } from "@lemmory/db/teacher";
 import { StudentAnalytics } from "@lemmory/ui/StudentAnalytics";
 import { Avatar } from "@lemmory/ui/ui";
-import { getClass, requireTeacher } from "@/lib/session";
+import { getClass, requireTeacher, studentUrl } from "@/lib/session";
 import { ManageStudent } from "./ManageStudent";
 
 export default async function StudentPage({ params }: PageProps<"/c/[classId]/students/[studentId]">) {
@@ -28,7 +28,7 @@ export default async function StudentPage({ params }: PageProps<"/c/[classId]/st
         </div>
       </div>
       <StudentAnalytics student={s} today={today} formulaHref={(fid) => `/c/${classId}/formulas/${fid}`} />
-      <ManageStudent classId={classId} studentId={studentId} name={s.name} />
+      <ManageStudent classId={classId} studentId={studentId} name={s.name} forgotUrl={`${studentUrl}/forgot`} />
     </div>
   );
 }

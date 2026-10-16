@@ -40,13 +40,13 @@ export const currentUser = cache(async (role: Role) => {
   const token = (await cookies()).get(COOKIE[role])?.value;
   if (!token) return null;
   const row = await db
-    .select({ id: users.id, name: users.name, role: users.role, email: users.email, username: users.username, expiresAt: sessions.expiresAt })
+    .select({ id: users.id, name: users.name, role: users.role, email: users.email, username: users.username, emailVerifiedAt: users.emailVerifiedAt, expiresAt: sessions.expiresAt })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
     .where(eq(sessions.id, sha256(token)))
     .get();
   if (!row || row.role !== role || row.expiresAt < new Date()) return null;
-  return { id: row.id, name: row.name, email: row.email, username: row.username };
+  return { id: row.id, name: row.name, email: row.email, username: row.username, emailVerified: !!row.emailVerifiedAt };
 });
 
 export type SessionUser = NonNullable<Awaited<ReturnType<typeof currentUser>>>;
