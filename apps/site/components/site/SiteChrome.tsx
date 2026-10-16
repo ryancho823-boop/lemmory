@@ -77,14 +77,14 @@ export function PageIntro({ title, sub }: { title: React.ReactNode; sub?: React.
   return (
     <div className="max-w-3xl">
       <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">{title}</h1>
-      {sub && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink/80">{sub}</p>}
+      {sub && <p className="mt-5 max-w-2xl text-lg leading-relaxed">{sub}</p>}
     </div>
   );
 }
 
 export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a student, then switch to the teacher view and watch your results show up." }) {
   return (
-    <section className="border-t border-line">
+    <section className="bg-lemon-soft">
       <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-8 px-5 py-20">
         <div className="max-w-xl">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h2>

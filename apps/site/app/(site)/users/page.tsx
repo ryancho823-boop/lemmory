@@ -72,14 +72,18 @@ const FAQ = [
 export default function ForUsers() {
   return (
     <div>
-      <section className="mx-auto max-w-6xl px-5 pb-20 pt-14 sm:pt-20">
-        <PageIntro
-          title="For academies, math clubs, and students"
-          sub="A retention tool that runs between classes, with no extra work for teachers. Every plan starts with a free pilot."
-        />
-        <ul className="mt-14 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map((b) => (
-            <li key={b.title} className="border-t-2 border-ink pt-4">
+      <section className="bg-lemon">
+        <div className="mx-auto max-w-6xl px-5 pb-16 pt-14 sm:pt-20">
+          <PageIntro
+            title="For academies, math clubs, and students"
+            sub="A retention tool that runs between classes, with no extra work for teachers. Every plan starts with a free pilot."
+          />
+        </div>
+      </section>
+      <section className="mx-auto max-w-6xl px-5 py-16">
+        <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          {BENEFITS.map((b, i) => (
+            <li key={b.title} className="border-t-4 pt-4" style={{ borderColor: ["#e11d48", "#2563eb", "#16a34a", "#9333ea"][i] }}>
               <h3 className="text-lg font-extrabold">{b.title}</h3>
               <p className="mt-1.5 leading-relaxed text-ink/80">{b.body}</p>
             </li>
