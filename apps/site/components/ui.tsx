@@ -51,7 +51,7 @@ export function Button({ href, onClick, variant = "primary", size = "md", classN
     size === "md" && "h-10 px-4 text-sm",
     size === "lg" && "h-12 px-6 text-[15px]",
     variant === "primary" && "bg-ink text-white hover:bg-ink/85",
-    variant === "lemon" && "bg-lemon text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105",
+    variant === "lemon" && "bg-lemon text-ink hover:brightness-105",
     variant === "ghost" && "text-ink/65 hover:bg-ink/5 hover:text-ink",
     variant === "outline" && "border border-line bg-white text-ink hover:border-ink/25",
     className,
@@ -89,7 +89,7 @@ export function StageTag({ stage, mastered }: { stage: Stage; mastered?: boolean
   );
 }
 
-const AVATAR_TINTS = ["#dbeafe", "#fde2d3", "#d5f3e6", "#fdefc3", "#fbe0ec", "#d9f0d9", "#e2defa", "#fcdcdc"];
+const AVATAR_TINTS = ["#ece9e1"];
 export function Avatar({ name, you, size = 32 }: { name: string; you?: boolean; size?: number }) {
   const initials = name.split(" ").map((p) => p[0]).slice(0, 2).join("");
   let h = 0;

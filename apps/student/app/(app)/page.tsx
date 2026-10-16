@@ -21,7 +21,7 @@ export default async function StudentHome() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-[32px] font-extrabold">Hi, {v.me.name.split(" ")[0]}</h1>
-        {v.klass?.contest && <p className="rounded-full border border-line bg-white px-3 py-1 text-sm">{v.klass.contest}</p>}
+        {v.klass?.contest && <p className="text-ink/75">{v.klass.contest}</p>}
       </div>
 
       {!v.klass && (

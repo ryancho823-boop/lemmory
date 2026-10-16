@@ -6,11 +6,16 @@
   /* Headings read calmer at semibold than at a heavy 800. */
   --font-weight-extrabold: 600;
   --color-ink: #0f1121;
-  --color-canvas: #f6f6f9;
-  --color-line: #e7e7ef;
+  --color-canvas: #f7f5f0;
+  --color-line: #e4e0d5;
   --color-lemon: #ffd43b;
   --color-lemon-soft: #fff7d1;
   --color-lemon-deep: #e0a800;
+  /* Plain, slightly squarer corners: big soft radii are what make a page look generated. */
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.75rem;
   /* Status (reserved; always paired with an icon or label). */
   --color-good: #0ca30c;
   --color-warn: #fab219;

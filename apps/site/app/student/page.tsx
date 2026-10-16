@@ -26,7 +26,7 @@ export default function StudentHome() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-[32px] font-extrabold">Hi, {YOU.name.split(" ")[0]}</h1>
-        <p className="rounded-full border border-line bg-white px-3 py-1 text-sm">{ready ? contestLabel(today) : CONTEST}</p>
+        <p className="text-ink/75">{ready ? contestLabel(today) : CONTEST}</p>
       </div>
 
       {/* Do your cards */}

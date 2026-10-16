@@ -51,7 +51,7 @@ const fmtDay = (day: number) =>
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <span
-      className="grid place-items-center rounded-[10px] bg-lemon font-extrabold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.15)]"
+      className="grid place-items-center rounded-md bg-lemon font-extrabold text-ink"
       style={{ width: size, height: size, fontSize: size * 0.5 }}
     >
       Σ
@@ -111,13 +111,13 @@ export function AppShell({ role, children }: { role: Role; children: React.React
                 href={it.href}
                 className={cx(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
-                  active ? "bg-ink text-white" : "text-ink/60 hover:bg-ink/5 hover:text-ink",
+                  active ? "bg-ink/[0.07] text-ink" : "text-ink/60 hover:bg-ink/5 hover:text-ink",
                 )}
               >
                 <it.icon size={18} strokeWidth={2.2} />
                 {it.label}
                 {it.href === "/student" && ready && !doneToday && (
-                  <span className={cx("ml-auto size-2 rounded-full", active ? "bg-lemon" : "bg-lemon-deep")} />
+                  <span className="ml-auto size-2 rounded-full bg-lemon-deep" />
                 )}
               </Link>
             );
@@ -205,7 +205,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
               href={it.href}
               className={cx(
                 "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold",
-                isActive(it.href, it.exact) ? "bg-ink text-white" : "text-ink/60",
+                isActive(it.href, it.exact) ? "bg-ink/[0.07] text-ink" : "text-ink/60",
               )}
             >
               <it.icon size={15} />

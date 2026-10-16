@@ -43,7 +43,7 @@ export function InfoTip({ title, children, align = "right", className }: { title
         <span
           role="dialog"
           className={cx(
-            "rise absolute top-8 z-40 block w-72 rounded-2xl border border-line bg-white p-4 text-left font-sans text-sm font-normal normal-case leading-relaxed tracking-normal text-ink/65 shadow-[0_20px_50px_-20px_rgb(15_17_33/0.35)]",
+            "rise absolute top-8 z-40 block w-72 rounded-2xl border border-line bg-white p-4 text-left font-sans text-sm font-normal normal-case leading-relaxed tracking-normal text-ink/65 shadow-[0_8px_24px_-12px_rgb(15_17_33/0.3)]",
             align === "right" ? "right-0" : "left-0",
           )}
         >

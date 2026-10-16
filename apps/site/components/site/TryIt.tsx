@@ -25,7 +25,7 @@ export function TryIt() {
   };
 
   return (
-    <div className="rounded-3xl border border-line bg-white shadow-[0_30px_70px_-40px_rgb(15_17_33/0.35)]">
+    <div className="rounded-lg border border-ink/15 bg-white">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4">
         <Segmented
           value={mode}
@@ -35,7 +35,7 @@ export function TryIt() {
             { value: "recall", label: "Recall" },
           ]}
         />
-        <span className="text-xs font-semibold text-ink/40">Live: this is the real card from the app</span>
+        <span className="text-sm text-ink/60">The same card students see</span>
       </div>
       <div className="p-6 sm:p-8">
         {result !== null ? (
