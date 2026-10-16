@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BarChart3, BookOpen, CreditCard, GraduationCap, LayoutDashboard, Settings, Trophy, Users } from "lucide-react";
+import { BarChart3, Bell, BookOpen, CreditCard, GraduationCap, LayoutDashboard, Settings, Trophy, Users } from "lucide-react";
 import { Shell } from "@lemmory/ui/Shell";
 import { logout } from "../../../actions";
 
@@ -47,6 +47,7 @@ export function TeacherShell({
         { href: `${base}/leaderboard`, label: "Leaderboard", icon: Trophy },
         { href: `${base}/settings`, label: "Class settings", icon: Settings },
         { href: "/plan", label: "Plan & billing", icon: CreditCard },
+        { href: "/preferences", label: "Preferences", icon: Bell },
       ]}
       footer={
         <>

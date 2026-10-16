@@ -210,3 +210,41 @@ export function leaderRows(students: Student[], game: Competition, today: number
     streak: streak(s.doneDays, today),
   }));
 }
+
+const pctOf = (x: number | null) => (x === null ? "–" : `${Math.round(x * 100)}%`);
+
+export interface Attention {
+  student: Student;
+  tag: "Behind" | "Struggling";
+  /** What a teacher would act on, like "No review in 4d · 12 cards waiting". */
+  detail: string;
+}
+
+/**
+ * Students who are behind on reviews (no streak) or struggling (under 60% right on the
+ * first try, last 14 days), worst first. Shown on the teacher's overview and in the weekly email.
+ */
+export function needsAttention(students: Student[], today: number, k = 5): Attention[] {
+  return students
+    .map((s) => ({ s, m: summary(s, today) }))
+    .filter(({ m }) => m.streak === 0 || (m.accuracy ?? 1) < 0.6)
+    .map(({ s, m }) => {
+      const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
+      const away = m.lastActive === null ? null : today - m.lastActive;
+      const weak = byTopic(recent(s.log, today, 28))
+        .filter((t) => t.n >= 3)
+        .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
+      const behind = m.streak === 0;
+      return {
+        student: s,
+        tag: behind ? ("Behind" as const) : ("Struggling" as const),
+        detail: behind
+          ? `${away === null ? "Never reviewed" : `No review in ${away}d`} · ${waiting} cards waiting`
+          : `${pctOf(m.accuracy)} first try${weak ? ` · weak: ${weak.topic}` : ""}`,
+        score: behind ? -waiting : (m.accuracy ?? 1),
+      };
+    })
+    .sort((a, b) => a.score - b.score)
+    .slice(0, k)
+    .map(({ score: _, ...a }) => a);
+}

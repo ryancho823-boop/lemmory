@@ -3,16 +3,17 @@
 import { useActionState, useTransition } from "react";
 import { Field } from "@lemmory/ui/Shell";
 import { Button, Panel } from "@lemmory/ui/ui";
-import { removeStudentAction, resetPasswordAction } from "../../../../../actions";
+import { kickStudentAction, removeStudentAction, resetPasswordAction } from "../../../../../actions";
 
 export function ManageStudent({ classId, studentId, name }: { classId: string; studentId: string; name: string }) {
   const [state, action, pending] = useActionState(resetPasswordAction.bind(null, classId, studentId), undefined);
   const [removing, start] = useTransition();
+  const first = name.split(" ")[0];
   return (
     <Panel className="mt-6 grid gap-6 p-5 md:grid-cols-2">
       <form action={action}>
         <h2 className="text-[15px] font-bold">Reset password</h2>
-        <p className="mb-3 mt-0.5 text-sm text-ink/55">For when {name.split(" ")[0]} forgets it. They&apos;ll be signed out everywhere.</p>
+        <p className="mb-3 mt-0.5 text-sm text-ink/55">For when {first} forgets it. They&apos;ll be signed out everywhere.</p>
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <Field label="New password" name="password" type="text" autoComplete="off" required minLength={8} />
@@ -26,15 +27,30 @@ export function ManageStudent({ classId, studentId, name }: { classId: string; s
       </form>
       <div>
         <h2 className="text-[15px] font-bold">Remove from class</h2>
-        <p className="mb-3 mt-0.5 text-sm text-ink/55">Their account and history stay. They can rejoin with the class code.</p>
-        <Button
-          variant="outline"
-          disabled={removing}
-          className="text-bad"
-          onClick={() => confirm(`Remove ${name} from this class?`) && start(() => removeStudentAction(classId, studentId))}
-        >
-          Remove {name.split(" ")[0]}
-        </Button>
+        <p className="mb-3 mt-0.5 text-sm text-ink/55">
+          Their account and history stay either way. <b>Remove</b> lets them rejoin with the class code. <b>Kick out</b> blocks the code for
+          them until you let them back in from the Students page.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            disabled={removing}
+            onClick={() => confirm(`Remove ${name} from this class? They can rejoin with the class code.`) && start(() => removeStudentAction(classId, studentId))}
+          >
+            Remove {first}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={removing}
+            className="text-bad"
+            onClick={() =>
+              confirm(`Kick ${name} out of this class? The class code won't work for them until you let them back in.`) &&
+              start(() => kickStudentAction(classId, studentId))
+            }
+          >
+            Kick out {first}
+          </Button>
+        </div>
       </div>
     </Panel>
   );

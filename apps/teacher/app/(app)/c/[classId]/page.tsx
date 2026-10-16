@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
-import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
+import { classFormulaHealth, needsAttention, summary } from "@lemmory/core/analytics";
 import { BarList } from "@lemmory/ui/charts";
-import { Avatar, Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
+import { Avatar, Button, PageHeader, Panel, PanelHeader } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
 
@@ -12,34 +12,13 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
   const { klass, today, students, assignments } = await getClass(classId);
   const base = `/c/${classId}`;
 
-  const sums = students.map((s) => ({ s, m: summary(s, today) }));
-  const done = sums.filter((x) => x.m.doneToday).length;
+  const done = students.filter((s) => summary(s, today).doneToday).length;
   const health = classFormulaHealth(
     students,
     assignments.map((a) => a.formulaId),
     today,
   ).filter((h) => h.n > 0);
-  // Who's behind on reviews or struggling, with the specifics a teacher would act on.
-  const attention = sums
-    .filter((x) => x.m.streak === 0 || (x.m.accuracy ?? 1) < 0.6)
-    .map(({ s, m }) => {
-      const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
-      const away = m.lastActive === null ? null : today - m.lastActive;
-      const weak = byTopic(recent(s.log, today, 28))
-        .filter((t) => t.n >= 3)
-        .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
-      const behind = m.streak === 0;
-      return {
-        s,
-        tag: behind ? "Behind" : "Struggling",
-        detail: behind
-          ? `${away === null ? "Never reviewed" : `No review in ${away}d`} · ${waiting} cards waiting`
-          : `${pct(m.accuracy)} first try${weak ? ` · weak: ${weak.topic}` : ""}`,
-        score: behind ? -waiting : (m.accuracy ?? 1),
-      };
-    })
-    .sort((a, b) => a.score - b.score)
-    .slice(0, 5);
+  const attention = needsAttention(students, today);
   const thisWeek = assignments.filter((a) => a.week === klass.currentWeek);
 
   return (
@@ -105,7 +84,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
             <PanelHeader title="Needs attention" info="Students behind on reviews, or under 60% right on the first try." />
             <ul className="mt-2 divide-y divide-line">
               {attention.length === 0 && <li className="px-5 py-4 text-sm text-ink/50">{students.length ? "Everyone is on track." : "No students yet."}</li>}
-              {attention.map(({ s, tag, detail }) => (
+              {attention.map(({ student: s, tag, detail }) => (
                 <li key={s.id}>
                   <Link href={`${base}/students/${s.id}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas">
                     <Avatar name={s.name} size={30} />
