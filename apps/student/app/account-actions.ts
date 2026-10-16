@@ -13,7 +13,7 @@ import {
   resetWithStudentCode,
 } from "@lemmory/db/accounts";
 import { currentUser, startSession } from "@lemmory/db/auth";
-import { escapeHtml, mailHtml, sendMail } from "@lemmory/db/mail";
+import { escapeHtml, mailHtml, mailStyle, sendMail } from "@lemmory/db/mail";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { studentUrl } from "@/lib/links";
 
@@ -53,11 +53,12 @@ export async function emailResetLink(_: AccountState, fd: FormData): Promise<Acc
       to: reset.email,
       subject: "Reset your Lemmory password",
       text: `Hi ${reset.name},\n\nSomeone (hopefully you) asked to reset your Lemmory password. Choose a new one here:\n\n${link}\n\nThe link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email.`,
-      html: mailHtml(
-        `<p style="margin:0 0 16px">Hi ${escapeHtml(reset.name)}, someone (hopefully you) asked to reset your Lemmory password.</p>
-<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Choose a new password</a>
-<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email.</p>`,
-      ),
+      html: mailHtml({
+        title: "Reset your password",
+        body: `<p style="${mailStyle.p}">Hi ${escapeHtml(reset.name)}, someone (hopefully you) asked to reset your Lemmory password.</p>`,
+        button: { href: link, label: "Choose a new password" },
+        note: `The link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email. Your password stays the same.`,
+      }),
     });
   }
   return {
@@ -92,11 +93,12 @@ export async function addRecoveryEmail(_: AccountState, fd: FormData): Promise<A
     to: email,
     subject: "Confirm your Lemmory email",
     text: `Hi ${user.name},\n\nConfirm this email so you can reset your Lemmory password yourself if you forget it:\n\n${link}\n\nThe link works once, for ${CONFIRM_HOURS} hours.`,
-    html: mailHtml(
-      `<p style="margin:0 0 16px">Hi ${escapeHtml(user.name)}, confirm this email so you can reset your Lemmory password yourself if you forget it.</p>
-<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Confirm my email</a>
-<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${CONFIRM_HOURS} hours.</p>`,
-    ),
+    html: mailHtml({
+      title: "Confirm your email",
+      body: `<p style="${mailStyle.p}">Hi ${escapeHtml(user.name)}, click below to add this email to your Lemmory account. Then, if you ever forget your password, you can reset it yourself.</p>`,
+      button: { href: link, label: "Confirm my email" },
+      note: `The link works once, for ${CONFIRM_HOURS} hours. If you didn't ask for this, ignore this email.`,
+    }),
   });
   refresh();
   return { ok: `We sent a link to ${email}. Click it to finish.` };

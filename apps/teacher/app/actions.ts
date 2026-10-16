@@ -18,7 +18,7 @@ import {
 import { currentUser, endSession, startSession } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutAcademy, requestClub, schoolEmailProblem, startPilot } from "@lemmory/db/billing";
-import { escapeHtml, mailHtml, sendMail } from "@lemmory/db/mail";
+import { escapeHtml, mailHtml, mailStyle, sendMail } from "@lemmory/db/mail";
 import { setWeeklyReport } from "@lemmory/db/report";
 import {
   type ClassSettings,
@@ -61,11 +61,12 @@ async function sendConfirmation(userId: string, name: string, email: string) {
     to: email,
     subject: "Confirm your Lemmory email",
     text: `Hi ${name},\n\nConfirm this is your email to finish setting up your Lemmory teacher account:\n\n${link}\n\nThe link works once, for ${CONFIRM_HOURS} hours. If you didn't sign up, ignore this email and the account won't be usable.`,
-    html: mailHtml(
-      `<p style="margin:0 0 16px">Hi ${escapeHtml(name)}, confirm this is your email to finish setting up your Lemmory teacher account.</p>
-<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Confirm my email</a>
-<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${CONFIRM_HOURS} hours. If you didn't sign up, ignore this email and the account won't be usable.</p>`,
-    ),
+    html: mailHtml({
+      title: "Confirm your email",
+      body: `<p style="${mailStyle.p}">Hi ${escapeHtml(name)}, welcome to Lemmory. Click below to confirm this is your email and finish setting up your teacher account.</p>`,
+      button: { href: link, label: "Confirm my email" },
+      note: `The link works once, for ${CONFIRM_HOURS} hours. If you didn't sign up for Lemmory, you can ignore this email.`,
+    }),
   });
   return true;
 }
@@ -134,11 +135,12 @@ export async function forgotPassword(_: FormState, fd: FormData): Promise<FormSt
       to: reset.email,
       subject: "Reset your Lemmory password",
       text: `Hi ${reset.name},\n\nSomeone (hopefully you) asked to reset the password for your Lemmory teacher account. Set a new one here:\n\n${link}\n\nThe link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email: your password stays the same.`,
-      html: mailHtml(
-        `<p style="margin:0 0 16px">Hi ${escapeHtml(reset.name)}, someone (hopefully you) asked to reset the password for your Lemmory teacher account.</p>
-<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Set a new password</a>
-<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email: your password stays the same.</p>`,
-      ),
+      html: mailHtml({
+        title: "Reset your password",
+        body: `<p style="${mailStyle.p}">Hi ${escapeHtml(reset.name)}, someone (hopefully you) asked to reset the password for your Lemmory teacher account.</p>`,
+        button: { href: link, label: "Set a new password" },
+        note: `The link works once, for ${RESET_MINUTES} minutes, and signs you out on every other device. If you didn't ask, ignore this email. Your password stays the same.`,
+      }),
     });
   }
   return { ok: `If there's a teacher account for ${email}, we've emailed it a link to set a new password. Check your spam folder too.`, values: { email } };

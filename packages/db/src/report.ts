@@ -4,7 +4,7 @@ import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { NEEDS_WORK, classFormulaHealth, needsAttention } from "@lemmory/core/analytics";
 import { teacherActive } from "./billing";
 import { db } from "./client";
-import { escapeHtml, mailHtml } from "./mail";
+import { escapeHtml, mailButton, mailHtml, mailStyle } from "./mail";
 import { loadClass } from "./records";
 import { classes, teacherPrefs, users } from "./schema";
 
@@ -118,32 +118,34 @@ export async function buildWeeklyReport(teacher: { id: string; name: string }, t
   ].join("\n");
 
   const e = escapeHtml;
-  const html = mailHtml(
-    [
-      `<p style="margin:0 0 16px">Hi ${e(teacher.name)}, here's how your students did on Lemmory this week.</p>`,
+  const st = mailStyle;
+  const html = mailHtml({
+    title: flagged ? `${flagged} student${flagged === 1 ? "" : "s"} could use your help` : "Everyone is on track",
+    body: [
+      `<p style="${st.p}">Hi ${e(teacher.name)}, here's how your students did on Lemmory this week.</p>`,
       ...reports.map(
-        (r) => `<div style="border-top:1px solid #e7e5df;padding-top:16px;margin-top:16px">
-<p style="margin:0;font-weight:700;font-size:16px">${e(r.name)}</p>
-<p style="margin:2px 0 12px;color:#5b5d6b">${r.steady} of ${r.students} students reviewed on 5 or more days</p>
+        (r) => `<div style="${st.section}">
+<p style="${st.h2}">${e(r.name)}</p>
+<p style="${st.p};color:${st.soft}">${r.steady} of ${r.students} students reviewed on 5 or more days</p>
 ${
   r.attention.length
-    ? `<p style="margin:0 0 4px;font-weight:700">Needs attention</p><ul style="margin:0 0 12px;padding-left:20px">${r.attention
-        .map((a) => `<li><b>${e(a.name)}</b> <span style="color:${a.tag === "Behind" ? "#c2410c" : "#a16207"}">${a.tag}</span>: ${e(a.detail)}</li>`)
+    ? `<p style="${st.label}">Needs attention</p><ul style="${st.list}">${r.attention
+        .map((a) => `<li style="margin-bottom:6px"><b>${e(a.name)}</b> <span style="color:${a.tag === "Behind" ? "#c2410c" : "#a16207"};font-weight:700">${a.tag}</span><br>${e(a.detail)}</li>`)
         .join("")}</ul>`
-    : `<p style="margin:0 0 12px">Everyone is on track.</p>`
+    : `<p style="${st.p}">Everyone is on track.</p>`
 }
 ${
   r.forgetting.length
-    ? `<p style="margin:0 0 4px;font-weight:700">Formulas the class is forgetting</p><ul style="margin:0 0 12px;padding-left:20px">${r.forgetting
-        .map((f) => `<li>${e(f.name)}: ${pct(f.accuracy)} right on the first try, ${f.struggling} below 60%</li>`)
+    ? `<p style="${st.label}">Formulas the class is forgetting</p><ul style="${st.list}">${r.forgetting
+        .map((f) => `<li style="margin-bottom:6px"><b>${e(f.name)}</b><br>${pct(f.accuracy)} right on the first try, ${f.struggling} below 60%</li>`)
         .join("")}</ul>`
     : ""
 }
-<a href="${e(`${teacherUrl}/c/${r.id}`)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:9px 16px;border-radius:10px">Open ${e(r.name)}</a>
+${mailButton(`${teacherUrl}/c/${r.id}`, `Open ${r.name}`)}
 </div>`,
       ),
-      `<p style="margin:24px 0 0;font-size:13px;color:#5b5d6b">You get this every Monday. <a href="${e(prefsUrl)}" style="color:#5b5d6b">Turn it off in Preferences</a>.</p>`,
     ].join("\n"),
-  );
+    footer: `You get this every Monday. <a href="${e(prefsUrl)}" style="color:${st.soft}">Turn it off in Preferences</a>.`,
+  });
   return { subject, text, html };
 }

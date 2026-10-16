@@ -97,7 +97,7 @@ When a pilot ends unpaid, the teacher is sent to the plan page and their student
 
 ## Email (`packages/db/src/mail.ts`)
 
-Emails go out through [Resend](https://resend.com) when `RESEND_API_KEY` is set (on the teacher site, and on the student site for recovery emails). Without it, local development prints each email (including confirmation and reset links) to the terminal running that site, and production logs that it wasn't sent.
+Emails go out through [Resend](https://resend.com) when `RESEND_API_KEY` is set (on the teacher site, and on the student site for recovery emails). Without it, local development prints each email (including confirmation and reset links) to the terminal running that site and saves it as a web page in `data/outbox`, and production logs that it wasn't sent.
 
 The weekly email is sent by `GET /api/cron/weekly-report` on the teacher site, which Vercel Cron calls every Monday at 15:00 UTC (`apps/teacher/vercel.json`). It needs `Authorization: Bearer $CRON_SECRET`. Running it twice in a week is safe: teachers emailed in the last 6 days are skipped. To try it locally, start the teacher site with `CRON_SECRET=test npm run dev:teacher` and run `curl -H "Authorization: Bearer test" localhost:3002/api/cron/weekly-report`.
 
