@@ -2,18 +2,15 @@ import Link from "next/link";
 import { ChevronRight, Flame } from "lucide-react";
 import { TOPIC_COLOR } from "@lemmory/core/formulas";
 import { byTopic, recent, summary } from "@lemmory/core/analytics";
-import { kickedStudents } from "@lemmory/db/teacher";
 import { Avatar, PageHeader, Panel, cx, pct, relDay } from "@lemmory/ui/ui";
-import { getClass, requireTeacher, studentUrl } from "@/lib/session";
+import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "../JoinCode";
-import { LetBackInButton } from "./LetBackInButton";
 
 export const metadata = { title: "Students · Lemmory for teachers" };
 
 export default async function Students({ params }: PageProps<"/c/[classId]/students">) {
   const { classId } = await params;
-  const [me, { klass, students, today }] = await Promise.all([requireTeacher(), getClass(classId)]);
-  const kicked = await kickedStudents(me.id, classId);
+  const { klass, students, today } = await getClass(classId);
   const rows = students
     .map((s) => {
       const m = summary(s, today);
@@ -81,25 +78,6 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
               ))}
             </tbody>
           </table>
-        </Panel>
-      )}
-      {kicked.length > 0 && (
-        <Panel>
-          <div className="px-5 pt-5">
-            <h2 className="text-[15px] font-bold">Kicked out</h2>
-            <p className="mt-0.5 text-sm text-ink/55">The class code doesn&apos;t work for them. Letting someone back in lets them rejoin with the code.</p>
-          </div>
-          <ul className="mt-3 divide-y divide-line border-t border-line">
-            {kicked.map((k) => (
-              <li key={k.id} className="flex items-center gap-3 px-5 py-2.5">
-                <Avatar name={k.name} size={30} />
-                <span className="min-w-0 flex-1 truncate">
-                  <span className="font-semibold">{k.name}</span> <span className="font-mono text-sm text-ink/45">{k.username}</span>
-                </span>
-                <LetBackInButton classId={classId} studentId={k.id} name={k.name} />
-              </li>
-            ))}
-          </ul>
         </Panel>
       )}
       <Panel className="p-5">

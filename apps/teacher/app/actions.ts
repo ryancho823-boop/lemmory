@@ -4,18 +4,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { RESET_MINUTES, accountExists, checkLogin, createPasswordReset, createTeacher, resetPasswordWithToken } from "@lemmory/db/accounts";
+import { accountExists, checkLogin, createTeacher } from "@lemmory/db/accounts";
 import { currentUser, endSession, startSession } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutAcademy, requestClub, schoolEmailProblem, startPilot } from "@lemmory/db/billing";
-import { escapeHtml, mailHtml, sendMail } from "@lemmory/db/mail";
-import { setWeeklyReport } from "@lemmory/db/report";
 import {
   type ClassSettings,
   assign,
   createClass,
-  kickStudent,
-  letBackIn,
   newClassCode,
   newGame,
   removeStudent,
@@ -24,7 +20,6 @@ import {
   unassign,
   updateClass,
 } from "@lemmory/db/teacher";
-import { teacherUrl } from "@/lib/session";
 
 // Server actions are public endpoints: every one checks the session, and the db layer
 // checks that the class belongs to this teacher.
@@ -80,45 +75,6 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
 export async function logout() {
   await endSession("teacher");
   redirect("/login");
-}
-
-/** "Forgot password": email a one-hour reset link. Says the same thing whether or not the account exists. */
-export async function forgotPassword(_: FormState, fd: FormData): Promise<FormState> {
-  const email = field(fd, "email").toLowerCase();
-  if (!EMAIL.test(email) || email.length > 200) return { error: "Enter the email you signed up with.", values: { email } };
-  const reset = await createPasswordReset(email);
-  if (reset) {
-    const link = `${teacherUrl}/reset?token=${reset.token}`;
-    await sendMail({
-      to: reset.email,
-      subject: "Reset your Lemmory password",
-      text: `Hi ${reset.name},\n\nSomeone (hopefully you) asked to reset the password for your Lemmory teacher account. Set a new one here:\n\n${link}\n\nThe link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email: your password stays the same.`,
-      html: mailHtml(
-        `<p style="margin:0 0 16px">Hi ${escapeHtml(reset.name)}, someone (hopefully you) asked to reset the password for your Lemmory teacher account.</p>
-<a href="${escapeHtml(link)}" style="display:inline-block;background:#0f1121;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 18px;border-radius:10px">Set a new password</a>
-<p style="margin:16px 0 0;font-size:13px;color:#5b5d6b">The link works once, for ${RESET_MINUTES} minutes. If you didn't ask, ignore this email: your password stays the same.</p>`,
-      ),
-    });
-  }
-  return { ok: `If there's a teacher account for ${email}, we've emailed it a link to set a new password. Check your spam folder too.`, values: { email } };
-}
-
-export async function resetPassword(token: string, _: FormState, fd: FormData): Promise<FormState> {
-  const password = String(fd.get("password") ?? "");
-  if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
-  if (password !== String(fd.get("confirm") ?? "")) return { error: "The two passwords don't match." };
-  const id = await resetPasswordWithToken(str(token, 100), password);
-  if (!id) return { error: "This link has expired or was already used. Ask for a new one." };
-  await startSession(id, "teacher");
-  redirect("/");
-}
-
-// ── preferences ──
-
-export async function savePreferences(_: FormState, fd: FormData): Promise<FormState> {
-  await setWeeklyReport(await me(), fd.get("weeklyReport") === "on");
-  refresh();
-  return { ok: "Saved." };
 }
 
 // ── plan ──
@@ -213,17 +169,6 @@ export async function newGameAction(classId: unknown) {
 export async function removeStudentAction(classId: unknown, studentId: unknown) {
   await removeStudent(await me(), str(classId), str(studentId));
   redirect(`/c/${str(classId)}/students`);
-}
-
-/** Kick out: like remove, but the class code stops working for them until they're let back in. */
-export async function kickStudentAction(classId: unknown, studentId: unknown) {
-  await kickStudent(await me(), str(classId), str(studentId));
-  redirect(`/c/${str(classId)}/students`);
-}
-
-export async function letBackInAction(classId: unknown, studentId: unknown) {
-  await letBackIn(await me(), str(classId), str(studentId));
-  refresh();
 }
 
 export async function resetPasswordAction(classId: string, studentId: string, _: FormState, fd: FormData): Promise<FormState> {
