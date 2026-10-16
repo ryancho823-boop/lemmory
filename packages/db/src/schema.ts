@@ -148,34 +148,3 @@ export const studentPlans = sqliteTable("student_plans", {
   studentId: text("student_id").primaryKey(),
   paidAt: integer("paid_at", { mode: "timestamp_ms" }).notNull(),
 });
-
-/** Teachers' "forgot password" links. `id` is a SHA-256 of the emailed token, like `sessions`. */
-export const passwordResets = sqliteTable(
-  "password_resets",
-  {
-    id: text("id").primaryKey(),
-    userId: text("user_id").notNull(),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-    createdAt: createdAt(),
-  },
-  (t) => [index("password_resets_user").on(t.userId)],
-);
-
-/** Students a teacher kicked out of a class. The class code stops working for them until they're let back in. */
-export const classBans = sqliteTable(
-  "class_bans",
-  {
-    classId: text("class_id").notNull(),
-    studentId: text("student_id").notNull(),
-    createdAt: createdAt(),
-  },
-  (t) => [primaryKey({ columns: [t.classId, t.studentId] })],
-);
-
-/** A teacher's preferences. No row means the defaults. */
-export const teacherPrefs = sqliteTable("teacher_prefs", {
-  teacherId: text("teacher_id").primaryKey(),
-  /** The Monday email about students who are behind or struggling. On unless turned off. */
-  weeklyReport: integer("weekly_report", { mode: "boolean" }).notNull().default(true),
-  lastWeeklyReportAt: integer("last_weekly_report_at", { mode: "timestamp_ms" }),
-});

@@ -23,7 +23,7 @@ import { isNew, newCard, review } from "@lemmory/core/srs";
 import { getStudentPlan, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, loadClass, loadRecords, settle } from "./records";
-import { assignments, cards, classBans, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
+import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
 
 export type Mode = "review" | "practice";
 
@@ -337,27 +337,11 @@ export async function findClassByCode(code: string) {
     .get();
 }
 
-/** Did this class's teacher kick the student out? Then its code doesn't work for them. */
-export async function kickedFrom(studentId: string, classId: string) {
-  const row = await db
-    .select({ classId: classBans.classId })
-    .from(classBans)
-    .where(and(eq(classBans.classId, classId), eq(classBans.studentId, studentId)))
-    .get();
-  return !!row;
-}
-
 /** Join another class (students can be in several). Its assigned formulas join the student's deck. */
 export async function joinClass(studentId: string, classId: string) {
   await db.transaction(async (q) => {
     const klass = await q.select().from(classes).where(eq(classes.id, classId)).get();
     if (!klass) throw new ReviewError("Class not found");
-    const kicked = await q
-      .select({ classId: classBans.classId })
-      .from(classBans)
-      .where(and(eq(classBans.classId, classId), eq(classBans.studentId, studentId)))
-      .get();
-    if (kicked) throw new ReviewError("Your teacher removed you from this class.");
     const today = classToday(klass);
     await q
       .insert(enrollments)

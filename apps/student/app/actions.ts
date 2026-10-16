@@ -17,7 +17,6 @@ import {
   findClassByCode,
   finishIfEmpty,
   joinClass,
-  kickedFrom,
   studentClasses,
   promptFor,
   removeFromDeck,
@@ -93,8 +92,6 @@ export async function joinWithCode(_: FormState, fd: FormData): Promise<FormStat
   const code = field(fd, "code").toUpperCase();
   const klass = await findClassByCode(code);
   if (!klass) return { error: "No class has that code. Check with your teacher.", values: { code } };
-  if (await kickedFrom(studentId, klass.id))
-    return { error: "Your teacher removed you from this class, so this code doesn't work for you. Ask them if you think that's a mistake.", values: { code } };
   await joinClass(studentId, klass.id);
   await showClass(klass.id);
   redirect("/");
