@@ -43,6 +43,10 @@ Other commands:
 - **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, name, username, password. The switch links between the two sites.
 - **No account yet.** Logging in with an email or username that doesn't exist goes to sign-up with it filled in (carried in a short-lived cookie, not the URL).
 - Already-logged-in visitors skip the login page. Sessions last 30 days.
+- **Teachers confirm their email.** After signing up, a teacher gets a link by email and sees "Check your email" (`/verify`) until they click it (`/confirm`). The link works once, for 24 hours; **Send it again** makes a new one and the old one stops working.
+- **Forgot password (teachers).** **Forgot your password?** on the login page emails a link to set a new one (`/forgot` → `/reset`). The link works once, for an hour, and signs the account out everywhere. At most one email per account every 2 minutes, and the page says the same thing whether or not the email has an account.
+- **Forgot password (students).** Students have no email by default, so their teacher clicks **Make a reset code** on the student's page. The student enters it at `/forgot` on the student site with a new password they choose, so the teacher never knows it. A code works once, for 24 hours, and stops working after 5 wrong tries; making a new one cancels the old one.
+- **Recovery email (students 13 and older, optional).** On **My classes**, a student can add an email and confirm it by link. Then **Forgot your password?** can email them a reset link instead. Each site only accepts its own reset links.
 
 Locally the sites link to each other on localhost. Online they use the addresses in `apps/site/lib/links.ts`, `apps/teacher/lib/session.ts` and `apps/student/lib/links.ts`, which `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL` override.
 
@@ -60,7 +64,9 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 ## The teacher site (`apps/teacher`)
 
 - Sign up → pick a plan → create a class → share its code or join link → assign formulas.
-- Pages: Overview (who finished today, what the class is forgetting, who needs attention), Assign formulas, Formula analytics (accuracy, recall vs. application, mix-ups), Students (per-student stats, password reset, remove), Leaderboard (start a new game), Class settings (contest date, time zone, new join code), Plan & billing.
+- Pages: Overview (who finished today, what the class is forgetting, who needs attention), Assign formulas, Formula analytics (accuracy, recall vs. application, mix-ups), Students (per-student stats, reset codes, remove or kick out), Leaderboard (start a new game), Class settings (contest date, time zone, new join code), Plan & billing, Preferences.
+- **Remove vs. kick out.** Both take a student out of the class and keep their account and history. A removed student can rejoin with the class code; a kicked-out student can't until the teacher clicks **Let back in** on the Students page.
+- **Weekly email.** Every Monday each teacher gets an email per class: who's behind on reviews or under 60% right on the first try (the same list as "Needs attention"), and the assigned formulas the class is forgetting. It's on by default; teachers turn it off in **Preferences**. Teachers without students or with an ended plan get nothing.
 - A teacher can run several classes and switch between them from the sidebar.
 
 ## The student site (`apps/student`)
@@ -76,7 +82,7 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 - **Scheduling.** [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) with a 90% target retention. Only the first attempt each day counts; misses come back until they're right. At most 6 new cards a day. A card moves from recall to application once its stability reaches 10 days.
 - **Grading happens on the server.** The browser only gets the prompt, so answers can't be read ahead of time and points can't be faked. Typed math is checked numerically with [Compute Engine](https://cortexjs.io/compute-engine/).
 - **Days** run midnight to midnight in each class's time zone. Past days are filled in when a class loads, so nothing has to run on a schedule.
-- **Privacy.** Students sign up with a username, no email. Students see classmates only as leaderboard rows, never their review history.
+- **Privacy.** Students sign up with a username, no email (13 and older can add one for password recovery). Students see classmates only as leaderboard rows, never their review history.
 
 ## Plans (`packages/db/src/billing.ts`)
 
@@ -89,6 +95,12 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 
 When a pilot ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.
 
+## Email (`packages/db/src/mail.ts`)
+
+Emails go out through [Resend](https://resend.com) when `RESEND_API_KEY` is set (on the teacher site, and on the student site for recovery emails). Without it, local development prints each email (including confirmation and reset links) to the terminal running that site and saves it as a web page in `data/outbox`, and production logs that it wasn't sent.
+
+The weekly email is sent by `GET /api/cron/weekly-report` on the teacher site, which Vercel Cron calls every Monday at 15:00 UTC (`apps/teacher/vercel.json`). It needs `Authorization: Bearer $CRON_SECRET`. Running it twice in a week is safe: teachers emailed in the last 6 days are skipped. To try it locally, start the teacher site with `CRON_SECRET=test npm run dev:teacher` and run `curl -H "Authorization: Bearer test" localhost:3002/api/cron/weekly-report`.
+
 ## Deploying
 
 See [DEPLOY.md](DEPLOY.md). Each site has a `/health` page (student and teacher) that shows whether the database is reachable, without revealing any secrets.
@@ -97,8 +109,8 @@ See [DEPLOY.md](DEPLOY.md). Each site has a `/health` page (student and teacher)
 
 - Real payments in place of the simulated checkout
 - An admin page for approving school clubs (it's a command for now)
-- Rate limiting on login and sign-up; teacher password reset by email
+- Rate limiting on login and sign-up
 - Academy accounts with several teachers
 - Teacher-made formulas and problems
-- A weekly email to teachers and a daily reminder to students
+- A daily reminder to students
 - A privacy and COPPA review before onboarding students under 13

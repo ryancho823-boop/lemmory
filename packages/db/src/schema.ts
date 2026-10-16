@@ -16,6 +16,10 @@ export const users = sqliteTable("users", {
   username: text("username").unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: createdAt(),
+  /** When a teacher clicked the link in their confirmation email. Unconfirmed teachers can't use the site yet. */
+  emailVerifiedAt: integer("email_verified_at", { mode: "timestamp_ms" }),
+  /** A confirmed email a student (13 or older) added so they can reset their own password. */
+  recoveryEmail: text("recovery_email"),
 });
 
 /** `id` is a SHA-256 of the cookie token, so a leaked database can't be used to sign in. */
@@ -147,4 +151,65 @@ export const plans = sqliteTable("plans", {
 export const studentPlans = sqliteTable("student_plans", {
   studentId: text("student_id").primaryKey(),
   paidAt: integer("paid_at", { mode: "timestamp_ms" }).notNull(),
+});
+
+/** Teachers' "forgot password" links. `id` is a SHA-256 of the emailed token, like `sessions`. */
+export const passwordResets = sqliteTable(
+  "password_resets",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("password_resets_user").on(t.userId)],
+);
+
+/** Students a teacher kicked out of a class. The class code stops working for them until they're let back in. */
+export const classBans = sqliteTable(
+  "class_bans",
+  {
+    classId: text("class_id").notNull(),
+    studentId: text("student_id").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.classId, t.studentId] })],
+);
+
+/** A teacher's preferences. No row means the defaults. */
+export const teacherPrefs = sqliteTable("teacher_prefs", {
+  teacherId: text("teacher_id").primaryKey(),
+  /** The Monday email about students who are behind or struggling. On unless turned off. */
+  weeklyReport: integer("weekly_report", { mode: "boolean" }).notNull().default(true),
+  lastWeeklyReportAt: integer("last_weekly_report_at", { mode: "timestamp_ms" }),
+});
+
+/**
+ * Links that confirm an email address: a new teacher's sign-up email, or a student's
+ * recovery email. `id` is a SHA-256 of the link's token. One use, 24 hours.
+ */
+export const emailConfirmations = sqliteTable(
+  "email_confirmations",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    email: text("email").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("email_confirmations_user").on(t.userId)],
+);
+
+/**
+ * A one-time code a teacher gives a student who forgot their password. The student types it
+ * with a new password of their choosing, so the teacher never knows the password. The code
+ * is stored as a SHA-256, works for 24 hours, and stops working after a few wrong tries.
+ */
+export const studentResetCodes = sqliteTable("student_reset_codes", {
+  studentId: text("student_id").primaryKey(),
+  codeHash: text("code_hash").notNull(),
+  createdBy: text("created_by").notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  createdAt: createdAt(),
 });

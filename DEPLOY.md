@@ -25,8 +25,8 @@ For each site: **vercel.com → Add New → Project → import `lemmory`**, then
 | Project | Root Directory | Environment Variables |
 | --- | --- | --- |
 | Main site | `apps/site` | none |
-| Teacher site | `apps/teacher` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
-| Student site | `apps/student` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
+| Teacher site | `apps/teacher` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `RESEND_API_KEY`, `EMAIL_FROM`, `CRON_SECRET` |
+| Student site | `apps/student` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN`, `RESEND_API_KEY`, `EMAIL_FROM` |
 
 Leave everything else as Vercel detects it (Next.js). For the variables, check **Production** and **Preview** and leave **Development** unchecked. Mark the token **Sensitive**.
 
@@ -40,6 +40,16 @@ The database address is the `DATABASE_URL=` line in the same file.
 
 After adding or changing a variable, redeploy: **Deployments → ⋯ on the latest one → Redeploy**.
 
+## Email
+
+Confirmation emails, password-reset links and the Monday email to teachers are sent with [Resend](https://resend.com):
+
+1. Make a Resend account, add and verify your domain, and create an API key.
+2. On the teacher **and** student projects, set `RESEND_API_KEY` (mark it **Sensitive**) and `EMAIL_FROM`, for example `Lemmory <hello@yourdomain.com>`. Until a domain is verified, Resend only delivers to your own address.
+3. On the teacher project, set `CRON_SECRET` to any long random string (`openssl rand -hex 32`). Vercel sends it with the scheduled call to `/api/cron/weekly-report` (set up by `apps/teacher/vercel.json`, Mondays 15:00 UTC), and the page refuses any call without it.
+
+**Teachers can't finish signing up without email**, because they have to click the confirmation link. Set `RESEND_API_KEY` before new teachers sign up. (Students without email still get back in with a reset code from their teacher.)
+
 ## Check that it works
 
 Open `/health` on the teacher and student sites:
@@ -51,7 +61,7 @@ Both should show `"database":"connected (… accounts)"` and `"token_shape":"348
 
 Then try the whole thing:
 
-1. On the main site, click **Sign up**. Create a teacher account, pick a plan, and create a class.
+1. On the main site, click **Log in → Teacher → New? Sign up**. Create a teacher account, click the link in the confirmation email, pick a plan, and create a class.
 2. Open the class's join link in a private window and sign up as a student.
 3. As the teacher, assign a formula. Refresh the student's page: it shows up in their cards.
 

@@ -5,10 +5,17 @@ import { currentUser } from "@lemmory/db/auth";
 import { NotFound, listClasses, loadTeacherClass } from "@lemmory/db/teacher";
 import { getPlan, planState } from "@lemmory/db/billing";
 
-/** The signed-in teacher, or a redirect to the login page. */
-export const requireTeacher = cache(async () => {
+/** The signed-in teacher, confirmed or not, or a redirect to the login page. */
+export const requireSignedIn = cache(async () => {
   const user = await currentUser("teacher");
   if (!user) redirect("/login");
+  return user;
+});
+
+/** The signed-in teacher, or a redirect: to log in, or to confirm their email first. */
+export const requireTeacher = cache(async () => {
+  const user = await requireSignedIn();
+  if (!user.emailVerified) redirect("/verify");
   return user;
 });
 
@@ -39,4 +46,9 @@ export const getClass = cache(async (classId: string) => {
 /** The student site, for the join link teachers share. Override with NEXT_PUBLIC_STUDENT_URL. */
 export const studentUrl = (
   process.env.NEXT_PUBLIC_STUDENT_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://lemmory-student.vercel.app")
+).replace(/\/$/, "");
+
+/** This site, for links in emails. Override with NEXT_PUBLIC_TEACHER_URL. */
+export const teacherUrl = (
+  process.env.NEXT_PUBLIC_TEACHER_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:3002" : "https://lemmory-teacher.vercel.app")
 ).replace(/\/$/, "");

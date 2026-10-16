@@ -1,13 +1,14 @@
 import "server-only";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { pointsBetween } from "@lemmory/core/analytics";
 import { dayInZone } from "@lemmory/core/days";
 import { isNew } from "@lemmory/core/srs";
 import { db } from "./client";
-import { hashPassword, newId, newJoinCode } from "./password";
+import { createStudentResetCode } from "./accounts";
+import { newId, newJoinCode } from "./password";
 import { addAssignedCards, classToday, loadClass, loadRecords, toCard } from "./records";
-import { assignments, cards, classes, enrollments, sessions, users } from "./schema";
+import { assignments, cards, classBans, classes, enrollments, sessions, users } from "./schema";
 
 export class NotFound extends Error {}
 
@@ -164,18 +165,43 @@ async function enrolled(teacherId: string, classId: string, studentId: string) {
 
 export const studentInfo = enrolled;
 
-/** Remove a student from the class. Their account and history stay. */
+/** Remove a student from the class. Their account and history stay, and they can rejoin with the code. */
 export async function removeStudent(teacherId: string, classId: string, studentId: string) {
   await enrolled(teacherId, classId, studentId);
   await db.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
 }
 
-/** Students forget passwords. The teacher can set a new one and signs them out everywhere. */
-export async function resetStudentPassword(teacherId: string, classId: string, studentId: string, password: string) {
+/** Kick a student out: they leave the class and the class code stops working for them. */
+export async function kickStudent(teacherId: string, classId: string, studentId: string) {
   await enrolled(teacherId, classId, studentId);
-  await db
-    .update(users)
-    .set({ passwordHash: await hashPassword(password) })
-    .where(eq(users.id, studentId));
-  await db.delete(sessions).where(eq(sessions.userId, studentId));
+  await db.transaction(async (q) => {
+    await q.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
+    await q.insert(classBans).values({ classId, studentId }).onConflictDoNothing();
+  });
+}
+
+/** Students kicked out of this class, most recent first. */
+export async function kickedStudents(teacherId: string, classId: string) {
+  await owned(teacherId, classId);
+  return db
+    .select({ id: users.id, name: users.name, username: users.username, kickedAt: classBans.createdAt })
+    .from(classBans)
+    .innerJoin(users, eq(users.id, classBans.studentId))
+    .where(eq(classBans.classId, classId))
+    .orderBy(desc(classBans.createdAt));
+}
+
+/** Undo a kick: the student can join with the class code again (they aren't re-added). */
+export async function letBackIn(teacherId: string, classId: string, studentId: string) {
+  await owned(teacherId, classId);
+  await db.delete(classBans).where(and(eq(classBans.classId, classId), eq(classBans.studentId, studentId)));
+}
+
+/**
+ * Students forget passwords. The teacher gets a one-time code to give the student, who uses
+ * it to choose a new password themselves, so the teacher never knows it.
+ */
+export async function makeStudentResetCode(teacherId: string, classId: string, studentId: string) {
+  await enrolled(teacherId, classId, studentId);
+  return createStudentResetCode(studentId, teacherId);
 }

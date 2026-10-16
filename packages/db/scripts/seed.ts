@@ -35,12 +35,12 @@ function nextContest() {
 
 async function main() {
   // Start clean.
-  for (const table of [t.studentPlans, t.plans, t.reviewSessions, t.days, t.reviews, t.cards, t.assignments, t.enrollments, t.classes, t.sessions, t.users])
+  for (const table of [t.emailConfirmations, t.studentResetCodes, t.passwordResets, t.classBans, t.teacherPrefs, t.studentPlans, t.plans, t.reviewSessions, t.days, t.reviews, t.cards, t.assignments, t.enrollments, t.classes, t.sessions, t.users])
     await db.delete(table);
 
   const hash = await hashPassword(PASSWORD);
   const teacherId = "teacher-chen";
-  await db.insert(t.users).values({ id: teacherId, role: "teacher", name: "Ms. Chen", email: "teacher@lemmory.test", passwordHash: hash });
+  await db.insert(t.users).values({ id: teacherId, role: "teacher", name: "Ms. Chen", email: "teacher@lemmory.test", passwordHash: hash, emailVerifiedAt: new Date() });
 
   await db.insert(t.plans).values({ teacherId, kind: "academy", orgName: "Lemmory Sample Academy", paidAt: new Date() });
 
