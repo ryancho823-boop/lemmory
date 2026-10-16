@@ -73,9 +73,6 @@ export default function Overview() {
               <Link href="/demo" className="group inline-flex h-12 items-center gap-2 rounded-lg bg-ink px-6 font-bold text-white hover:bg-ink/85">
                 Try the demo <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
-              <a href="#inside" className="font-semibold underline decoration-ink/40 decoration-2 underline-offset-4 hover:decoration-ink">
-                See inside the app
-              </a>
             </div>
             <p className="mt-8 text-[15px]">Free for students in a paid class. Teachers start with a free {PILOT_DAYS}-day pilot.</p>
           </div>

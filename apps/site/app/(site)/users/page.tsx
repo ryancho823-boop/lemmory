@@ -98,7 +98,7 @@ const FAQ: FaqGroup[] = [
     items: [
       {
         q: "Why are there different prices?",
-        a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is capped at $40 per class a month. Students on their own pay $2 a month.",
+        a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is never over $20 a month per class. Students on their own pay $2 a month.",
       },
       {
         q: "What happens when the free pilot ends?",

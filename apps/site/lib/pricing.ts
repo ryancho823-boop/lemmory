@@ -26,7 +26,7 @@ export const TIERS: Tier[] = [
     who: "School math clubs",
     price: "$3",
     per: "per student / month",
-    note: "Never more than $40 per class a month",
+    note: "Never over $20 a month per class",
     body: "Everything academies get, for free clubs run at a school by a teacher or club advisor.",
     verify: "Sign up with your school email and school name. We confirm the club with the school before the cap applies; until then it's a free pilot.",
   },

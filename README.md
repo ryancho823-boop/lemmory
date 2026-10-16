@@ -84,7 +84,7 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 | --- | --- | --- |
 | Free pilot | $0 for 14 days | Once per teacher; it can't be restarted |
 | Academy | $3 per student per month | A student in two of the teacher's classes counts once |
-| School math club | $3 per student, capped at $40 per class per month | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
+| School math club | $3 per student, never over $20 a month per class | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
 | Individual student | $2 per month | For students not in a class |
 
 When a pilot ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.

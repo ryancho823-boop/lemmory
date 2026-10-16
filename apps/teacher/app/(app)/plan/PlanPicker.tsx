@@ -56,7 +56,7 @@ export function PlanPicker({ formulaCount, pilotDays, academy, club, current, pi
           title="School math club"
           price={`$${club.perStudent}`}
           per="per student / month"
-          note={`Never more than $${club.classCap} per class`}
+          note={`Never over $${club.classCap} a month per class`}
           body="For free clubs run at a school. We confirm the club with your school first."
           active={current === "club"}
           action={

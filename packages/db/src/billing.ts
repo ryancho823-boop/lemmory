@@ -10,7 +10,7 @@ export type PlanKind = "pilot" | "academy" | "club";
 
 export const PRICES = {
   academy: { label: "Academy", perStudent: 3, body: "For programs that run paid classes. $3 per student in your classes, each month." },
-  club: { label: "School math club", perStudent: 3, classCap: 40, body: "For free clubs run at a school. $3 per student, never more than $40 per class a month." },
+  club: { label: "School math club", perStudent: 3, classCap: 20, body: "For free clubs run at a school. $3 per student, never over $20 a month per class." },
   student: { label: "Individual", monthly: 2, body: "Your own deck and daily review, with the full formula bank." },
 } as const;
 

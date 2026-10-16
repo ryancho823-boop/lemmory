@@ -17,11 +17,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
   return (
     <AuthFrame
       title="Sign up"
-      sub={
-        fromLogin
-          ? "We couldn't find that username, so let's make your account. Your teacher gives you the class code."
-          : "As a student you'll need the class code from your teacher."
-      }
+      sub={fromLogin ? "No account with that username yet, so let's make one." : undefined}
       top={<RoleToggle current="student" teacherHref={`${teacherUrl}/signup`} studentHref="/join" />}
       foot={
         <>

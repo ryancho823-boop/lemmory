@@ -19,8 +19,11 @@ export function JoinForm({ code, username }: { code: string; username: string })
         defaultValue={v?.code ?? code}
         className="uppercase tracking-[0.2em]"
       />
-      <Field label="Your name" name="name" required autoComplete="name" defaultValue={v?.name} hint="First and last, so your teacher knows it's you." />
-      <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username ?? username} hint="No email needed." />
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={v?.firstName} />
+        <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={v?.lastName} />
+      </div>
+      <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username ?? username} />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
