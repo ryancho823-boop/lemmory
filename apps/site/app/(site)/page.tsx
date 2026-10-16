@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { FORMULAS, LOCKED, TOPIC_COLOR, TOTAL_FORMULAS, type Topic } from "@/lib/bank";
@@ -138,16 +139,29 @@ export default function Overview() {
       </section>
 
       <section className="bg-ink text-white">
-        <blockquote data-reveal className="mx-auto max-w-6xl px-5 py-20">
-          <span aria-hidden className="block font-display text-7xl leading-[0.6] text-lemon">&ldquo;</span>
-          <p className="mt-4 max-w-3xl font-display text-3xl leading-snug sm:text-[40px]">
-            Every formula a student learns should still be there on contest day.
-          </p>
-          <p className="mt-5 max-w-2xl text-lg text-white/80">
-            We make review part of the course, so every student keeps what they&apos;re taught, not just the ones with perfect
-            study habits.
-          </p>
-        </blockquote>
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-20">
+          <div data-reveal className="overflow-hidden rounded-lg">
+            {/* Photo by Greg Rosenke on Unsplash (Unsplash License). */}
+            <Image
+              src="/student-studying.jpg"
+              width={1600}
+              height={1067}
+              sizes="(min-width: 1024px) 540px, 100vw"
+              alt="A student working through a geometry worksheet"
+              className="h-auto w-full"
+            />
+          </div>
+          <blockquote data-reveal>
+            <span aria-hidden className="block font-display text-7xl leading-[0.6] text-lemon">&ldquo;</span>
+            <p className="mt-4 font-display text-3xl leading-snug sm:text-[38px]">
+              Every formula a student learns should still be there on contest day.
+            </p>
+            <p className="mt-5 text-lg text-white/80">
+              We make review part of the course, so every student keeps what they&apos;re taught, not just the ones with
+              perfect study habits.
+            </p>
+          </blockquote>
+        </div>
       </section>
 
       <section id="inside" className="scroll-mt-20 py-20">
