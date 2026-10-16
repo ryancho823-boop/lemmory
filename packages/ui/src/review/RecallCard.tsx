@@ -107,7 +107,6 @@ export function RecallCard({ prompt, onCheck, onDone }: Props) {
               <span className="block overflow-x-auto py-1">
                 <Tex math={graded.statement} />
               </span>
-              <span className="mt-1 block text-ink/60">It&apos;ll come back before today&apos;s session ends.</span>
             </>
           )}
         </Feedback>

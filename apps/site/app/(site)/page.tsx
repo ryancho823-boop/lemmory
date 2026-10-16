@@ -78,20 +78,16 @@ export default function Overview() {
             </div>
             <p className="mt-8 text-[15px]">Free for students in a paid class. Teachers start with a free {PILOT_DAYS}-day pilot.</p>
           </div>
-          <figure className="rise" style={{ animationDelay: "120ms" }}>
+          <div className="rise" style={{ animationDelay: "120ms" }}>
             <HeroCard />
-            <figcaption className="mt-4 text-sm">An application card: pick the formula first, then solve.</figcaption>
-          </figure>
+          </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-5 py-20">
-        <div data-reveal className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="max-w-xl text-3xl font-extrabold leading-tight sm:text-4xl">{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</h2>
-          <Link href="/student/bank" className="font-semibold underline decoration-ink/30 decoration-2 underline-offset-4 hover:decoration-ink">
-            Browse the formula bank
-          </Link>
-        </div>
+        <h2 data-reveal className="max-w-xl text-3xl font-extrabold leading-tight sm:text-4xl">
+          {TOTAL_FORMULAS} formulas, from AMC 8 to AIME
+        </h2>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TOPICS.map((t) => (
             <li key={t.topic} data-reveal className="rounded-lg border border-line border-t-4 bg-white p-5" style={{ borderTopColor: TOPIC_COLOR[t.topic] }}>
@@ -106,10 +102,10 @@ export default function Overview() {
             </li>
           ))}
           <li data-reveal className="flex">
-            <Link href="/demo" className="group flex w-full flex-col justify-between rounded-lg bg-ink p-5 text-white hover:bg-ink/90">
-              <p className="font-display text-xl">Try some now</p>
+            <Link href="/student/bank" className="group flex w-full flex-col justify-between rounded-lg bg-ink p-5 text-white hover:bg-ink/90">
+              <p className="font-display text-xl">See the formula bank</p>
               <p className="mt-6 flex items-center gap-1.5 font-semibold text-lemon">
-                Open the demo <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                Open it in the demo <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </p>
             </Link>
           </li>
@@ -182,11 +178,11 @@ export default function Overview() {
 
           <div className="mt-20 grid items-start gap-10 lg:grid-cols-[1fr_1.5fr]">
             <div data-reveal className="lg:sticky lg:top-28">
-              <h3 className="text-2xl font-extrabold leading-tight">Try one: choose the formula, then solve the problem.</h3>
+              <h3 className="text-2xl font-extrabold leading-tight">Try it: recall first, then apply.</h3>
               <p className="mt-3 leading-relaxed text-ink/80">
-                On the AMC, the hard step is seeing which tool a problem needs. Application cards train exactly that. Each
-                review shows a different problem, look-alike formulas are mixed into the choices, and answers count in any
-                form (37/4 and 9.25 are both right).
+                Every formula starts as a recall card: type it from memory, and any equivalent form counts. Once it sticks, it
+                becomes an application card, where students choose the formula a problem needs and then solve it. Each
+                review shows a different problem, with look-alike formulas mixed into the choices.
               </p>
             </div>
             <div data-reveal>
@@ -197,8 +193,8 @@ export default function Overview() {
           <div data-reveal className="mt-20">
             <h3 className="text-2xl font-extrabold">Then the scheduler takes over</h3>
             <p className="mt-2 max-w-2xl text-ink/80">
-              Each correct review pushes the next one further out, and a miss brings it back sooner. Here is one formula,
-              answered right every time:
+              Each correct review pushes the next one further out. A missed card comes back later in the same review until
+              it&apos;s right, and then sooner on the calendar. Here is one formula, answered right every time:
             </p>
             <ol className="mt-10 grid max-w-4xl grid-cols-4 border-t-2 border-ink/20">
               {TIMELINE.map((t, i) => (
@@ -209,6 +205,15 @@ export default function Overview() {
                 </li>
               ))}
             </ol>
+            <aside className="mt-12 max-w-3xl rounded-lg border-l-4 border-lemon-deep bg-lemon-soft px-6 py-5">
+              <p className="font-display text-xl">What is FSRS?</p>
+              <p className="mt-2 leading-relaxed">
+                FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For
+                every student and every formula, it estimates how strong the memory is and how fast it&apos;s fading, then
+                schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of
+                millions of real reviews, and Anki, the most popular flashcard app, made it a built-in option in 2023.
+              </p>
+            </aside>
           </div>
         </div>
       </section>

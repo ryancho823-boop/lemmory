@@ -1,6 +1,5 @@
-import { ChevronDown } from "lucide-react";
-import { TOTAL_FORMULAS } from "@/lib/bank";
 import { PageIntro } from "@/components/site/SiteChrome";
+import { Faq, type FaqGroup } from "@/components/site/Faq";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
 import { PILOT_DAYS, TIERS } from "@/lib/pricing";
 
@@ -22,50 +21,98 @@ const PREVIEW = [
   { name: "Arithmetic Series", v: 0.88 },
 ];
 
-const FAQ = [
+const FAQ: FaqGroup[] = [
   {
-    q: "Why are there different prices?",
-    a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is capped at $40 per class a month. Individual students pay $2 a month for their own deck.",
+    id: "start",
+    label: "Getting started",
+    color: "#2563eb",
+    items: [
+      {
+        q: "How long does it take to set up a class?",
+        a: "A few minutes. Sign up, create a class, and share its code or join link. Students sign up with the code, and you assign formulas whenever the course covers them.",
+      },
+      {
+        q: "Do students need an email address?",
+        a: "No. Students sign up with a username and the class code, so younger students can join without an email.",
+      },
+      {
+        q: "Who is it for?",
+        a: "Middle and high school students preparing for the AMC 8, AMC 10/12 and AIME, plus calculus rounds at tournaments. It works for academy courses, school math clubs, and students studying on their own.",
+      },
+      {
+        q: "Does it replace our curriculum?",
+        a: "No. You teach the way you already do and assign each week's formulas to match. Lemmory handles the review between classes.",
+      },
+    ],
   },
   {
-    q: "How do you know a math club is really a school club?",
-    a: "Club sign-ups need a school email address and the school's name, and we confirm with the school before the club price applies. A program that charges students tuition counts as an academy.",
+    id: "daily",
+    label: "Day to day",
+    color: "#16a34a",
+    items: [
+      {
+        q: "How long does it take students each day?",
+        a: "About five minutes. Each day's review only includes the cards that are due, usually 5 to 15.",
+      },
+      {
+        q: "How is typed math graded?",
+        a: "Answers are checked by value, so any equivalent form counts: 37/4 and 9.25 are both right. A one-letter typo in a formula gets one free retry.",
+      },
+      {
+        q: "What happens if a student misses a day?",
+        a: "Their cards wait for them and their streak resets. Teachers can see who's behind, and students see the missed days on their calendar.",
+      },
+      {
+        q: "Can students practice more than what's assigned?",
+        a: "Yes. They can add any formula from the bank to their own deck, or run Practice all before a contest. Extra practice doesn't earn leaderboard points, so the competition stays fair.",
+      },
+    ],
   },
   {
-    q: "Could an academy just have its students buy the $2 plan?",
-    a: "Students could, but the teacher would lose everything that makes Lemmory useful for a class: assigning formulas, class analytics, and the leaderboard. Individual accounts can't be grouped into a class.",
+    id: "teachers",
+    label: "For teachers",
+    color: "#e11d48",
+    items: [
+      {
+        q: "What will I see about my class?",
+        a: "Which formulas the class is forgetting, who finished today's review, who needs attention, which look-alike formulas students mix up, and full stats for each student.",
+      },
+      {
+        q: "Can I teach more than one class?",
+        a: "Yes. Switch between classes from the sidebar. A student can be in several classes and keeps one deck across all of them.",
+      },
+      {
+        q: "How does the leaderboard work?",
+        a: "Students earn 10 points per assigned card, plus a streak bonus. You can start a new game whenever you want, for example at the start of a unit.",
+      },
+      {
+        q: "How is this different from Anki or Quizlet?",
+        a: "Those only have the cards people make. Lemmory comes with a ready-to-assign competition formula bank, grades typed math, trains students to recognize which formula a problem needs, and shows you how the class is doing.",
+      },
+    ],
   },
   {
-    q: "How long does it take students each day?",
-    a: "About five minutes. Each day's review only includes the cards that are due, usually 5 to 15.",
-  },
-  {
-    q: "How is it different from Anki or Quizlet?",
-    a: "Those only have the cards people make. Lemmory comes with a ready-to-assign competition formula bank, grades typed math (any equivalent form counts), trains students to recognize which formula a problem needs, and gives teachers class analytics.",
-  },
-  {
-    q: "How does the scheduling work?",
-    a: "We use FSRS, the open-source algorithm Anki adopted in 2023. It estimates how well each student remembers each formula and brings the card back when predicted recall drops to 90%.",
-  },
-  {
-    q: "What happens if a student misses a day?",
-    a: "Their cards wait for them and their streak resets. Teachers can see who's behind, and the student's calendar shows which days they missed and by how much.",
-  },
-  {
-    q: "Can students add their own formulas?",
-    a: "Yes. Any formula in the bank can go into a student's personal deck as extra practice. Only teacher-assigned cards earn leaderboard points, so the competition stays fair.",
-  },
-  {
-    q: "What about right before the contest?",
-    a: "Students can run Practice all to go through their whole deck at once. It doesn't affect their schedule or points, so it's pure short-term review.",
-  },
-  {
-    q: "Which contests does it cover?",
-    a: `${TOTAL_FORMULAS} formulas spanning AMC 8, AMC 10/12 and AIME across algebra, geometry, trigonometry, number theory, combinatorics and probability, plus calculus for tournament calculus rounds.`,
-  },
-  {
-    q: "Does it replace our curriculum?",
-    a: "No. You teach the way you already do and assign each week's formulas to match. Lemmory handles the review between classes.",
+    id: "pricing",
+    label: "Pricing",
+    color: "#9333ea",
+    items: [
+      {
+        q: "Why are there different prices?",
+        a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is capped at $40 per class a month. Students on their own pay $2 a month.",
+      },
+      {
+        q: "What happens when the free pilot ends?",
+        a: `The pilot lasts ${PILOT_DAYS} days, once per teacher. When it ends, you pick a plan to keep going. Until then students can't start new reviews, but nothing is lost.`,
+      },
+      {
+        q: "How do you check that a club is a school club?",
+        a: "Club sign-ups need a school email address and the school's name, and we confirm with the school before the club price applies. A program that charges tuition counts as an academy.",
+      },
+      {
+        q: "Do students in a paid class pay anything?",
+        a: "No. When the teacher's plan covers the class, students use Lemmory for free.",
+      },
+    ],
   },
 ];
 
@@ -153,18 +200,10 @@ export default function ForUsers() {
       </section>
 
       <section className="border-t border-line py-20">
-        <div className="mx-auto grid max-w-6xl px-5 gap-10 lg:grid-cols-[1fr_2fr]">
-          <h2 className="text-3xl font-extrabold tracking-tight">Questions</h2>
-          <div className="divide-y divide-line border-y border-line">
-            {FAQ.map((f) => (
-              <details key={f.q} className="group py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold">
-                  {f.q}
-                  <ChevronDown size={18} className="shrink-0 text-ink/50 transition-transform group-open:rotate-180" />
-                </summary>
-                <p className="mt-3 max-w-2xl leading-relaxed text-ink/80">{f.a}</p>
-              </details>
-            ))}
+        <div className="mx-auto max-w-6xl px-5">
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Questions people ask</h2>
+          <div className="mt-8">
+            <Faq groups={FAQ} />
           </div>
         </div>
       </section>

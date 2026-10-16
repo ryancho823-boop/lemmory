@@ -94,11 +94,10 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
           <span className="text-ink/60">
             <Rich text={pick.whenToUse} />
           </span>
-          {!pick.right && <span className="mt-1 block text-ink/60">This one will come back later.</span>}
         </p>
       )}
 
-      {/* The wrong formula ends the card: no solving, and it comes back later. */}
+      {/* The wrong formula ends the card: no solving, and the student moves on. */}
       {pick && !pick.right && (
         <Button size="lg" className="rise mt-4" onClick={() => onDone(false)}>
           Continue

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
 import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { setupApply } from "@/lib/practice";
-import { InfoTip } from "@/components/InfoTip";
 import { useStore } from "@/lib/store";
 import { CARD_POINTS, streak, streakBonus } from "@/lib/analytics";
 import { isNew } from "@lemmory/core/srs";
@@ -104,7 +103,6 @@ export default function ReviewPage() {
       <Panel className="mx-auto max-w-xl px-6 py-12 text-center">
         <p className="flex items-center justify-center gap-1 text-sm font-semibold text-ink/45">
           Daily review
-          <InfoTip align="left">Missed cards come back until you get them right.</InfoTip>
         </p>
         <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{queue.length} cards</h1>
         <div className="mt-6 flex justify-center gap-2 text-sm">

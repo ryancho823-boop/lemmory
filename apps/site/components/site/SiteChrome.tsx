@@ -96,14 +96,9 @@ export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a
             </a>
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/student" className="inline-flex h-12 items-center gap-2 rounded-lg bg-ink px-6 font-bold text-white hover:bg-ink/85">
-            Student demo <ArrowRight size={18} />
-          </Link>
-          <Link href="/teacher" className="inline-flex h-12 items-center gap-2 rounded-lg border border-ink/20 bg-white px-6 font-semibold hover:border-ink/40">
-            Teacher demo <ArrowRight size={18} />
-          </Link>
-        </div>
+        <Link href="/demo" className="group inline-flex h-12 items-center gap-2 rounded-lg bg-ink px-6 font-bold text-white hover:bg-ink/85">
+          Open the live demo <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </div>
     </section>
   );
