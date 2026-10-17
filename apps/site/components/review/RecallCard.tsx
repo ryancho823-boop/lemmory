@@ -8,7 +8,8 @@ import { MathInput, type MathInputHandle } from "@/components/MathInput";
 import { Rich, Tex } from "@/components/Tex";
 import { Button, StageTag, TopicTag } from "@/components/ui";
 
-export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (correct: boolean) => void }) {
+/** `autoFocus` is off where the card sits mid-page (the homepage), so loading the page doesn't scroll to it. */
+export function RecallCard({ formula, onDone, autoFocus = true }: { formula: Formula; onDone: (correct: boolean) => void; autoFocus?: boolean }) {
   const [values, setValues] = useState<string[]>(() => formula.recall.map(() => ""));
   const [results, setResults] = useState<boolean[] | null>(null);
   // Boxes that look one letter off. Each card gets one free retry to fix a slip.
@@ -57,7 +58,7 @@ export function RecallCard({ formula, onDone }: { formula: Formula; onDone: (cor
                 ref={(h) => {
                   inputs.current[i] = h;
                 }}
-                autoFocus={i === 0}
+                autoFocus={autoFocus && i === 0}
                 disabled={!!results}
                 tools={!results && active === i}
                 onFocus={() => setActive(i)}

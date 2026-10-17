@@ -50,7 +50,7 @@ export function TryIt() {
         ) : mode === "apply" ? (
           <ApplyCard key={run} problem={PROBLEM} options={OPTIONS} onDone={(ok) => setResult(ok)} />
         ) : (
-          <RecallCard key={run} formula={FORMULA_BY_ID["heron"]} onDone={(ok) => setResult(ok)} />
+          <RecallCard key={run} formula={FORMULA_BY_ID["heron"]} autoFocus={run > 0} onDone={(ok) => setResult(ok)} />
         )}
       </div>
     </div>
