@@ -105,7 +105,7 @@ export default function ReviewPage() {
           Daily review
         </p>
         <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{queue.length} cards</h1>
-        <div className="mt-6 flex justify-center gap-2 text-sm">
+        <div className="mt-4 flex justify-center gap-4 text-[15px] text-ink/80">
           <Chip n={queue.length - fresh - apply} label="recall" />
           <Chip n={apply} label="application" />
           <Chip n={fresh} label="new" />
@@ -144,8 +144,8 @@ export default function ReviewPage() {
 
 function Chip({ n, label }: { n: number; label: string }) {
   return (
-    <span className="rounded-full border border-line bg-white px-3 py-1.5 font-semibold">
-      {n} <span className="font-medium text-ink/50">{label}</span>
+    <span>
+      <b>{n}</b> {label}
     </span>
   );
 }

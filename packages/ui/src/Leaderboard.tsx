@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { LeaderRow } from "@lemmory/core/analytics";
 import { InfoTip } from "./InfoTip";
-import { Avatar, Panel, Segmented, cx } from "./ui";
+import { Panel, Segmented, cx } from "./ui";
 
 type Range = "game" | "all";
 
@@ -24,8 +24,8 @@ export function Leaderboard({ rows: raw, compact = false }: { rows: LeaderRow[];
 
   return (
     <Panel className="overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-5 pt-5">
-        <h2 className="flex items-center gap-1 text-[17px] font-semibold">
+      <div className="flex items-center justify-between gap-3 border-b border-line bg-paper px-5 py-2.5">
+        <h2 className="flex items-center gap-1 text-[16px] font-bold">
           Leaderboard
           <InfoTip title="How scoring works" align="left">
             <b className="text-ink">10 points per assigned card</b>, however many tries it takes. Finish the day&apos;s review for a{" "}
@@ -64,7 +64,6 @@ function Row({ r }: { r: LeaderRow & { xp: number; label: string; rank: number }
   return (
     <li className={cx("flex items-center gap-3 px-3 py-2.5", r.you && "font-semibold")}>
       <span className="w-6 text-right tabular-nums">{r.rank}</span>
-      <Avatar name={r.name} you={r.you} size={28} />
       <span className="min-w-0 flex-1 truncate">{r.label}</span>
       <span className="tabular-nums">{r.xp} pts</span>
     </li>

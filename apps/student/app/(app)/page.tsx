@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Flame, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
 import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
@@ -63,7 +63,7 @@ export default async function StudentHome() {
               </p>
               {v.klass && (
                 <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                  <Flame size={16} className="text-lemon-deep" /> +{bonus} streak bonus
+                  +{bonus} streak bonus
                 </p>
               )}
             </div>

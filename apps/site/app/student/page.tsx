@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Flame } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CONTEST, contestLabel, YOU } from "@/lib/sim";
@@ -49,7 +49,7 @@ export default function StudentHome() {
                 </InfoTip>
               </p>
               <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                <Flame size={16} className="text-lemon-deep" /> +{bonus} streak bonus
+                +{bonus} streak bonus
               </p>
             </div>
           )}

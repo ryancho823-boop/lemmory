@@ -8,7 +8,7 @@ import { formulaAcrossClass } from "@/lib/analytics";
 import { isMastered } from "@lemmory/core/srs";
 import { Tex } from "@lemmory/ui/Tex";
 import { FormulaDetail } from "@/components/FormulaDetail";
-import { Avatar, Button, LevelTag, Meter, Panel, PanelHeader, Skeleton, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
+import { Button, LevelTag, Meter, Panel, PanelHeader, Skeleton, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
 
 export function TeacherFormula({ id }: { id: string }) {
   const { ready, students, state, today, assign } = useStore();
@@ -72,7 +72,6 @@ export function TeacherFormula({ id }: { id: string }) {
               <li key={r.student.id}>
                 <Link href={`/teacher/students/${r.student.id}`} className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-2.5 hover:bg-canvas sm:grid-cols-[1fr_100px_90px_120px]">
                   <span className="flex min-w-0 items-center gap-3">
-                    <Avatar name={r.student.name} size={28} you={r.student.isYou} />
                     <span className="truncate text-sm font-semibold">{r.student.isYou ? `${r.student.name} (demo)` : r.student.name}</span>
                   </span>
                   <span>

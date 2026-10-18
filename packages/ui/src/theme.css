@@ -10,6 +10,10 @@
   --color-lemon: #ffd43b;
   --color-lemon-soft: #fff7d1;
   --color-lemon-deep: #e0a800;
+  /* Title bars and boxed notes inside the product. */
+  --color-paper: #f1eee6;
+  /* Plain text links inside the product. */
+  --color-link: #1f4e96;
   /* Plain, slightly squarer corners: big soft radii are what make a page look generated. */
   --radius-lg: 0.375rem;
   --radius-xl: 0.5rem;
@@ -49,6 +53,34 @@ body {
     font-variation-settings: "SOFT" 50;
     letter-spacing: -0.01em;
   }
+}
+
+/*
+ * The product (the demo and the student and teacher apps) is plain and solid, like a
+ * well-kept reference site: white paper, square corners, sans-serif headings, no shadows.
+ * The marketing pages keep the softer look above. Shells add class="product".
+ */
+.product {
+  --color-canvas: #ffffff;
+  --color-line: #d6d2c6;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
+  --font-weight-extrabold: 700;
+}
+/* Table header rows get the same shaded bar as box titles. */
+.product thead {
+  background: var(--color-paper);
+}
+
+/* Not in a layer, so it wins over the font-display utility too. */
+.product :is(h1, h2, h3, h4, .font-extrabold, .font-display) {
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: 0;
 }
 
 ::selection {

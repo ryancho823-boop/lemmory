@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Logo } from "@lemmory/ui/Shell";
+import { TopBar } from "@lemmory/ui/Shell";
 import { Panel } from "@lemmory/ui/ui";
 import { getClasses, requirePlan } from "@/lib/session";
 import { createClassAction } from "../../actions";
@@ -13,12 +13,11 @@ export default async function NewClass() {
   await requirePlan();
   const classes = await getClasses();
   return (
-    <div className="min-h-screen bg-canvas">
-      <header className="mx-auto flex max-w-xl items-center justify-between px-5 py-6">
-        <Logo tag="Teacher" />
+    <div className="product min-h-screen bg-canvas">
+      <TopBar tag="Teacher" width="max-w-xl">
         <LogoutButton />
-      </header>
-      <main className="mx-auto max-w-xl px-5 pb-20">
+      </TopBar>
+      <main className="mx-auto max-w-xl px-5 pb-20 pt-8">
         {classes.length > 0 && (
           <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-ink/45 hover:text-ink">
             <ArrowLeft size={15} /> Your classes
