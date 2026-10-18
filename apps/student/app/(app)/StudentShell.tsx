@@ -34,7 +34,7 @@ export function StudentShell({
             value={classId ?? ""}
             disabled={pending}
             onChange={(e) => (e.target.value === "join" ? router.push("/class") : start(() => switchClass(e.target.value)))}
-            className="h-9 w-full border border-ink/30 bg-white px-2 text-sm font-semibold outline-none focus:border-ink"
+            className="h-10 w-full rounded-lg border border-line bg-white px-3 text-sm font-semibold outline-none focus:border-ink"
           >
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
@@ -56,10 +56,10 @@ export function StudentShell({
       ]}
       footer={
         <>
-          <p className="truncate" title={current?.name}>
-            Signed in as <b>{name}</b>
+          <p className="truncate font-semibold" title={current?.name}>
+            {name}
           </p>
-          <p>{streak ? `${streak}-day streak` : "No streak yet"}</p>
+          <p className="text-ink/55">{streak ? `${streak}-day streak` : "No streak yet"}</p>
         </>
       }
     >

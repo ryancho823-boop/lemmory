@@ -28,7 +28,7 @@ export function TeacherShell({
           aria-label="Class"
           value={classId}
           onChange={(e) => router.push(e.target.value === "new" ? "/new" : `/c/${e.target.value}`)}
-          className="h-9 w-full border border-ink/30 bg-white px-2 text-sm font-semibold outline-none focus:border-ink"
+          className="h-10 w-full rounded-lg border border-line bg-white px-3 text-sm font-semibold outline-none focus:border-ink"
         >
           {classes.map((c) => (
             <option key={c.id} value={c.id}>
@@ -48,9 +48,12 @@ export function TeacherShell({
         { href: "/plan", label: "Plan & billing" },
       ]}
       footer={
-        <p className="truncate" title={className}>
-          Signed in as <b>{teacher}</b>
-        </p>
+        <>
+          <p className="truncate font-semibold" title={className}>
+            {teacher}
+          </p>
+          <p className="text-ink/55">Teacher</p>
+        </>
       }
     >
       {children}

@@ -25,7 +25,7 @@ const VIEWS = [
     title: "Assign this week's formulas",
     body: "Teachers pick formulas from the bank as the course covers them. Each one goes into every student's deck with one click.",
     src: "/shots/teacher-assign.png",
-    w: 1560,
+    w: 1512,
     h: 1000,
     alt: "Teacher's Assign formulas page listing algebra formulas, most marked Assigned",
   },

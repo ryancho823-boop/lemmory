@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Frame, SideHeading } from "@lemmory/ui/Shell";
+import { Frame } from "@lemmory/ui/Shell";
 import { useStore } from "@/lib/store";
 import { YOU } from "@/lib/sim";
 import { streak } from "@/lib/analytics";
@@ -64,13 +64,29 @@ export function AppShell({ role, children }: { role: Role; children: React.React
   const isActive = (href: string, exact?: boolean) =>
     exact ? path === href || (href === "/student" && path === "/student/review") : path === href || path.startsWith(href + "/");
 
-  const other: Role = role === "student" ? "teacher" : "student";
-  const control = "block underline disabled:pointer-events-none disabled:no-underline disabled:opacity-40";
+  const small = "h-8 rounded-lg border border-line bg-white px-3 text-sm font-semibold text-ink/75 hover:border-ink/30 hover:text-ink disabled:pointer-events-none disabled:opacity-40";
+
+  // Student | Teacher: both views share one simulated class.
+  const switcher = (
+    <div className="grid grid-cols-2 rounded-lg border border-line p-0.5 text-sm font-semibold">
+      {(["student", "teacher"] as const).map((r) => (
+        <Link
+          key={r}
+          href={`/${r}`}
+          aria-current={r === role ? "page" : undefined}
+          className={cx("rounded-md py-1.5 text-center capitalize transition-colors", r === role ? "bg-ink text-white" : "text-ink/60 hover:text-ink")}
+        >
+          {r}
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <Frame
       home={`/${role}`}
       tag="Demo"
+      above={switcher}
       nav={items.map((it) => ({
         href: it.href,
         label: it.label,
@@ -78,53 +94,40 @@ export function AppShell({ role, children }: { role: Role; children: React.React
         due: it.href === "/student" && ready && !doneToday,
       }))}
       below={
-        <>
-          <SideHeading>Demo</SideHeading>
-          <div className="space-y-1 px-4 py-2.5 text-[15px] text-ink">
-            <p>
-              {role === "student" ? (
-                <>
-                  Signed in as <b>{YOU.name}</b>
-                  {ready && `, ${s}-day streak`}
-                </>
-              ) : (
-                <>
-                  Signed in as <b>Ms. Chen</b>
-                </>
-              )}
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="font-semibold">{role === "student" ? YOU.name : "Ms. Chen"}</p>
+            <p className="text-ink/55">{role === "student" ? (ready ? `${s}-day streak` : "\u00a0") : "Teacher"}</p>
+          </div>
+          <div>
+            <p className="text-ink/55">
+              {ready ? fmtDay(today) : "\u00a0"}
+              {state.dayOffset > 0 && ` (+${state.dayOffset})`}
             </p>
-            <Link href={`/${other}`} className="block underline">
-              Switch to the {other} view
-            </Link>
-            <p className="pt-2 font-bold">{ready ? fmtDay(today) : "\u00a0"}</p>
-            {state.dayOffset > 0 && <p>{`${state.dayOffset} day${state.dayOffset === 1 ? "" : "s"} ahead of today`}</p>}
-            <button onClick={nextDay} disabled={atLimit} className={control}>
-              Skip to tomorrow
-            </button>
+            <div className="mt-1.5 flex gap-2">
+              <button onClick={nextDay} disabled={atLimit} className={small}>
+                Next day
+              </button>
+              <button onClick={() => confirm("Reset all demo data?") && reset()} className={small}>
+                Reset
+              </button>
+            </div>
             {atLimit && (
-              <p className="text-sm">
+              <p className="mt-2 text-ink/60">
                 The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
-                <a href={SIGNUP_URL} className="font-semibold underline">
+                <a href={SIGNUP_URL} className="font-semibold text-ink underline">
                   Start a pilot
                 </a>{" "}
                 to use it with a real class.
               </p>
             )}
-            <button onClick={() => confirm("Reset all demo data?") && reset()} className={control}>
-              Reset demo
-            </button>
           </div>
-        </>
+        </div>
       }
       mobileExtra={
-        <>
-          <Link href={`/${other}`} className="underline capitalize">
-            {other} view
-          </Link>
-          <button onClick={nextDay} disabled={atLimit} className="underline disabled:opacity-40">
-            Next day
-          </button>
-        </>
+        <button onClick={nextDay} disabled={atLimit} className={small}>
+          Next day
+        </button>
       }
     >
       {children}
