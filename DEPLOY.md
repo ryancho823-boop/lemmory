@@ -9,7 +9,7 @@ Three websites on Vercel, all from this one GitHub repo, plus one Turso database
 | Student site | `apps/student` | https://lemmory-student.vercel.app |
 | Database | Turso | `libsql://lemmory-ryancho823-boop.aws-us-east-2.turso.io` |
 
-The sites already know these addresses (`apps/site/lib/links.ts` and `apps/teacher/lib/session.ts`), so the links between them work with no extra settings. Pushing to GitHub's `main` branch redeploys all three.
+The sites already know these addresses (`packages/core/src/urls.ts`), so the links between them work with no extra settings. Pushing to GitHub's `main` branch redeploys all three.
 
 ## The database (Turso)
 
@@ -57,7 +57,7 @@ Then try the whole thing:
 
 ## If the addresses change
 
-If you rename a project or add your own domain (say `teach.lemmory.com`), either update the two files above and push, or set these in Vercel (**Settings → Environment Variables**) and redeploy:
+If you rename a project or add your own domain (say `teach.lemmory.com`), either update that file and push, or set these in Vercel (**Settings → Environment Variables**) and redeploy:
 
 | On this project | Add |
 | --- | --- |

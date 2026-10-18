@@ -3,12 +3,44 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { FORMULAS, LOCKED, TOPIC_COLOR, TOTAL_FORMULAS, type Topic } from "@/lib/bank";
 import { Tex } from "@lemmory/ui/Tex";
-import { DemoCTA } from "@/components/site/SiteChrome";
+import { Container, CtaLink, DemoCTA, SectionTitle } from "@/components/site/blocks";
 import { TryIt } from "@/components/site/TryIt";
 import { ForgettingCurve, RESEARCH } from "@/components/site/research";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ProductTour } from "@/components/site/ProductTour";
 import { PILOT_DAYS } from "@/lib/pricing";
+import { ACCENT, ACCENT_CYCLE } from "@/lib/accents";
+
+// The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
+const TEXT = {
+  hero: {
+    title: "Remember every formula. Know when to use it.",
+    body: "Lemmory is daily formula practice for competition math classes. Each student gets a deck that grows with the course, and every formula comes back right before they'd forget it.",
+    button: "Try the demo",
+    note: <>Free for students in a paid class. Teachers start with a free {PILOT_DAYS}-day pilot.</>,
+  },
+  bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
+  problem: {
+    title: "Courses move on. Memory fades.",
+    body: "More than 350,000 students take the AMC each year. About 6,000 qualify for the AIME, and about 500 reach the USAMO. The formulas they learn in September have to last until contest day.",
+  },
+  mission: {
+    quote: "Every formula a student learns should still be there on contest day.",
+    body: "We make review part of the course, so every student keeps what they're taught, not just the ones with perfect study habits.",
+    photoAlt: "A student working through a geometry worksheet",
+  },
+  inside: { title: "A look inside", body: "Real screens from the app. The demo has all of them, with a sample class you can click around." },
+  how: {
+    title: "Five minutes a day. The scheduling is automatic.",
+    tryTitle: "Try it: recall first, then apply.",
+    tryBody: "Every formula starts as a recall card: type it from memory, and any equivalent form counts. Once it sticks, it becomes an application card, where students choose the formula a problem needs and then solve it. Each review shows a different problem, with look-alike formulas mixed into the choices.",
+    schedulerTitle: "Then the scheduler takes over",
+    schedulerBody: "Each correct review pushes the next one further out. A missed card comes back later in the same review until it's right, and then sooner on the calendar. Here is one formula, answered right every time:",
+    fsrsTitle: "What is FSRS?",
+    fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews, and Anki, the most popular flashcard app, made it a built-in option in 2023.",
+  },
+  research: { title: "Built on how memory actually works" },
+};
 
 const PROBLEMS = [
   {
@@ -38,8 +70,6 @@ const TOPICS: { topic: Topic; sample: string; tex: string }[] = [
 
 const COUNTS = [...FORMULAS, ...LOCKED].reduce<Partial<Record<Topic, number>>>((m, f) => ({ ...m, [f.topic]: (m[f.topic] ?? 0) + 1 }), {});
 
-const STEP_COLORS = ["#e11d48", "#2563eb", "#16a34a", "#9333ea"];
-
 const STEPS = [
   { title: "The teacher assigns", body: "This week's formulas go into every student's deck with one click." },
   { title: "Students recall", body: "They see a formula's name and type it out. Any equivalent form counts." },
@@ -60,32 +90,25 @@ export default function Overview() {
     <div>
       <ScrollReveal />
       <section className="bg-lemon">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_1fr]">
+        <Container className="grid items-center gap-12 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_1fr]">
           <div className="rise">
-            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">
-              Remember every formula. Know when to use it.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed">
-              Lemmory is daily formula practice for competition math classes. Each student gets a deck that grows with the
-              course, and every formula comes back right before they&apos;d forget it.
-            </p>
+            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">{TEXT.hero.title}</h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed">{TEXT.hero.body}</p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link href="/demo" className="group inline-flex h-12 items-center gap-2 rounded-lg bg-ink px-6 font-bold text-white hover:bg-ink/85">
-                Try the demo <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
+              <CtaLink href="/demo">{TEXT.hero.button}</CtaLink>
             </div>
-            <p className="mt-8 text-[15px]">Free for students in a paid class. Teachers start with a free {PILOT_DAYS}-day pilot.</p>
+            <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           <div className="rise" style={{ animationDelay: "120ms" }}>
             <HeroCard />
           </div>
-        </div>
+        </Container>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-20">
-        <h2 data-reveal className="max-w-xl text-3xl font-extrabold leading-tight sm:text-4xl">
-          {TOTAL_FORMULAS} formulas, from AMC 8 to AIME
-        </h2>
+      <Container as="section" className="py-20">
+        <SectionTitle reveal className="max-w-xl">
+          {TEXT.bank.title}
+        </SectionTitle>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TOPICS.map((t) => (
             <li key={t.topic} data-reveal className="rounded-lg border border-line border-t-4 bg-white p-5" style={{ borderTopColor: TOPIC_COLOR[t.topic] }}>
@@ -101,28 +124,25 @@ export default function Overview() {
           ))}
           <li data-reveal className="flex">
             <Link href="/student/bank" className="group flex w-full flex-col justify-between rounded-lg bg-ink p-5 text-white hover:bg-ink/90">
-              <p className="font-display text-xl">See the formula bank</p>
+              <p className="font-display text-xl">{TEXT.bank.link}</p>
               <p className="mt-6 flex items-center gap-1.5 font-semibold text-lemon">
-                Open it in the demo <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+                {TEXT.bank.linkNote} <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
               </p>
             </Link>
           </li>
         </ul>
-      </section>
+      </Container>
 
       <section className="border-t border-line">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-20 lg:grid-cols-[1fr_2fr]">
+        <Container className="grid gap-10 py-20 lg:grid-cols-[1fr_2fr]">
           <div data-reveal>
-            <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Courses move on. Memory fades.</h2>
-            <p className="mt-4 leading-relaxed text-ink/80">
-              More than 350,000 students take the AMC each year. About 6,000 qualify for the AIME, and about 500 reach the
-              USAMO. The formulas they learn in September have to last until contest day.
-            </p>
+            <SectionTitle>{TEXT.problem.title}</SectionTitle>
+            <p className="mt-4 leading-relaxed text-ink/80">{TEXT.problem.body}</p>
           </div>
           <div className="divide-y divide-line">
             {PROBLEMS.map((p, i) => (
               <div key={p.title} data-reveal className="flex gap-5 py-5 first:pt-0">
-                <span className="font-display text-3xl leading-none" style={{ color: STEP_COLORS[i] }}>
+                <span className="font-display text-3xl leading-none" style={{ color: ACCENT_CYCLE[i] }}>
                   {i + 1}
                 </span>
                 <div>
@@ -132,11 +152,11 @@ export default function Overview() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="bg-ink text-white">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-20">
+        <Container className="grid items-center gap-10 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-20">
           <div data-reveal className="overflow-hidden rounded-lg">
             {/* Photo by Greg Rosenke on Unsplash (Unsplash License). */}
             <Image
@@ -144,41 +164,36 @@ export default function Overview() {
               width={1600}
               height={1067}
               sizes="(min-width: 1024px) 540px, 100vw"
-              alt="A student working through a geometry worksheet"
+              alt={TEXT.mission.photoAlt}
               className="h-auto w-full"
             />
           </div>
           <blockquote data-reveal>
             <span aria-hidden className="block font-display text-7xl leading-[0.6] text-lemon">&ldquo;</span>
-            <p className="mt-4 font-display text-3xl leading-snug sm:text-[38px]">
-              Every formula a student learns should still be there on contest day.
-            </p>
-            <p className="mt-5 text-lg text-white/80">
-              We make review part of the course, so every student keeps what they&apos;re taught, not just the ones with
-              perfect study habits.
-            </p>
+            <p className="mt-4 font-display text-3xl leading-snug sm:text-[38px]">{TEXT.mission.quote}</p>
+            <p className="mt-5 text-lg text-white/80">{TEXT.mission.body}</p>
           </blockquote>
-        </div>
+        </Container>
       </section>
 
       <section id="inside" className="scroll-mt-20 py-20">
-        <div className="mx-auto max-w-6xl px-5">
-          <h2 data-reveal className="text-3xl font-extrabold leading-tight sm:text-4xl">A look inside</h2>
+        <Container>
+          <SectionTitle reveal>{TEXT.inside.title}</SectionTitle>
           <p data-reveal className="mt-3 max-w-2xl text-lg text-ink/80">
-            Real screens from the app. The demo has all of them, with a sample class you can click around.
+            {TEXT.inside.body}
           </p>
           <div data-reveal className="mt-10">
             <ProductTour />
           </div>
-        </div>
+        </Container>
       </section>
 
       <section id="how" className="scroll-mt-20 border-t border-line bg-white py-20">
-        <div className="mx-auto max-w-6xl px-5">
-          <h2 data-reveal className="text-3xl font-extrabold leading-tight sm:text-4xl">Five minutes a day. The scheduling is automatic.</h2>
+        <Container>
+          <SectionTitle reveal>{TEXT.how.title}</SectionTitle>
           <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((s, i) => (
-              <li key={s.title} data-reveal className="border-t-4 pt-4" style={{ borderColor: STEP_COLORS[i] }}>
+              <li key={s.title} data-reveal className="border-t-4 pt-4" style={{ borderColor: ACCENT_CYCLE[i] }}>
                 <p className="font-display text-lg">
                   {i + 1}. {s.title}
                 </p>
@@ -189,12 +204,8 @@ export default function Overview() {
 
           <div className="mt-20 grid items-start gap-10 lg:grid-cols-[1fr_1.5fr]">
             <div data-reveal className="lg:sticky lg:top-28">
-              <h3 className="text-2xl font-extrabold leading-tight">Try it: recall first, then apply.</h3>
-              <p className="mt-3 leading-relaxed text-ink/80">
-                Every formula starts as a recall card: type it from memory, and any equivalent form counts. Once it sticks, it
-                becomes an application card, where students choose the formula a problem needs and then solve it. Each
-                review shows a different problem, with look-alike formulas mixed into the choices.
-              </p>
+              <h3 className="text-2xl font-extrabold leading-tight">{TEXT.how.tryTitle}</h3>
+              <p className="mt-3 leading-relaxed text-ink/80">{TEXT.how.tryBody}</p>
             </div>
             <div data-reveal>
               <TryIt />
@@ -202,11 +213,8 @@ export default function Overview() {
           </div>
 
           <div data-reveal className="mt-20">
-            <h3 className="text-2xl font-extrabold">Then the scheduler takes over</h3>
-            <p className="mt-2 max-w-2xl text-ink/80">
-              Each correct review pushes the next one further out. A missed card comes back later in the same review until
-              it&apos;s right, and then sooner on the calendar. Here is one formula, answered right every time:
-            </p>
+            <h3 className="text-2xl font-extrabold">{TEXT.how.schedulerTitle}</h3>
+            <p className="mt-2 max-w-2xl text-ink/80">{TEXT.how.schedulerBody}</p>
             <ol className="mt-10 grid max-w-4xl grid-cols-4 border-t-2 border-ink/20">
               {TIMELINE.map((t, i) => (
                 <li key={t.day} className="relative pt-5">
@@ -217,21 +225,16 @@ export default function Overview() {
               ))}
             </ol>
             <aside className="mt-12 max-w-3xl rounded-lg border-l-4 border-lemon-deep bg-lemon-soft px-6 py-5">
-              <p className="font-display text-xl">What is FSRS?</p>
-              <p className="mt-2 leading-relaxed">
-                FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For
-                every student and every formula, it estimates how strong the memory is and how fast it&apos;s fading, then
-                schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of
-                millions of real reviews, and Anki, the most popular flashcard app, made it a built-in option in 2023.
-              </p>
+              <p className="font-display text-xl">{TEXT.how.fsrsTitle}</p>
+              <p className="mt-2 leading-relaxed">{TEXT.how.fsrsBody}</p>
             </aside>
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-5 py-20">
-          <h2 data-reveal className="text-3xl font-extrabold leading-tight sm:text-4xl">Built on how memory actually works</h2>
+        <Container className="py-20">
+          <SectionTitle reveal>{TEXT.research.title}</SectionTitle>
           <div className="mt-10 grid items-start gap-12 lg:grid-cols-[1fr_1.15fr]">
             <div data-reveal>
               <ForgettingCurve />
@@ -250,7 +253,7 @@ export default function Overview() {
               ))}
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       <DemoCTA />
@@ -266,11 +269,11 @@ function HeroCard() {
         <span className="text-ink/50">4 of 11</span>
       </div>
       <div className="mt-4 flex items-start gap-4">
-      <p className="flex-1 leading-relaxed">
-        Chords <Tex math="\overline{AB}" /> and <Tex math="\overline{CD}" /> meet at <Tex math="P" /> inside a circle. <Tex math="PA=4" />,{" "}
-        <Tex math="PB=6" />, <Tex math="PC=3" />. Find <Tex math="PD" />.
-      </p>
-      <ChordDiagram />
+        <p className="flex-1 leading-relaxed">
+          Chords <Tex math="\overline{AB}" /> and <Tex math="\overline{CD}" /> meet at <Tex math="P" /> inside a circle. <Tex math="PA=4" />,{" "}
+          <Tex math="PB=6" />, <Tex math="PC=3" />. Find <Tex math="PD" />.
+        </p>
+        <ChordDiagram />
       </div>
       <p className="mt-5 text-sm font-bold">1. Which formula does this need?</p>
       <div className="mt-2.5 grid grid-cols-2 gap-2 text-sm font-semibold">
@@ -301,8 +304,8 @@ function ChordDiagram() {
   return (
     <svg viewBox="30 30 200 200" className="w-32 shrink-0 sm:w-40" role="img" aria-label="Circle with chords AB and CD crossing at P">
       <circle cx="130" cy="130" r="82.8" fill="none" className="stroke-ink" strokeWidth="2" />
-      <line x1={pts.A[0]} y1={pts.A[1]} x2={pts.B[0]} y2={pts.B[1]} stroke="#2563eb" strokeWidth="3" />
-      <line x1={pts.C[0]} y1={pts.C[1]} x2={pts.D[0]} y2={pts.D[1]} stroke="#e11d48" strokeWidth="3" />
+      <line x1={pts.A[0]} y1={pts.A[1]} x2={pts.B[0]} y2={pts.B[1]} stroke={ACCENT.blue} strokeWidth="3" />
+      <line x1={pts.C[0]} y1={pts.C[1]} x2={pts.D[0]} y2={pts.D[1]} stroke={ACCENT.rose} strokeWidth="3" />
       {Object.values(pts).map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r="3.5" className="fill-ink" />
       ))}

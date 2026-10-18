@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { cx } from "@lemmory/ui/ui";
+import { ACCENT } from "@/lib/accents";
 
 // Screenshots of the demo (public/shots), retaken with the demo running locally.
 const VIEWS = [
   {
     id: "home",
     tab: "Student home",
-    color: "#2563eb",
+    color: ACCENT.blue,
     title: "One button a day",
     body: "Students see how many cards are due, the formulas they keep missing, and where they stand on the class leaderboard.",
     src: "/shots/student-home.png",
@@ -20,7 +21,7 @@ const VIEWS = [
   {
     id: "assign",
     tab: "Assigning",
-    color: "#e11d48",
+    color: ACCENT.rose,
     title: "Assign this week's formulas",
     body: "Teachers pick formulas from the bank as the course covers them. Each one goes into every student's deck with one click.",
     src: "/shots/teacher-assign.png",
@@ -31,7 +32,7 @@ const VIEWS = [
   {
     id: "class",
     tab: "Class overview",
-    color: "#16a34a",
+    color: ACCENT.green,
     title: "See what the class is forgetting",
     body: "Accuracy on every assigned formula, who finished today's review, and which students are falling behind.",
     src: "/shots/teacher-overview.png",
@@ -42,7 +43,7 @@ const VIEWS = [
   {
     id: "stats",
     tab: "Student stats",
-    color: "#9333ea",
+    color: ACCENT.purple,
     title: "Progress students can see",
     body: "A streak calendar, accuracy by topic, and the formulas that need more work.",
     src: "/shots/student-stats.png",

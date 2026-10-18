@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
 import { cx } from "@lemmory/ui/ui";
-import { SIGNUP_URL } from "@/lib/links";
 
 const TABS = [
   { href: "/", label: "Overview" },
@@ -70,36 +69,5 @@ export function SiteFooter() {
         <p>Spaced-repetition practice for competition math. Not affiliated with the MAA or AoPS.</p>
       </div>
     </footer>
-  );
-}
-
-export function PageIntro({ title, sub }: { title: React.ReactNode; sub?: React.ReactNode }) {
-  return (
-    <div className="max-w-3xl">
-      <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">{title}</h1>
-      {sub && <p className="mt-5 max-w-2xl text-lg leading-relaxed">{sub}</p>}
-    </div>
-  );
-}
-
-export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a student, then switch to the teacher view and watch your results show up." }) {
-  return (
-    <section className="bg-lemon-soft">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-8 px-5 py-20">
-        <div className="max-w-xl">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h2>
-          <p className="mt-3 text-lg text-ink/80">{sub}</p>
-          <p className="mt-4 text-ink/80">
-            Ready for your own class?{" "}
-            <a href={SIGNUP_URL} className="font-semibold text-ink underline underline-offset-2">
-              Start a free pilot
-            </a>
-          </p>
-        </div>
-        <Link href="/demo" className="group inline-flex h-12 items-center gap-2 rounded-lg bg-ink px-6 font-bold text-white hover:bg-ink/85">
-          Open the live demo <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      </div>
-    </section>
   );
 }

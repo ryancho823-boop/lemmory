@@ -1,7 +1,8 @@
-import { PageIntro } from "@/components/site/SiteChrome";
+import { Container, PageIntro } from "@/components/site/blocks";
 import { Faq, type FaqGroup } from "@/components/site/Faq";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
-import { PILOT_DAYS, TIERS } from "@/lib/pricing";
+import { PILOT_DAYS, PRICES, TIERS } from "@/lib/pricing";
+import { ACCENT, ACCENT_CYCLE } from "@/lib/accents";
 
 export const metadata = { title: "For users · Lemmory" };
 
@@ -25,7 +26,7 @@ const FAQ: FaqGroup[] = [
   {
     id: "start",
     label: "Getting started",
-    color: "#2563eb",
+    color: ACCENT.blue,
     items: [
       {
         q: "How long does it take to set up a class?",
@@ -48,7 +49,7 @@ const FAQ: FaqGroup[] = [
   {
     id: "daily",
     label: "Day to day",
-    color: "#16a34a",
+    color: ACCENT.green,
     items: [
       {
         q: "How long does it take students each day?",
@@ -71,7 +72,7 @@ const FAQ: FaqGroup[] = [
   {
     id: "teachers",
     label: "For teachers",
-    color: "#e11d48",
+    color: ACCENT.rose,
     items: [
       {
         q: "What will I see about my class?",
@@ -94,11 +95,11 @@ const FAQ: FaqGroup[] = [
   {
     id: "pricing",
     label: "Pricing",
-    color: "#9333ea",
+    color: ACCENT.purple,
     items: [
       {
         q: "Why are there different prices?",
-        a: "Academies charge for contest prep, so they pay the standard $3 per student. School clubs are usually free for students, so their price is never over $20 a month per class. Students on their own pay $2 a month.",
+        a: `Academies charge for contest prep, so they pay the standard $${PRICES.academy.perStudent} per student. School clubs are usually free for students, so their price is never over $${PRICES.club.classCap} a month per class. Students on their own pay $${PRICES.student.monthly} a month.`,
       },
       {
         q: "What happens when the free pilot ends?",
@@ -120,26 +121,26 @@ export default function ForUsers() {
   return (
     <div>
       <section className="bg-lemon">
-        <div className="mx-auto max-w-6xl px-5 pb-16 pt-14 sm:pt-20">
+        <Container className="pb-16 pt-14 sm:pt-20">
           <PageIntro
             title="For academies, math clubs, and students"
             sub="A retention tool that runs between classes, with no extra work for teachers. Every plan starts with a free pilot."
           />
-        </div>
+        </Container>
       </section>
-      <section className="mx-auto max-w-6xl px-5 py-16">
+      <Container as="section" className="py-16">
         <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
           {BENEFITS.map((b, i) => (
-            <li key={b.title} className="border-t-4 pt-4" style={{ borderColor: ["#e11d48", "#2563eb", "#16a34a", "#9333ea"][i] }}>
+            <li key={b.title} className="border-t-4 pt-4" style={{ borderColor: ACCENT_CYCLE[i] }}>
               <h3 className="text-lg font-extrabold">{b.title}</h3>
               <p className="mt-1.5 leading-relaxed text-ink/80">{b.body}</p>
             </li>
           ))}
         </ul>
-      </section>
+      </Container>
 
       <section className="border-t border-line bg-white py-20">
-        <div className="mx-auto grid max-w-6xl px-5 items-center gap-12 lg:grid-cols-2">
+        <Container className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-extrabold leading-tight tracking-tight">Know what to reteach before the contest</h2>
             <p className="mt-4 leading-relaxed text-ink/80">
@@ -167,11 +168,11 @@ export default function ForUsers() {
             </div>
             <figcaption className="mt-3 text-sm text-ink/60">From the teacher dashboard: right on the first try, last 14 days.</figcaption>
           </figure>
-        </div>
+        </Container>
       </section>
 
       <section id="pricing" className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-5 py-20">
+        <Container className="py-20">
           <h2 className="text-3xl font-extrabold">Pricing</h2>
           <p className="mt-3 max-w-xl text-lg text-ink/80">Teachers start with a free {PILOT_DAYS}-day pilot. Students in a paid class never pay.</p>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -196,16 +197,16 @@ export default function ForUsers() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="border-t border-line py-20">
-        <div className="mx-auto max-w-6xl px-5">
+        <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Questions people ask</h2>
           <div className="mt-8">
             <Faq groups={FAQ} />
           </div>
-        </div>
+        </Container>
       </section>
     </div>
   );
