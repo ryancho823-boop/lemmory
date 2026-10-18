@@ -2,9 +2,9 @@
 
 import { RotateCcw } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { InfoTip } from "@/components/InfoTip";
+import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";
-import { Button, Panel, Skeleton } from "@/components/ui";
+import { Button, Panel, Skeleton } from "@lemmory/ui/ui";
 
 export default function TeacherLeaderboard() {
   const { ready, state, today, resetCompetition } = useStore();

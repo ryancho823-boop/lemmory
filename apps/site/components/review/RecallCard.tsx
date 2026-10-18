@@ -1,12 +1,15 @@
 "use client";
 
+// The demo's version of packages/ui/src/review/RecallCard.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import { useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import type { Formula } from "@lemmory/core/content/types";
 import { findTypo, gradeRecall } from "@lemmory/core/grade";
-import { MathInput, type MathInputHandle } from "@/components/MathInput";
-import { Rich, Tex } from "@/components/Tex";
-import { Button, StageTag, TopicTag } from "@/components/ui";
+import { MathInput, type MathInputHandle } from "@lemmory/ui/MathInput";
+import { Rich, Tex } from "@lemmory/ui/Tex";
+import { Button, StageTag, TopicTag } from "@lemmory/ui/ui";
 
 /** `autoFocus` is off where the card sits mid-page (the homepage), so loading the page doesn't scroll to it. */
 export function RecallCard({ formula, onDone, autoFocus = true }: { formula: Formula; onDone: (correct: boolean) => void; autoFocus?: boolean }) {

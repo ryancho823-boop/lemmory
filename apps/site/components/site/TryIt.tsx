@@ -5,7 +5,7 @@ import { CheckCircle2, RotateCcw } from "lucide-react";
 import { FORMULA_BY_ID } from "@/lib/bank";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
-import { Button, Segmented } from "@/components/ui";
+import { Button, Segmented } from "@lemmory/ui/ui";
 
 type Mode = "apply" | "recall";
 

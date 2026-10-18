@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { FORMULA_BY_ID } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { classFormulaHealth } from "@/lib/analytics";
-import { Meter, PageHeader, Panel, Skeleton, TopicPill, pct } from "@/components/ui";
+import { Meter, PageHeader, Panel, Skeleton, TopicPill, pct } from "@lemmory/ui/ui";
 
 export default function FormulaAnalyticsIndex() {
   const { ready, students, state, today } = useStore();

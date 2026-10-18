@@ -3,7 +3,7 @@
 import { Check, Plus, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { FormulaBrowser } from "@/components/FormulaBrowser";
-import { Button, PageHeader, Skeleton } from "@/components/ui";
+import { Button, PageHeader, Skeleton } from "@lemmory/ui/ui";
 
 export default function AssignPage() {
   const { ready, state, assign, unassign, startNextWeek } = useStore();

@@ -22,7 +22,7 @@ import { YOU } from "@/lib/sim";
 import { streak } from "@/lib/analytics";
 import { DEMO_MAX_DAYS } from "@/lib/demo";
 import { SIGNUP_URL } from "@/lib/links";
-import { Avatar, cx } from "../ui";
+import { Avatar, cx } from "@lemmory/ui/ui";
 
 type Role = "student" | "teacher";
 

@@ -1,5 +1,8 @@
 "use client";
 
+// The demo's version of packages/ui/src/StudentAnalytics.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
@@ -12,7 +15,7 @@ import {
   weakest,
 } from "@/lib/analytics";
 import { BarList, WeekGrid } from "./charts";
-import { Meter, Panel, PanelHeader, StatStrip, pct } from "./ui";
+import { Meter, Panel, PanelHeader, StatStrip, pct } from "@lemmory/ui/ui";
 
 /** A student's analytics: used for "My stats" and the teacher's per-student page. */
 export function StudentAnalytics({

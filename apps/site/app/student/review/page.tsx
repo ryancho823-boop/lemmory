@@ -10,7 +10,7 @@ import { isNew } from "@lemmory/core/srs";
 import { Leaderboard } from "@/components/Leaderboard";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
-import { Button, Panel, Skeleton } from "@/components/ui";
+import { Button, Panel, Skeleton } from "@lemmory/ui/ui";
 
 interface Active {
   queue: string[];

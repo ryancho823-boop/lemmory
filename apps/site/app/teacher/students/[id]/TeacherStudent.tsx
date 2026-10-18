@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
 import { StudentAnalytics } from "@/components/StudentAnalytics";
-import { Avatar, Skeleton } from "@/components/ui";
+import { Avatar, Skeleton } from "@lemmory/ui/ui";
 
 export function TeacherStudent({ id }: { id: string }) {
   const { ready, students, today } = useStore();

@@ -1,11 +1,14 @@
 "use client";
 
+// The demo's version of packages/ui/src/charts.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 // Bar chart for 0..1 values. Magnitude uses the sequential blue; status colors only
 // appear next to the printed value. Bars show a tooltip on hover.
 
 import { type DayStatus, dayStatus } from "@/lib/analytics";
 import type { StudentRecord } from "@/lib/sim";
-import { pct } from "./ui";
+import { pct } from "@lemmory/ui/ui";
 
 /** Horizontal bars for a 0..1 value with a label on the left and the value on the right. */
 export function BarList({

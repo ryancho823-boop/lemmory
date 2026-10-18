@@ -7,9 +7,9 @@ import { useStore } from "@/lib/store";
 import { CONTEST, contestLabel, YOU } from "@/lib/sim";
 import { streak, streakBonus, weakest } from "@/lib/analytics";
 import { isNew } from "@lemmory/core/srs";
-import { InfoTip } from "@/components/InfoTip";
+import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";
-import { Button, Meter, Panel, PanelHeader, Skeleton, pct } from "@/components/ui";
+import { Button, Meter, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function StudentHome() {
   const { ready, you, today, doneToday, nothingDue, buildQueue, state } = useStore();

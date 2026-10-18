@@ -6,9 +6,9 @@ import { FORMULA_BY_ID } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { formulaAcrossClass } from "@/lib/analytics";
 import { isMastered } from "@lemmory/core/srs";
-import { Tex } from "@/components/Tex";
+import { Tex } from "@lemmory/ui/Tex";
 import { FormulaDetail } from "@/components/FormulaDetail";
-import { Avatar, Button, LevelTag, Meter, Panel, PanelHeader, Skeleton, StageSteps, StatStrip, TopicTag, pct } from "@/components/ui";
+import { Avatar, Button, LevelTag, Meter, Panel, PanelHeader, Skeleton, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
 
 export function TeacherFormula({ id }: { id: string }) {
   const { ready, students, state, today, assign } = useStore();

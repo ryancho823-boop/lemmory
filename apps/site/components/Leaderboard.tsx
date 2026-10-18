@@ -1,10 +1,13 @@
 "use client";
 
+// The demo's version of packages/ui/src/Leaderboard.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { competitionPoints, summary } from "@/lib/analytics";
-import { InfoTip } from "./InfoTip";
-import { Avatar, Panel, Segmented, cx } from "./ui";
+import { InfoTip } from "@lemmory/ui/InfoTip";
+import { Avatar, Panel, Segmented, cx } from "@lemmory/ui/ui";
 
 type Range = "week" | "all";
 

@@ -1,7 +1,10 @@
+// The demo's version of packages/ui/src/FormulaDetail.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import { ChevronDown, Lightbulb, Sigma } from "lucide-react";
 import { NOTES, type Formula } from "@/lib/bank";
-import { Rich, Tex } from "./Tex";
-import { LevelTag, Panel, TopicTag } from "./ui";
+import { Rich, Tex } from "@lemmory/ui/Tex";
+import { LevelTag, Panel, TopicTag } from "@lemmory/ui/ui";
 
 /** Header, statement, explanation with an expandable proof, when to use it, and an example. */
 export function FormulaDetail({ f, aside, actions }: { f: Formula; aside?: React.ReactNode; actions?: React.ReactNode }) {

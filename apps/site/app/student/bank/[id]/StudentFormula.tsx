@@ -8,7 +8,7 @@ import { accuracy } from "@/lib/analytics";
 import { isMastered, isNew } from "@lemmory/core/srs";
 import { FormulaDetail } from "@/components/FormulaDetail";
 import { DeckButton } from "@/components/DeckButton";
-import { Panel, StageTag, pct, relDay } from "@/components/ui";
+import { Panel, StageTag, pct, relDay } from "@lemmory/ui/ui";
 
 export function StudentFormula({ id }: { id: string }) {
   const { ready, state, you, today } = useStore();

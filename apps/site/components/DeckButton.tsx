@@ -2,7 +2,7 @@
 
 import { Check, Plus } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { Button } from "./ui";
+import { Button } from "@lemmory/ui/ui";
 
 export function DeckButton({ formulaId, size = "sm" }: { formulaId: string; size?: "sm" | "md" }) {
   const { ready, state, addToDeck, removeFromDeck } = useStore();

@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
 import { byTopic, classFormulaHealth, recent, summary } from "@/lib/analytics";
 import { BarList } from "@/components/charts";
-import { Avatar, Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@/components/ui";
+import { Avatar, Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function TeacherOverview() {
   const { ready, students, state, today } = useStore();

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { FORMULAS, LOCKED, TOPIC_COLOR, TOTAL_FORMULAS, type Topic } from "@/lib/bank";
-import { Tex } from "@/components/Tex";
+import { Tex } from "@lemmory/ui/Tex";
 import { DemoCTA } from "@/components/site/SiteChrome";
 import { TryIt } from "@/components/site/TryIt";
 import { ForgettingCurve, RESEARCH } from "@/components/site/research";

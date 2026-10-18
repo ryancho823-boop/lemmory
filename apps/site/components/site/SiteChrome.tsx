@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
-import { cx } from "@/components/ui";
+import { cx } from "@lemmory/ui/ui";
 import { SIGNUP_URL } from "@/lib/links";
 
 const TABS = [

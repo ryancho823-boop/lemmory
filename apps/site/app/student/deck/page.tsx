@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import { FORMULAS, FORMULA_BY_ID, TOPICS, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { type Card, mastery } from "@lemmory/core/srs";
-import { Button, PageHeader, Segmented, Skeleton } from "@/components/ui";
+import { Button, PageHeader, Segmented, Skeleton } from "@lemmory/ui/ui";
 
 type Order = "topic" | "mastery";
 const BANK_ORDER = new Map(FORMULAS.map((f, i) => [f.id, i]));

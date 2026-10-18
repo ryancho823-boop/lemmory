@@ -1,12 +1,15 @@
 "use client";
 
+// The demo's version of packages/ui/src/review/ApplyCard.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { gradeNumber } from "@lemmory/core/grade";
-import { MathInput } from "@/components/MathInput";
-import { Rich, Tex } from "@/components/Tex";
-import { Button, StageTag, cx } from "@/components/ui";
+import { MathInput } from "@lemmory/ui/MathInput";
+import { Rich, Tex } from "@lemmory/ui/Tex";
+import { Button, StageTag, cx } from "@lemmory/ui/ui";
 import { Feedback } from "./RecallCard";
 
 interface Props {

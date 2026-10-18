@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cx } from "@/components/ui";
+import { cx } from "@lemmory/ui/ui";
 
 export type FaqItem = { q: string; a: string };
 export type FaqGroup = { id: string; label: string; color: string; items: FaqItem[] };

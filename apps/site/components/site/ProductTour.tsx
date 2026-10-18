@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { cx } from "@/components/ui";
+import { cx } from "@lemmory/ui/ui";
 
 // Screenshots of the demo (public/shots), retaken with the demo running locally.
 const VIEWS = [
