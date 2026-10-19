@@ -2,25 +2,9 @@ import { Container, PageIntro } from "@/components/site/blocks";
 import { Faq, type FaqGroup } from "@/components/site/Faq";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
 import { PILOT_DAYS, PRICES, TIERS } from "@/lib/pricing";
-import { ACCENT, ACCENT_CYCLE } from "@/lib/accents";
+import { ACCENT } from "@/lib/accents";
 
-export const metadata = { title: "For users · Lemmory" };
-
-const BENEFITS = [
-  { title: "One-click assignments", body: "Pick formulas from the bank as the course covers them. Scheduling handles the rest." },
-  { title: "Review is homework", body: "Because it counts, students actually do it. That's where standalone flashcard apps fail." },
-  { title: "See what to reteach", body: "Class analytics show which formulas are fading and which ones students confuse." },
-  { title: "Class competitions", body: "A class leaderboard with streak bonuses. Start a new game whenever you want." },
-];
-
-// A static preview of the teacher dashboard's "forgetting" panel.
-const PREVIEW = [
-  { name: "Inscribed Angle Theorem", v: 0.62 },
-  { name: "Number of Divisors", v: 0.64 },
-  { name: "Power of a Point", v: 0.71 },
-  { name: "Heron's Formula", v: 0.79 },
-  { name: "Arithmetic Series", v: 0.88 },
-];
+export const metadata = { title: "Plans and pricing · Lemmory" };
 
 const FAQ: FaqGroup[] = [
   {
@@ -117,73 +101,34 @@ const FAQ: FaqGroup[] = [
   },
 ];
 
+// What a visitor deciding what to buy needs: the plans, which one fits, and answers.
+const INTRO = {
+  title: "Plans and pricing",
+  sub: `Pick the plan that matches how you teach. Every teacher plan starts with a free ${PILOT_DAYS}-day pilot, and students in a paid class never pay.`,
+};
+
 export default function ForUsers() {
   return (
     <div>
       <section className="bg-lemon">
         <Container className="pb-16 pt-14 sm:pt-20">
-          <PageIntro
-            title="For academies, math clubs, and students"
-            sub="A retention tool that runs between classes, with no extra work for teachers. Every plan starts with a free pilot."
-          />
-        </Container>
-      </section>
-      <Container as="section" className="py-16">
-        <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          {BENEFITS.map((b, i) => (
-            <li key={b.title} className="border-t-4 pt-4" style={{ borderColor: ACCENT_CYCLE[i] }}>
-              <h3 className="text-lg font-extrabold">{b.title}</h3>
-              <p className="mt-1.5 leading-relaxed text-ink/80">{b.body}</p>
-            </li>
-          ))}
-        </ul>
-      </Container>
-
-      <section className="border-t border-line bg-white py-20">
-        <Container className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
-            <h2 className="text-3xl font-extrabold leading-tight tracking-tight">Know what to reteach before the contest</h2>
-            <p className="mt-4 leading-relaxed text-ink/80">
-              Every review feeds the class dashboard: which formulas the class is forgetting, which students fell behind, and
-              which look-alike formulas students mix up.
-            </p>
-          </div>
-          <figure>
-            <div className="rounded-lg border border-ink/15 bg-white p-6">
-              <p className="font-bold">What the class is forgetting</p>
-              <ul className="mt-4 space-y-3">
-                {PREVIEW.map((p) => (
-                  <li key={p.name} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 sm:grid-cols-[170px_1fr_auto]">
-                    <span className="truncate text-sm">{p.name}</span>
-                    <span className="text-right text-sm font-semibold tabular-nums sm:order-last">{Math.round(p.v * 100)}%</span>
-                    <span className="col-span-2 h-2 rounded-sm bg-ink/6 sm:col-span-1">
-                      <span
-                        className="block h-full rounded-sm"
-                        style={{ width: `${p.v * 100}%`, background: p.v >= 0.8 ? "var(--color-good)" : p.v >= 0.65 ? "var(--color-warn)" : "var(--color-bad)" }}
-                      />
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <figcaption className="mt-3 text-sm text-ink/60">From the teacher dashboard: right on the first try, last 14 days.</figcaption>
-          </figure>
+          <PageIntro title={INTRO.title} sub={INTRO.sub} />
         </Container>
       </section>
 
-      <section id="pricing" className="border-t border-line">
-        <Container className="py-20">
-          <h2 className="text-3xl font-extrabold">Pricing</h2>
-          <p className="mt-3 max-w-xl text-lg text-ink/80">Teachers start with a free {PILOT_DAYS}-day pilot. Students in a paid class never pay.</p>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+      <section id="pricing">
+        <Container className="py-16">
+          <div className="grid gap-5 md:grid-cols-3">
             {TIERS.map((t) => (
               <div key={t.id} className="flex flex-col rounded-lg border-2 border-lemon bg-white p-7">
-                <h3 className="text-lg font-semibold">{t.who}</h3>
-                <p className="mt-4">
+                <h2 className="text-xl font-semibold">{t.who}</h2>
+                <p className="mt-1 font-semibold text-ink/70">{t.bestFor}</p>
+                <p className="mt-5">
                   <span className="text-4xl font-extrabold">{t.price}</span> <span className="text-ink/70">{t.per}</span>
                 </p>
                 {t.note && <p className="mt-1 font-semibold">{t.note}</p>}
-                <p className="mt-3 leading-relaxed text-ink/80">{t.body}</p>
+                <p className="mt-1 text-ink/80">{t.example}</p>
+                <p className="mt-4 leading-relaxed text-ink/80">{t.body}</p>
                 <div className="mt-5 flex-1 border-t border-line pt-4">
                   <p className="text-sm font-semibold">How we check</p>
                   <p className="mt-1 text-sm leading-relaxed text-ink/75">{t.verify}</p>
