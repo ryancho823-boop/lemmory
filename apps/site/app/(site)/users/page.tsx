@@ -14,14 +14,15 @@ const INTRO = {
 
 // "Yes", "No", or a short note. Keep claims about other tools conservative.
 const COMPARE = {
-  columns: ["Lemmory", "Anki", "Quizlet", "Studying alone"],
+  // Podsie: from podsie.org (free, by the nonprofit Teaching Lab; ready-made sets are science).
+  columns: ["Lemmory", "Podsie", "Anki", "Quizlet", "Studying alone"],
   rows: [
-    { label: "Competition formulas, ready to assign", cells: ["Yes, 187", "Make your own", "Make your own", "No"] },
-    { label: "Checks typed math in any equivalent form", cells: ["Yes", "No", "No", "No"] },
-    { label: "Practice picking the right formula for a problem", cells: ["Yes", "No", "No", "No"] },
-    { label: "Reviews spaced so formulas aren't forgotten", cells: ["Yes", "Yes", "Partly", "No"] },
-    { label: "Teacher sees what the class is forgetting", cells: ["Yes", "No", "Partly", "No"] },
-    { label: "Class leaderboard", cells: ["Yes", "No", "Partly", "No"] },
+    { label: "Competition formulas, ready to assign", cells: ["Yes, 187", "No (science sets)", "Make your own", "Make your own", "No"] },
+    { label: "Checks typed math in any equivalent form", cells: ["Yes", "Not listed", "No", "No", "No"] },
+    { label: "Practice picking the right formula for a problem", cells: ["Yes", "No", "No", "No", "No"] },
+    { label: "Reviews spaced so formulas aren't forgotten", cells: ["Yes", "Yes", "Yes", "Partly", "No"] },
+    { label: "Teacher sees what the class is forgetting", cells: ["Yes", "Yes", "No", "Partly", "No"] },
+    { label: "Class leaderboard", cells: ["Yes", "Not listed", "No", "Partly", "No"] },
   ],
 };
 
@@ -97,7 +98,7 @@ export default function ForUsers() {
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
           <div className="mt-8 overflow-x-auto rounded-lg border border-line">
-            <table className="w-full min-w-[640px] text-left">
+            <table className="w-full min-w-[760px] text-left">
               <thead className="border-b border-line bg-canvas">
                 <tr>
                   <th className="px-5 py-3 font-semibold" />
