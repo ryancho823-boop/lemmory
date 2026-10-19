@@ -5,7 +5,7 @@ import { PILOT_DAYS, TIERS } from "@/lib/pricing";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
 
-// What a visitor deciding what to buy needs: the plans, how Lemmory compares, and the basics.
+// What a visitor deciding what to buy needs: the plans and how Lemmory compares.
 const INTRO = {
   title: "Plans and pricing",
   sub: `Pick the plan that matches how you teach. Every teacher plan starts with a free ${PILOT_DAYS}-day pilot, and students in a paid class never pay.`,
@@ -24,14 +24,6 @@ const COMPARE = {
     { label: "Class leaderboard", cells: ["Yes", "Yes", "No", "Partly", "No"] },
   ],
 };
-
-// Only what isn't already said by the plans, the comparison, or the homepage.
-const GOOD_TO_KNOW = [
-  "Setting up a class takes a few minutes. Share its code and students join.",
-  "Students sign up with a username. No email needed.",
-  "If a student misses a day, their cards wait for them.",
-  "Keep your curriculum. Assign each week's formulas as you teach them.",
-];
 
 export default function ForUsers() {
   return (
@@ -97,17 +89,6 @@ export default function ForUsers() {
               </tbody>
             </table>
           </div>
-        </Container>
-      </section>
-
-      <section className="border-t border-line py-20">
-        <Container>
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Good to know</h2>
-          <ul className="mt-6 max-w-3xl list-disc space-y-2 pl-5 text-lg leading-relaxed text-ink/85 marker:text-ink/40">
-            {GOOD_TO_KNOW.map((x) => (
-              <li key={x}>{x}</li>
-            ))}
-          </ul>
         </Container>
       </section>
     </div>
