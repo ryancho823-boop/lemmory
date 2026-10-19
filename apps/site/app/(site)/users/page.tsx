@@ -1,5 +1,6 @@
 import { Container, PageIntro } from "@/components/site/blocks";
 import { Faq, type FaqGroup } from "@/components/site/Faq";
+import { InfoTip } from "@lemmory/ui/InfoTip";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
 import { PILOT_DAYS, PRICES, TIERS } from "@/lib/pricing";
 import { ACCENT } from "@/lib/accents";
@@ -119,23 +120,26 @@ export default function ForUsers() {
       <section id="pricing">
         <Container className="py-16">
           <div className="grid gap-5 md:grid-cols-3">
-            {TIERS.map((t) => (
+            {TIERS.map((t, i) => (
               <div key={t.id} className="flex flex-col rounded-lg border-2 border-lemon bg-white p-7">
-                <h2 className="text-xl font-semibold">{t.who}</h2>
-                <p className="mt-1 font-semibold text-ink/70">{t.bestFor}</p>
-                <p className="mt-5">
+                <h2 className="flex items-center gap-1 text-xl font-semibold">
+                  {t.who}
+                  <InfoTip title={t.who} align={i === TIERS.length - 1 ? "right" : "left"}>
+                    <span className="block">{t.body}</span>
+                    <span className="mt-2 block">{t.example}</span>
+                    <span className="mt-2 block">
+                      <b className="text-ink">How we check:</b> {t.verify}
+                    </span>
+                  </InfoTip>
+                </h2>
+                <p className="mt-1 text-ink/70">{t.bestFor}</p>
+                <p className="mt-6">
                   <span className="text-4xl font-extrabold">{t.price}</span> <span className="text-ink/70">{t.per}</span>
                 </p>
-                {t.note && <p className="mt-1 font-semibold">{t.note}</p>}
-                <p className="mt-1 text-ink/80">{t.example}</p>
-                <p className="mt-4 leading-relaxed text-ink/80">{t.body}</p>
-                <div className="mt-5 flex-1 border-t border-line pt-4">
-                  <p className="text-sm font-semibold">How we check</p>
-                  <p className="mt-1 text-sm leading-relaxed text-ink/75">{t.verify}</p>
-                </div>
+                <p className="mt-1 min-h-6 font-semibold">{t.note}</p>
                 <a
                   href={t.id === "student" ? JOIN_URL : SIGNUP_URL}
-                  className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-ink px-4 font-semibold text-white hover:bg-ink/85"
+                  className="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-ink px-4 font-semibold text-white hover:bg-ink/85"
                 >
                   {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}
                 </a>

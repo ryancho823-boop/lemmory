@@ -22,7 +22,7 @@ export interface Tier {
 export const TIERS: Tier[] = [
   {
     id: "academy",
-    who: "Competition math academies",
+    who: "Math academies",
     bestFor: "You run paid classes or tutoring.",
     price: `$${PRICES.academy.perStudent}`,
     per: "per student / month",
