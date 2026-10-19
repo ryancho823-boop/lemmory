@@ -71,7 +71,7 @@ const TOPICS: { topic: Topic; sample: string; tex: string }[] = [
 const COUNTS = [...FORMULAS, ...LOCKED].reduce<Partial<Record<Topic, number>>>((m, f) => ({ ...m, [f.topic]: (m[f.topic] ?? 0) + 1 }), {});
 
 const STEPS = [
-  { title: "The teacher assigns", body: "This week's formulas go into every student's deck with one click." },
+  { title: "The teacher assigns", body: "Keep teaching your own curriculum. Each week, assign the formulas you covered, and they go into every student's deck." },
   { title: "Students recall", body: "They see a formula's name and type it out. Any equivalent form counts." },
   { title: "Then they apply", body: "Once recall is solid, the card becomes a real problem: choose the formula, then solve." },
   { title: "It comes back on time", body: "Each card returns right before it would be forgotten." },

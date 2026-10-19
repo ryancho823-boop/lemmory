@@ -34,7 +34,7 @@ const VIEWS = [
     tab: "Class overview",
     color: ACCENT.green,
     title: "See what the class is forgetting",
-    body: "Accuracy on every assigned formula, who finished today's review, and which students are falling behind.",
+    body: "Accuracy on every assigned formula, who finished today's review, who's falling behind, and which look-alike formulas students mix up, so you know what to reteach before the contest.",
     src: "/shots/teacher-overview.png",
     w: 2560,
     h: 1300,
