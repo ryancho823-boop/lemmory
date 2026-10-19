@@ -6,10 +6,12 @@ import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
 import { cx } from "@lemmory/ui/ui";
 
+// `also` lists other pages that belong under a tab (Plan details sits under For users).
 const TABS = [
-  { href: "/", label: "Overview" },
-  { href: "/users", label: "For users" },
+  { href: "/", label: "Overview", also: [] as string[] },
+  { href: "/users", label: "For users", also: ["/plans"] },
 ];
+const isCurrent = (t: (typeof TABS)[number], path: string) => path === t.href || t.also.includes(path);
 
 export function SiteHeader() {
   const path = usePathname();
@@ -26,7 +28,7 @@ export function SiteHeader() {
               href={t.href}
               className={cx(
                 "px-3 py-1.5 text-[15px] font-semibold underline-offset-[6px] transition-colors",
-                path === t.href ? "text-ink underline decoration-lemon-deep decoration-2" : "text-ink/60 hover:text-ink",
+                isCurrent(t, path) ? "text-ink underline decoration-lemon-deep decoration-2" : "text-ink/60 hover:text-ink",
               )}
             >
               {t.label}
@@ -51,7 +53,7 @@ export function SiteHeader() {
           <Link
             key={t.href}
             href={t.href}
-            className={cx("shrink-0 px-3 py-1.5 text-sm font-semibold underline-offset-[6px]", path === t.href ? "underline decoration-lemon-deep decoration-2" : "text-ink/60")}
+            className={cx("shrink-0 px-3 py-1.5 text-sm font-semibold underline-offset-[6px]", isCurrent(t, path) ? "underline decoration-lemon-deep decoration-2" : "text-ink/60")}
           >
             {t.label}
           </Link>
