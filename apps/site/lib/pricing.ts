@@ -24,9 +24,9 @@ const { academy, club, student } = PRICES;
 
 // What a teacher plan includes. Academies and clubs get the same features; only the price differs.
 const TEACHER_FEATURES = [
-  `Unlimited classes, each with all ${TOTAL_FORMULAS} formulas to assign`,
-  "See which formulas each class is forgetting and who's falling behind",
-  "Class leaderboard games",
+  `All ${TOTAL_FORMULAS} formulas, from AMC 8 to AIME, ready to assign to your students`,
+  "A dashboard that shows which formulas your class is forgetting and which students are falling behind",
+  "A class leaderboard that you can restart whenever you want",
 ];
 
 export const TIERS: Tier[] = [
@@ -36,10 +36,17 @@ export const TIERS: Tier[] = [
     bestFor: "You run paid classes or tutoring.",
     price: `$${academy.perStudent}`,
     per: "per student / month",
-    intro: "For tutoring centers and programs that charge for classes.",
+    intro: "For tutoring centers and programs that charge students for classes.",
     details: [
       { title: "What you get", items: TEACHER_FEATURES },
-      { title: "What you pay", items: [`$${academy.perStudent} per student each month. A class of 20 costs $${20 * academy.perStudent} a month.`] },
+      {
+        title: "What you pay",
+        items: [
+          `$${academy.perStudent} for each student, every month`,
+          "A student in two of your classes is only counted once",
+          `Example: 20 students cost $${20 * academy.perStudent} a month`,
+        ],
+      },
     ],
   },
   {
@@ -52,8 +59,18 @@ export const TIERS: Tier[] = [
     intro: "For free math clubs run by a teacher or advisor at a school.",
     details: [
       { title: "What you get", items: TEACHER_FEATURES },
-      { title: "What you pay", items: [`$${club.perStudent} per student each month, but never more than $${club.classCap} a month per club.`] },
-      { title: "How we confirm", items: ["Sign up with your school email. The club price starts once we confirm your school; until then it's free."] },
+      {
+        title: "What you pay",
+        items: [
+          `$${club.perStudent} for each student, every month`,
+          `Never more than $${club.classCap} a month for the club, however many students join`,
+          `Example: 5 students cost $${5 * club.perStudent} a month; 30 students cost $${Math.min(30 * club.perStudent, club.classCap)}`,
+        ],
+      },
+      {
+        title: "How we confirm",
+        items: ["Sign up with your school email", "We confirm your school, then the club price starts", "Until we confirm, it's free"],
+      },
     ],
   },
   {
@@ -62,10 +79,20 @@ export const TIERS: Tier[] = [
     bestFor: "You're studying on your own, not in a class.",
     price: `$${student.monthly}`,
     per: "per month",
-    intro: "For students preparing on their own.",
+    intro: "For students preparing for contests on their own.",
     details: [
-      { title: "What you get", items: [`Your own deck: add any of the ${TOTAL_FORMULAS} formulas and review them every day`] },
-      { title: "What you pay", items: [`$${student.monthly} a month. If your teacher's plan covers your class, you don't need this.`] },
+      {
+        title: "What you get",
+        items: [
+          `Add any of the ${TOTAL_FORMULAS} formulas to your own deck`,
+          "A short daily review that brings each formula back before you forget it",
+          "Your own stats, and Practice all to go through your whole deck before a contest",
+        ],
+      },
+      {
+        title: "What you pay",
+        items: [`$${student.monthly} a month`, "Not needed if your teacher's plan already covers your class"],
+      },
     ],
   },
 ];

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
 import { PILOT_DAYS, TIERS } from "@/lib/pricing";
-import { ACCENT } from "@/lib/accents";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
 
@@ -26,37 +25,12 @@ const COMPARE = {
   ],
 };
 
-// Plain facts, not repeated from the homepage or the plan details.
+// Only what isn't already said by the plans, the comparison, or the homepage.
 const GOOD_TO_KNOW = [
-  {
-    title: "Getting started",
-    color: ACCENT.blue,
-    items: [
-      "Setting up a class takes a few minutes: create it, share the class code or join link, and assign formulas as the course covers them.",
-      "Students join with a username and the class code. No email needed, so younger students can join.",
-      "Covers the AMC 8, AMC 10/12 and AIME, plus calculus for tournament rounds.",
-      "It works alongside your curriculum. You keep teaching the way you do now.",
-    ],
-  },
-  {
-    title: "Day to day",
-    color: ACCENT.green,
-    items: [
-      "About five minutes a day, usually 5 to 15 cards.",
-      "If a student misses a day, their cards wait for them and their streak resets.",
-      "Students can add any formula for extra practice. Extra practice doesn't earn leaderboard points.",
-      "Before a contest, Practice all runs through the whole deck without changing the schedule.",
-    ],
-  },
-  {
-    title: "For teachers",
-    color: ACCENT.rose,
-    items: [
-      "Run several classes and switch between them from the sidebar.",
-      "A student in two of your classes keeps one deck across both.",
-      "Students earn 10 points per assigned card plus a streak bonus. Start a new leaderboard game whenever you want.",
-    ],
-  },
+  "Setting up a class takes a few minutes. Share its code and students join.",
+  "Students sign up with a username. No email needed.",
+  "If a student misses a day, their cards wait for them.",
+  "Keep your curriculum. Assign each week's formulas as you teach them.",
 ];
 
 export default function ForUsers() {
@@ -129,18 +103,11 @@ export default function ForUsers() {
       <section className="border-t border-line py-20">
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Good to know</h2>
-          <div className="mt-8 grid gap-10 md:grid-cols-3">
-            {GOOD_TO_KNOW.map((g) => (
-              <div key={g.title} className="border-t-4 pt-4" style={{ borderColor: g.color }}>
-                <h3 className="text-xl font-extrabold">{g.title}</h3>
-                <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-ink/85 marker:text-ink/40">
-                  {g.items.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </div>
+          <ul className="mt-6 max-w-3xl list-disc space-y-2 pl-5 text-lg leading-relaxed text-ink/85 marker:text-ink/40">
+            {GOOD_TO_KNOW.map((x) => (
+              <li key={x}>{x}</li>
             ))}
-          </div>
+          </ul>
         </Container>
       </section>
     </div>
