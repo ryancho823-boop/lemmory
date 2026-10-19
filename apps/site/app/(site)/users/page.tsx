@@ -14,15 +14,15 @@ const INTRO = {
 
 // "Yes", "No", or a short note. Keep claims about other tools conservative.
 const COMPARE = {
-  // Podsie: from podsie.org (free, by the nonprofit Teaching Lab; ready-made sets are science).
+  // Podsie: free, by the nonprofit Teaching Lab. Teachers make cards or have AI generate them.
   columns: ["Lemmory", "Podsie", "Anki", "Quizlet", "Studying alone"],
   rows: [
-    { label: "Competition formulas, ready to assign", cells: ["Yes, 187", "No (science sets)", "Make your own", "Make your own", "No"] },
-    { label: "Checks typed math in any equivalent form", cells: ["Yes", "Not listed", "No", "No", "No"] },
+    { label: "Competition formulas, ready to assign", cells: ["Yes, 187", "Make your own or AI-made", "Make your own", "Make your own", "No"] },
+    { label: "Checks typed math in any equivalent form", cells: ["Yes", "No", "No", "No", "No"] },
     { label: "Practice picking the right formula for a problem", cells: ["Yes", "No", "No", "No", "No"] },
     { label: "Reviews spaced so formulas aren't forgotten", cells: ["Yes", "Yes", "Yes", "Partly", "No"] },
     { label: "Teacher sees what the class is forgetting", cells: ["Yes", "Yes", "No", "Partly", "No"] },
-    { label: "Class leaderboard", cells: ["Yes", "Not listed", "No", "Partly", "No"] },
+    { label: "Class leaderboard", cells: ["Yes", "Yes", "No", "Partly", "No"] },
   ],
 };
 

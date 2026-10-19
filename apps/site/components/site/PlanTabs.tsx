@@ -5,8 +5,11 @@ import { cx } from "@lemmory/ui/ui";
 import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
 import type { Tier } from "@/lib/pricing";
 
-/** One button per plan; the chosen plan's details show below. The URL's #academy, #club or #student picks one. */
-export function PlanTabs({ tiers }: { tiers: Tier[] }) {
+/**
+ * One button per plan; the chosen plan's details show below. The URL's #academy, #club or #student picks one.
+ * `teacherRules` (the pilot, students never paying) show on the teacher plans only.
+ */
+export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules: string[] }) {
   const [active, setActive] = useState(tiers[0].id);
   useEffect(() => {
     const fromHash = tiers.find((t) => `#${t.id}` === window.location.hash)?.id;
@@ -62,6 +65,17 @@ export function PlanTabs({ tiers }: { tiers: Tier[] }) {
             </div>
           ))}
         </div>
+
+        {t.id !== "student" && (
+          <div className="mt-8 rounded-lg bg-paper px-6 py-5">
+            <h3 className="text-lg font-extrabold">Every teacher plan</h3>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 leading-relaxed text-ink/85 marker:text-ink/40">
+              {teacherRules.map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <a
           href={t.id === "student" ? JOIN_URL : SIGNUP_URL}

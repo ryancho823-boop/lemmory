@@ -1,6 +1,7 @@
 // The plans, for the pricing cards on "For users" and the Plan details page. The numbers come from packages/core/src/plans.ts,
 // which the apps' billing uses too, so the site and the apps always agree.
 import { PILOT_DAYS, PRICES } from "@lemmory/core/plans";
+import { TOTAL_FORMULAS } from "@/lib/bank";
 
 export { PILOT_DAYS, PRICES };
 
@@ -33,8 +34,9 @@ export const TIERS: Tier[] = [
       {
         title: "What you get",
         items: [
-          "As many classes as you want, each with the full formula bank",
-          "Assign formulas, see what each class is forgetting, and run leaderboard games",
+          "Create as many classes as you need, with no extra fee per class",
+          `Assign any of the ${TOTAL_FORMULAS} formulas, from AMC 8 to AIME`,
+          "See what each class is forgetting, and run leaderboard games",
         ],
       },
       {
@@ -86,7 +88,7 @@ export const TIERS: Tier[] = [
       {
         title: "What you get",
         items: [
-          "Your own deck and daily review, with the full formula bank",
+          `Your own deck and daily review, with all ${TOTAL_FORMULAS} formulas to choose from`,
           "Assigning and class leaderboards aren't included. Those come with a teacher's plan.",
         ],
       },
@@ -98,8 +100,8 @@ export const TIERS: Tier[] = [
   },
 ];
 
-/** Rules that hold for every teacher plan. */
-export const EVERY_PLAN = [
+/** Rules for the teacher plans (academies and clubs), not the individual student plan. */
+export const TEACHER_PLAN_RULES = [
   `Every teacher plan starts with a free ${PILOT_DAYS}-day pilot, once per teacher`,
   "When the pilot ends, pick a plan to keep going. Students can't start new reviews until you do, but nothing is lost.",
   "Students never pay when their teacher's plan covers the class",
