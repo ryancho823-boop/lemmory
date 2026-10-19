@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ChevronRight, Flame } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { TOPIC_COLOR } from "@lemmory/core/formulas";
 import { byTopic, recent, summary } from "@lemmory/core/analytics";
-import { Avatar, PageHeader, Panel, cx, pct, relDay } from "@lemmory/ui/ui";
+import { PageHeader, Panel, cx, pct, relDay } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "../JoinCode";
 
@@ -43,7 +43,6 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
                 <tr key={s.id} className="group hover:bg-canvas">
                   <td className="px-5 py-2.5">
                     <Link href={`/c/${classId}/students/${s.id}`} className="flex items-center gap-3">
-                      <Avatar name={s.name} size={30} />
                       <span className="font-semibold group-hover:underline">{s.name}</span>
                     </Link>
                   </td>
@@ -56,7 +55,7 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
                   </td>
                   <td className="px-3 py-2.5">
                     <span className={cx("flex items-center gap-1 font-semibold", m.streak === 0 && "text-bad")}>
-                      <Flame size={14} /> {m.streak}
+                      {m.streak}
                     </span>
                   </td>
                   <td className={cx("px-3 py-2.5 font-semibold tabular-nums", (m.accuracy ?? 1) < 0.6 && "text-bad")}>{pct(m.accuracy)}</td>

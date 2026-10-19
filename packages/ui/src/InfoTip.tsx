@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Info } from "lucide-react";
 import { cx } from "./ui";
 
-/** A circled "i" button that reveals an explanation in a small popover. Closes on outside click or Escape. */
+/** A small "[?]" link that reveals an explanation in a box. Closes on outside click or Escape. */
 export function InfoTip({ title, children, align = "right", className }: { title?: string; children: React.ReactNode; align?: "left" | "right"; className?: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -32,18 +31,15 @@ export function InfoTip({ title, children, align = "right", className }: { title
         }}
         aria-label={title ? `About: ${title}` : "More info"}
         aria-expanded={open}
-        className={cx(
-          "grid size-6 place-items-center rounded-full transition-colors",
-          open ? "bg-ink text-white" : "text-ink/35 hover:bg-ink/5 hover:text-ink",
-        )}
+        className={cx("px-1 font-sans text-[13px] font-normal text-link hover:underline", open && "underline")}
       >
-        <Info size={15} />
+        [?]
       </button>
       {open && (
         <span
           role="dialog"
           className={cx(
-            "rise absolute top-8 z-40 block w-72 rounded-2xl border border-line bg-white p-4 text-left font-sans text-sm font-normal normal-case leading-relaxed tracking-normal text-ink/65 shadow-[0_20px_50px_-20px_rgb(15_17_33/0.35)]",
+            "absolute top-7 z-40 block w-72 border border-ink/40 bg-white p-4 text-left font-sans text-sm font-normal normal-case leading-relaxed tracking-normal text-ink/80",
             align === "right" ? "right-0" : "left-0",
           )}
         >

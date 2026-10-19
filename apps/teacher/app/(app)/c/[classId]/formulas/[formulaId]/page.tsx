@@ -6,7 +6,7 @@ import { formulaAcrossClass } from "@lemmory/core/analytics";
 import { isMastered } from "@lemmory/core/srs";
 import { FormulaDetail } from "@lemmory/ui/FormulaDetail";
 import { Tex } from "@lemmory/ui/Tex";
-import { Avatar, LevelTag, Meter, Panel, PanelHeader, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
+import { LevelTag, Meter, Panel, PanelHeader, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
 import { getClass } from "@/lib/session";
 import { AssignButton } from "../../AssignButton";
 
@@ -79,7 +79,6 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
                   className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-2.5 hover:bg-canvas sm:grid-cols-[1fr_100px_90px_120px]"
                 >
                   <span className="flex min-w-0 items-center gap-3">
-                    <Avatar name={r.student.name} size={28} />
                     <span className="truncate text-sm font-semibold">{r.student.name}</span>
                   </span>
                   <span>

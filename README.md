@@ -18,6 +18,17 @@ packages/ui     React components, theme and the app icon, shared by all three si
 packages/db     Database schema, migrations, accounts and sessions, plans, and every read and write the sites make
 ```
 
+Where to change common things:
+
+| To change | Edit |
+| --- | --- |
+| Prices or the pilot length | `packages/core/src/plans.ts` (the pricing page and billing both read it) |
+| The student and teacher site addresses | `packages/core/src/urls.ts` |
+| Colors and fonts | `packages/ui/src/theme.css` (all three sites) |
+| The main site's accent colors | `apps/site/lib/accents.ts` |
+| Homepage wording | `TEXT` at the top of `apps/site/app/(site)/page.tsx` |
+| Pricing cards and FAQ | `apps/site/lib/pricing.ts` and `apps/site/app/(site)/users/page.tsx` |
+
 ## Run it
 
 ```bash
@@ -44,7 +55,7 @@ Other commands:
 - **No account yet.** Logging in with an email or username that doesn't exist goes to sign-up with it filled in (carried in a short-lived cookie, not the URL).
 - Already-logged-in visitors skip the login page. Sessions last 30 days.
 
-Locally the sites link to each other on localhost. Online they use the addresses in `apps/site/lib/links.ts`, `apps/teacher/lib/session.ts` and `apps/student/lib/links.ts`, which `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL` override.
+Locally the sites link to each other on localhost. Online they use the addresses in `packages/core/src/urls.ts`, which `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL` override.
 
 ## The main site (`apps/site`)
 
@@ -78,13 +89,13 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 - **Days** run midnight to midnight in each class's time zone. Past days are filled in when a class loads, so nothing has to run on a schedule.
 - **Privacy.** Students sign up with a username, no email. Students see classmates only as leaderboard rows, never their review history.
 
-## Plans (`packages/db/src/billing.ts`)
+## Plans (prices in `packages/core/src/plans.ts`, billing in `packages/db/src/billing.ts`)
 
 | Plan | Price | Notes |
 | --- | --- | --- |
 | Free pilot | $0 for 14 days | Once per teacher; it can't be restarted |
 | Academy | $3 per student per month | A student in two of the teacher's classes counts once |
-| School math club | $3 per student, capped at $40 per class per month | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
+| School math club | $3 per student, never over $20 a month per class | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
 | Individual student | $2 per month | For students not in a class |
 
 When a pilot ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.

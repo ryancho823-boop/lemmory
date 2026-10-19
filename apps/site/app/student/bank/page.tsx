@@ -2,7 +2,7 @@
 
 import { FormulaBrowser } from "@/components/FormulaBrowser";
 import { DeckButton } from "@/components/DeckButton";
-import { PageHeader } from "@/components/ui";
+import { PageHeader } from "@lemmory/ui/ui";
 
 export default function BankPage() {
   return (

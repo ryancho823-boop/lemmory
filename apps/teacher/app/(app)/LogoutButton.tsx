@@ -1,12 +1,9 @@
-import { LogOut } from "lucide-react";
 import { logout } from "../actions";
 
 export function LogoutButton() {
   return (
     <form action={logout}>
-      <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold text-ink/50 hover:bg-ink/5 hover:text-ink">
-        <LogOut size={15} /> Log out
-      </button>
+      <button className="font-semibold text-ink/60 hover:text-ink">Log out</button>
     </form>
   );
 }

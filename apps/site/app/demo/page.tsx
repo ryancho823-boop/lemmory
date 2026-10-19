@@ -49,9 +49,6 @@ export default function DemoPage() {
       <main className="mx-auto max-w-5xl px-5 pb-20 pt-8">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Pick a side</h1>
-          <p className="mx-auto mt-3 max-w-lg text-lg text-ink/60">
-            Both views share one simulated class. Finish a review as Alex, then switch to the teacher view and your results show up there.
-          </p>
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           {SIDES.map((s) => (

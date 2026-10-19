@@ -2,24 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, type LucideIcon } from "lucide-react";
 import { cx } from "./ui";
 
 export interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
   /** Only active on this exact path (plus `also`). */
   exact?: boolean;
   also?: string[];
-  /** A small dot, e.g. "today's cards aren't done". */
+  /** Marks the link "Due", e.g. today's cards aren't done. */
   dot?: boolean;
 }
 
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <span
-      className="grid place-items-center rounded-[10px] bg-lemon font-extrabold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.15)]"
+      className="grid place-items-center rounded-md bg-lemon font-extrabold text-ink"
       style={{ width: size, height: size, fontSize: size * 0.5 }}
     >
       Σ
@@ -27,17 +25,118 @@ export function LogoMark({ size = 32 }: { size?: number }) {
   );
 }
 
-export function Logo({ tag }: { tag?: string }) {
+export function Logo({ tag, light }: { tag?: string; light?: boolean }) {
   return (
-    <span className="flex items-center gap-2.5 text-lg font-extrabold tracking-tight">
+    <span className={cx("flex items-center gap-2.5 text-lg font-extrabold tracking-tight", light && "text-white")}>
       <LogoMark />
       Lemmory
-      {tag && <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-[11px] font-bold tracking-normal text-ink/50">{tag}</span>}
+      {tag && <span className={cx("text-sm font-semibold tracking-normal", light ? "text-lemon" : "text-ink/45")}>{tag}</span>}
     </span>
   );
 }
 
-/** Sidebar on desktop, top bar with scrolling tabs on mobile. */
+/** A sidebar link: plain text, with a soft highlight on the current page. `due` flags today's unfinished review. */
+export function SideLink({ href, active, due, children }: { href: string; active?: boolean; due?: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={cx(
+        "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-[15px] transition-colors",
+        active ? "bg-paper font-semibold text-ink" : "text-ink/75 hover:bg-paper/60 hover:text-ink",
+      )}
+    >
+      {children}
+      {due && <span className="text-xs font-semibold text-lemon-deep">Due</span>}
+    </Link>
+  );
+}
+
+/**
+ * The product's frame: a white sidebar with plain links on desktop, and a top bar with a row
+ * of links on phones. Adds class="product", which switches on the plain product look.
+ */
+export function Frame({
+  home,
+  tag,
+  above,
+  nav,
+  below,
+  mobileExtra,
+  children,
+}: {
+  home: string;
+  tag?: string;
+  /** Shown above the links, e.g. a class switcher. */
+  above?: React.ReactNode;
+  nav: { href: string; label: string; active: boolean; due?: boolean }[];
+  /** Pinned to the bottom of the sidebar: who's signed in, log out, demo controls. */
+  below?: React.ReactNode;
+  /** Extra controls in the phone top bar. */
+  mobileExtra?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="product min-h-screen bg-canvas lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
+      <div className="hidden border-r border-line bg-white lg:block">
+        <aside className="sticky top-0 flex h-screen flex-col overflow-y-auto px-4 py-5">
+          <Link href={home} className="px-2">
+            <Logo tag={tag} />
+          </Link>
+          {above && <div className="mt-6">{above}</div>}
+          <nav className="mt-6 space-y-0.5">
+            {nav.map((it) => (
+              <SideLink key={it.href} href={it.href} active={it.active} due={it.due}>
+                {it.label}
+              </SideLink>
+            ))}
+          </nav>
+          {below && <div className="mt-auto border-t border-line px-2 pt-4">{below}</div>}
+        </aside>
+      </div>
+
+      <header className="sticky top-0 z-30 border-b border-line bg-white lg:hidden">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <Link href={home}>
+            <Logo tag={tag} />
+          </Link>
+          <div className="ml-auto flex items-center gap-3 text-sm">{mobileExtra}</div>
+        </div>
+        {above && <div className="px-4 pb-2">{above}</div>}
+        <nav className="flex gap-1 overflow-x-auto px-3 pb-2 [scrollbar-width:none]">
+          {nav.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              aria-current={it.active ? "page" : undefined}
+              className={cx("shrink-0 rounded-lg px-3 py-1.5 text-sm", it.active ? "bg-paper font-semibold text-ink" : "text-ink/70")}
+            >
+              {it.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+
+      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 lg:py-10">{children}</main>
+    </div>
+  );
+}
+
+/** A plain top bar, for product pages that have no sidebar (like picking a plan). */
+export function TopBar({ tag, home = "/", width = "max-w-5xl", children }: { tag?: string; home?: string; width?: string; children?: React.ReactNode }) {
+  return (
+    <header className="border-b border-line bg-white">
+      <div className={cx("mx-auto flex items-center justify-between px-5 py-4 text-sm", width)}>
+        <Link href={home}>
+          <Logo tag={tag} />
+        </Link>
+        {children}
+      </div>
+    </header>
+  );
+}
+
+/** The student and teacher apps: the product frame plus an Account group with Log out. */
 export function Shell({
   tag,
   nav,
@@ -58,77 +157,28 @@ export function Shell({
   const path = usePathname();
   const isActive = (it: NavItem) =>
     it.exact ? path === it.href || !!it.also?.includes(path) : path === it.href || path.startsWith(it.href + "/");
-  const home = nav[0]?.href ?? "/";
+  const logout = (
+    <form action={onLogout}>
+      <button className="text-sm font-semibold text-ink/60 hover:text-ink">Log out</button>
+    </form>
+  );
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
-      <div className="hidden border-r border-line bg-white lg:block">
-        <aside className="sticky top-0 flex h-screen flex-col px-4 py-5">
-          <Link href={home} className="px-2">
-            <Logo tag={tag} />
-          </Link>
-          {above && <div className="mt-6">{above}</div>}
-          <nav className="mt-6 space-y-0.5">
-            {nav.map((it) => {
-              const active = isActive(it);
-              return (
-                <Link
-                  key={it.href}
-                  href={it.href}
-                  className={cx(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
-                    active ? "bg-ink text-white" : "text-ink/60 hover:bg-ink/5 hover:text-ink",
-                  )}
-                >
-                  <it.icon size={18} strokeWidth={2.2} />
-                  {it.label}
-                  {it.dot && <span className={cx("ml-auto size-2 rounded-full", active ? "bg-lemon" : "bg-lemon-deep")} />}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="mt-auto flex items-center gap-2 rounded-xl px-2 py-1">
-            <div className="flex min-w-0 flex-1 items-center gap-3">{footer}</div>
-            <form action={onLogout}>
-              <button aria-label="Log out" title="Log out" className="rounded-lg p-2 text-ink/40 hover:bg-ink/5 hover:text-ink">
-                <LogOut size={16} />
-              </button>
-            </form>
-          </div>
-        </aside>
-      </div>
-
-      <header className="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur lg:hidden">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Link href={home}>
-            <Logo tag={tag} />
-          </Link>
-          <form action={onLogout} className="ml-auto">
-            <button aria-label="Log out" className="rounded-lg p-1.5 text-ink/50 hover:bg-ink/5">
-              <LogOut size={18} />
-            </button>
-          </form>
+    <Frame
+      home={nav[0]?.href ?? "/"}
+      tag={tag}
+      above={above}
+      nav={nav.map((it) => ({ href: it.href, label: it.label, active: isActive(it), due: it.dot }))}
+      below={
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0 text-sm">{footer}</div>
+          {logout}
         </div>
-        {above && <div className="px-4 pb-2">{above}</div>}
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
-          {nav.map((it) => (
-            <Link
-              key={it.href}
-              href={it.href}
-              className={cx(
-                "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold",
-                isActive(it) ? "bg-ink text-white" : "text-ink/60",
-              )}
-            >
-              <it.icon size={15} />
-              {it.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 lg:py-10">{children}</main>
-    </div>
+      }
+      mobileExtra={logout}
+    >
+      {children}
+    </Frame>
   );
 }
 
@@ -177,7 +227,7 @@ export function AuthFrame({
         <div className="flex justify-center">
           <Logo tag={tag} />
         </div>
-        <div className="mt-8 rounded-3xl border border-line bg-white p-7 shadow-[0_30px_70px_-40px_rgb(15_17_33/0.35)]">
+        <div className="mt-8 rounded-3xl border border-line bg-white p-7">
           {top && <div className="mb-6">{top}</div>}
           <h1 className="text-2xl font-extrabold">{title}</h1>
           {sub && <p className="mt-1 text-ink/75">{sub}</p>}

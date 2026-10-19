@@ -2,19 +2,22 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { db } from "./client";
 import { plans, studentPlans } from "./schema";
+import { PILOT_DAYS, PRICES as SHARED_PRICES } from "@lemmory/core/plans";
 
-// Prices match the "For users" page on the main site (Lemmory/lib/pricing.ts).
+// The numbers live in packages/core/src/plans.ts, shared with the main site's pricing page.
 // Checkout is simulated: nothing is charged until a payment provider is connected.
 
 export type PlanKind = "pilot" | "academy" | "club";
 
+const { academy, club, student } = SHARED_PRICES;
+
 export const PRICES = {
-  academy: { label: "Academy", perStudent: 3, body: "For programs that run paid classes. $3 per student in your classes, each month." },
-  club: { label: "School math club", perStudent: 3, classCap: 40, body: "For free clubs run at a school. $3 per student, never more than $40 per class a month." },
-  student: { label: "Individual", monthly: 2, body: "Your own deck and daily review, with the full formula bank." },
+  academy: { label: "Academy", ...academy, body: `For programs that run paid classes. $${academy.perStudent} per student in your classes, each month.` },
+  club: { label: "School math club", ...club, body: `For free clubs run at a school. $${club.perStudent} per student, never over $${club.classCap} a month per class.` },
+  student: { label: "Individual", ...student, body: "Your own deck and daily review, with the full formula bank." },
 } as const;
 
-export const PILOT_DAYS = 14;
+export { PILOT_DAYS };
 
 /**
  * Monthly cost, or null during a pilot. Academies pay per student, counting a student in

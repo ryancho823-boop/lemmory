@@ -8,7 +8,7 @@ import { setupApply, shuffle } from "@/lib/practice";
 import { isNew } from "@lemmory/core/srs";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
-import { Button, PageHeader, Panel, Skeleton, cx } from "@/components/ui";
+import { Button, PageHeader, Panel, Skeleton, cx } from "@lemmory/ui/ui";
 
 interface Run {
   queue: string[];

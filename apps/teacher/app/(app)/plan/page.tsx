@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { FORMULAS } from "@lemmory/core/formulas";
 import { PILOT_DAYS, PRICES, getPlan, monthlyCost, pilotUsed, planState } from "@lemmory/db/billing";
-import { Logo } from "@lemmory/ui/Shell";
+import { TopBar } from "@lemmory/ui/Shell";
 import { uniqueStudents } from "@lemmory/db/teacher";
 import { getClasses, requireTeacher } from "@/lib/session";
 import { LogoutButton } from "../LogoutButton";
@@ -36,12 +36,11 @@ export default async function PlanPage() {
               : `Club pricing for ${plan.orgName} is waiting on verification. We'll confirm with ${plan.schoolEmail}. You're on a free pilot until ${fmt(plan.pilotEndsAt)}.`;
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6">
-        <Logo tag="Teacher" />
+    <div className="product min-h-screen bg-canvas">
+      <TopBar tag="Teacher" width="max-w-5xl">
         <LogoutButton />
-      </header>
-      <main className="mx-auto max-w-5xl px-5 pb-20">
+      </TopBar>
+      <main className="mx-auto max-w-5xl px-5 pb-20 pt-8">
         {plan && state !== "expired" && (
           <Link href="/" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-ink/60 hover:text-ink">
             <ArrowLeft size={15} /> {classes.length ? "Back to your classes" : "Continue"}

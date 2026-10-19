@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
 import { StudentAnalytics } from "@/components/StudentAnalytics";
-import { Avatar, Skeleton } from "@/components/ui";
+import { Skeleton } from "@lemmory/ui/ui";
 
 export function TeacherStudent({ id }: { id: string }) {
   const { ready, students, today } = useStore();
@@ -17,7 +17,6 @@ export function TeacherStudent({ id }: { id: string }) {
         <ArrowLeft size={15} /> Students
       </Link>
       <div className="mb-6 flex items-center gap-4">
-        <Avatar name={s.name} size={52} you={s.isYou} />
         <div>
           <h1 className="text-[28px] font-extrabold leading-tight tracking-tight">{s.name}</h1>
           <p className="text-ink/55">

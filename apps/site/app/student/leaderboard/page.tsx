@@ -2,7 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { Leaderboard } from "@/components/Leaderboard";
-import { Skeleton } from "@/components/ui";
+import { Skeleton } from "@lemmory/ui/ui";
 
 export default function LeaderboardPage() {
   const { ready } = useStore();

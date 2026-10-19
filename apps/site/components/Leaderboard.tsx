@@ -1,10 +1,13 @@
 "use client";
 
+// The demo's version of packages/ui/src/Leaderboard.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { competitionPoints, summary } from "@/lib/analytics";
-import { InfoTip } from "./InfoTip";
-import { Avatar, Panel, Segmented, cx } from "./ui";
+import { InfoTip } from "@lemmory/ui/InfoTip";
+import { Panel, Segmented, cx } from "@lemmory/ui/ui";
 
 type Range = "week" | "all";
 
@@ -31,8 +34,8 @@ export function Leaderboard({ compact = false, teacher = false }: { compact?: bo
 
   return (
     <Panel className="overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-5 pt-5">
-        <h2 className="flex items-center gap-1 text-[17px] font-semibold">
+      <div className="flex items-center justify-between gap-3 border-b border-line bg-paper px-5 py-2.5">
+        <h2 className="flex items-center gap-1 text-[16px] font-bold">
           Leaderboard
           <InfoTip title="How scoring works" align="left">
             <b className="text-ink">10 points per assigned card</b>, however many tries it takes. Finish the day&apos;s review for a{" "}
@@ -67,7 +70,6 @@ function Row({ r }: { r: ReturnType<typeof useRows>[number] }) {
   return (
     <li className={cx("flex items-center gap-3 px-3 py-2.5", r.you && "font-semibold")}>
       <span className="w-6 text-right tabular-nums">{r.rank}</span>
-      <Avatar name={r.fullName} you={r.you} size={28} />
       <span className="min-w-0 flex-1 truncate">{r.name}</span>
       <span className="tabular-nums">{r.xp} pts</span>
     </li>

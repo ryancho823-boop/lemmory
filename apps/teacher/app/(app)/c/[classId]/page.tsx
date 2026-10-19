@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
 import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
 import { BarList } from "@lemmory/ui/charts";
-import { Avatar, Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
+import { Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
 
@@ -108,11 +108,10 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
               {attention.map(({ s, tag, detail }) => (
                 <li key={s.id}>
                   <Link href={`${base}/students/${s.id}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas">
-                    <Avatar name={s.name} size={30} />
                     <span className="min-w-0 flex-1 truncate font-semibold" title={detail}>
                       {s.name}
                     </span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${tag === "Behind" ? "bg-bad/10 text-bad" : "bg-warn/20 text-ink/70"}`}>
+                    <span className={`shrink-0 text-sm font-bold ${tag === "Behind" ? "text-bad" : "text-ink/70"}`}>
                       {tag}
                     </span>
                     <ArrowRight size={14} className="shrink-0 text-ink/30" />

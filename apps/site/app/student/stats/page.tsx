@@ -2,7 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { StudentAnalytics } from "@/components/StudentAnalytics";
-import { PageHeader, Skeleton } from "@/components/ui";
+import { PageHeader, Skeleton } from "@lemmory/ui/ui";
 
 export default function StatsPage() {
   const { ready, you, today } = useStore();

@@ -5,7 +5,6 @@ import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
 import type { LeaderRow } from "@lemmory/core/analytics";
 import type { Prompt } from "@lemmory/core/grading";
 import { CARD_POINTS, streak, streakBonus } from "@lemmory/core/points";
-import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
 import { Button, Panel, Skeleton } from "@lemmory/ui/ui";
 import { getPrompt, markDone } from "../../actions";
@@ -120,10 +119,9 @@ export function ReviewSession({
       <Panel className="mx-auto max-w-xl px-6 py-12 text-center">
         <p className="flex items-center justify-center gap-1 text-sm font-semibold text-ink/45">
           Daily review
-          <InfoTip align="left">Missed cards come back until you get them right.</InfoTip>
         </p>
         <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{initial.length} cards</h1>
-        <div className="mt-6 flex justify-center gap-2 text-sm">
+        <div className="mt-4 flex justify-center gap-4 text-[15px] text-ink/80">
           <Chip n={initial.length - fresh - apply} label="recall" />
           <Chip n={apply} label="application" />
           <Chip n={fresh} label="new" />
@@ -170,8 +168,8 @@ export function ReviewSession({
 
 function Chip({ n, label }: { n: number; label: string }) {
   return (
-    <span className="rounded-full border border-line bg-white px-3 py-1.5 font-semibold">
-      {n} <span className="font-medium text-ink/50">{label}</span>
+    <span>
+      <b>{n}</b> {label}
     </span>
   );
 }

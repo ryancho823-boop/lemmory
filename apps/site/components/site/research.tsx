@@ -39,6 +39,11 @@ export const RESEARCH = [
   },
 ];
 
+// The chart's colors: ink for the axes and the no-review curve, blue for the spaced-review curve.
+const CHART_INK = "#0f1121";
+const CHART_BLUE = "#2a78d6";
+const CHART_BLUE_DARK = "#1c5cab";
+
 /** Illustration: FSRS forgetting curve with and without spaced reviews. */
 export function ForgettingCurve() {
   const W = 520;
@@ -66,26 +71,26 @@ export function ForgettingCurve() {
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Forgetting curve with and without spaced reviews">
         {[0.25, 0.5, 0.75, 1].map((g) => (
           <g key={g}>
-            <line x1={pad.l} x2={W - pad.r} y1={y(g)} y2={y(g)} stroke="#0f1121" strokeOpacity={0.07} />
-            <text x={pad.l - 8} y={y(g) + 4} textAnchor="end" fontSize={11} fill="#0f1121" fillOpacity={0.45}>
+            <line x1={pad.l} x2={W - pad.r} y1={y(g)} y2={y(g)} stroke={CHART_INK} strokeOpacity={0.07} />
+            <text x={pad.l - 8} y={y(g) + 4} textAnchor="end" fontSize={11} fill={CHART_INK} fillOpacity={0.45}>
               {g * 100}%
             </text>
           </g>
         ))}
         {[0, 10, 20, 30, 40].map((d) => (
-          <text key={d} x={x(d)} y={H - 12} textAnchor={d === 40 ? "end" : "middle"} fontSize={11} fill="#0f1121" fillOpacity={0.45}>
+          <text key={d} x={x(d)} y={H - 12} textAnchor={d === 40 ? "end" : "middle"} fontSize={11} fill={CHART_INK} fillOpacity={0.45}>
             {d === 0 ? "Class" : `Day ${d}`}
           </text>
         ))}
-        <polyline points={noReview.join(" ")} fill="none" stroke="#0f1121" strokeOpacity={0.3} strokeWidth={2} strokeDasharray="5 5" />
-        <polyline points={spaced.join(" ")} fill="none" stroke="#2a78d6" strokeWidth={2.5} strokeLinejoin="round" />
+        <polyline points={noReview.join(" ")} fill="none" stroke={CHART_INK} strokeOpacity={0.3} strokeWidth={2} strokeDasharray="5 5" />
+        <polyline points={spaced.join(" ")} fill="none" stroke={CHART_BLUE} strokeWidth={2.5} strokeLinejoin="round" />
         {reviews.slice(1).map((rv) => (
-          <circle key={rv.at} cx={x(rv.at)} cy={y(1)} r={5} fill="#2a78d6" stroke="white" strokeWidth={2} />
+          <circle key={rv.at} cx={x(rv.at)} cy={y(1)} r={5} fill={CHART_BLUE} stroke="white" strokeWidth={2} />
         ))}
-        <text x={x(31)} y={y(R(31, 1)) + 18} fontSize={12} fill="#0f1121" fillOpacity={0.55}>
+        <text x={x(31)} y={y(R(31, 1)) + 18} fontSize={12} fill={CHART_INK} fillOpacity={0.55}>
           No review
         </text>
-        <text x={x(22)} y={y(0.97) - 8} fontSize={12} fontWeight={700} fill="#1c5cab">
+        <text x={x(22)} y={y(0.97) - 8} fontSize={12} fontWeight={700} fill={CHART_BLUE_DARK}>
           With Lemmory reviews
         </text>
       </svg>

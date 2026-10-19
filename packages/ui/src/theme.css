@@ -5,11 +5,20 @@
   /* Headings read calmer at semibold than at a heavy 800. */
   --font-weight-extrabold: 600;
   --color-ink: #0f1121;
-  --color-canvas: #f6f6f9;
-  --color-line: #e7e7ef;
+  --color-canvas: #f7f5f0;
+  --color-line: #e4e0d5;
   --color-lemon: #ffd43b;
   --color-lemon-soft: #fff7d1;
   --color-lemon-deep: #e0a800;
+  /* Title bars and boxed notes inside the product. */
+  --color-paper: #f1eee6;
+  /* Plain text links inside the product. */
+  --color-link: #1f4e96;
+  /* Plain, slightly squarer corners: big soft radii are what make a page look generated. */
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.75rem;
   /* Status (reserved; always paired with an icon or label). */
   --color-good: #0ca30c;
   --color-warn: #fab219;
@@ -44,6 +53,34 @@ body {
     font-variation-settings: "SOFT" 50;
     letter-spacing: -0.01em;
   }
+}
+
+/*
+ * The product (the demo and the student and teacher apps) is plain and solid, like a
+ * well-kept reference site: white paper, gently rounded corners, sans-serif headings, no shadows.
+ * The marketing pages keep the softer look above. Shells add class="product".
+ */
+.product {
+  --color-canvas: #ffffff;
+  --color-line: #d6d2c6;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 8px;
+  --radius-3xl: 8px;
+  --font-weight-extrabold: 700;
+}
+/* Table header rows get the same shaded bar as box titles. */
+.product thead {
+  background: var(--color-paper);
+}
+
+/* Not in a layer, so it wins over the font-display utility too. */
+.product :is(h1, h2, h3, h4, .font-extrabold, .font-display) {
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: 0;
 }
 
 ::selection {

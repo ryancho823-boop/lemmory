@@ -24,8 +24,8 @@ export function BarList({
           <li key={r.key} className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(120px,200px)_1fr_auto]">
             <div className="truncate text-sm">{r.label}</div>
             <div className="text-right text-sm font-semibold tabular-nums sm:order-last">{pct(r.value)}</div>
-            <div className="relative col-span-2 h-2.5 rounded-full bg-ink/6 sm:col-span-1" title={r.hint}>
-              <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${Math.max(v * 100, 2)}%`, background: color }} />
+            <div className="relative col-span-2 h-2.5 bg-ink/6 sm:col-span-1" title={r.hint}>
+              <div className="h-full transition-[width] duration-500" style={{ width: `${Math.max(v * 100, 2)}%`, background: color }} />
               {r.hint && (
                 <span className="pointer-events-none absolute -top-8 left-0 z-10 hidden whitespace-nowrap rounded-lg bg-ink px-2 py-1 text-xs text-white group-hover:block">
                   {r.hint}

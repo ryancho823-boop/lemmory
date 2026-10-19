@@ -2,45 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart3,
-  BookOpen,
-  FastForward,
-  Flame,
-  GraduationCap,
-  Layers,
-  LayoutDashboard,
-  Library,
-  type LucideIcon,
-  RotateCcw,
-  Trophy,
-  Users,
-  Zap,
-} from "lucide-react";
+import { Frame } from "@lemmory/ui/Shell";
 import { useStore } from "@/lib/store";
 import { YOU } from "@/lib/sim";
 import { streak } from "@/lib/analytics";
 import { DEMO_MAX_DAYS } from "@/lib/demo";
 import { SIGNUP_URL } from "@/lib/links";
-import { Avatar, cx } from "../ui";
+import { cx } from "@lemmory/ui/ui";
 
 type Role = "student" | "teacher";
 
-const NAV: Record<Role, { href: string; label: string; icon: LucideIcon; exact?: boolean }[]> = {
+const NAV: Record<Role, { href: string; label: string; exact?: boolean }[]> = {
   student: [
-    { href: "/student", label: "Home", icon: LayoutDashboard, exact: true },
-    { href: "/student/deck", label: "My deck", icon: Layers },
-    { href: "/student/practice", label: "Practice all", icon: Zap },
-    { href: "/student/bank", label: "Formula bank", icon: Library },
-    { href: "/student/stats", label: "My stats", icon: BarChart3 },
-    { href: "/student/leaderboard", label: "Leaderboard", icon: Trophy },
+    { href: "/student", label: "Home", exact: true },
+    { href: "/student/deck", label: "My deck" },
+    { href: "/student/practice", label: "Practice all" },
+    { href: "/student/bank", label: "Formula bank" },
+    { href: "/student/stats", label: "My stats" },
+    { href: "/student/leaderboard", label: "Leaderboard" },
   ],
   teacher: [
-    { href: "/teacher", label: "Overview", icon: LayoutDashboard, exact: true },
-    { href: "/teacher/assign", label: "Assign formulas", icon: BookOpen },
-    { href: "/teacher/formulas", label: "Formula analytics", icon: BarChart3 },
-    { href: "/teacher/students", label: "Students", icon: Users },
-    { href: "/teacher/leaderboard", label: "Leaderboard", icon: Trophy },
+    { href: "/teacher", label: "Overview", exact: true },
+    { href: "/teacher/assign", label: "Assign formulas" },
+    { href: "/teacher/formulas", label: "Formula analytics" },
+    { href: "/teacher/students", label: "Students" },
+    { href: "/teacher/leaderboard", label: "Leaderboard" },
   ],
 };
 
@@ -51,7 +37,7 @@ const fmtDay = (day: number) =>
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <span
-      className="grid place-items-center rounded-[10px] bg-lemon font-extrabold text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.15)]"
+      className="grid place-items-center rounded-md bg-lemon font-extrabold text-ink"
       style={{ width: size, height: size, fontSize: size * 0.5 }}
     >
       Σ
@@ -78,144 +64,73 @@ export function AppShell({ role, children }: { role: Role; children: React.React
   const isActive = (href: string, exact?: boolean) =>
     exact ? path === href || (href === "/student" && path === "/student/review") : path === href || path.startsWith(href + "/");
 
-  return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
-      {/* Sidebar */}
-      <div className="hidden border-r border-line bg-white lg:block">
-      <aside className="sticky top-0 flex h-screen flex-col px-4 py-5">
-        <Link href="/" className="px-2">
-          <Logo />
+  const small = "h-8 rounded-lg border border-line bg-white px-3 text-sm font-semibold text-ink/75 hover:border-ink/30 hover:text-ink disabled:pointer-events-none disabled:opacity-40";
+
+  // Student | Teacher: both views share one simulated class.
+  const switcher = (
+    <div className="grid grid-cols-2 rounded-lg border border-line p-0.5 text-sm font-semibold">
+      {(["student", "teacher"] as const).map((r) => (
+        <Link
+          key={r}
+          href={`/${r}`}
+          aria-current={r === role ? "page" : undefined}
+          className={cx("rounded-md py-1.5 text-center capitalize transition-colors", r === role ? "bg-ink text-white" : "text-ink/60 hover:text-ink")}
+        >
+          {r}
         </Link>
+      ))}
+    </div>
+  );
 
-        <div className="mt-6 grid grid-cols-2 rounded-xl bg-ink/5 p-1 text-sm font-semibold">
-          {(["student", "teacher"] as const).map((r) => (
-            <Link
-              key={r}
-              href={`/${r}`}
-              className={cx(
-                "rounded-lg py-1.5 text-center capitalize transition-colors",
-                r === role ? "bg-white text-ink shadow-sm" : "text-ink/50 hover:text-ink",
-              )}
-            >
-              {r}
-            </Link>
-          ))}
-        </div>
-
-        <nav className="mt-6 space-y-0.5">
-          {items.map((it) => {
-            const active = isActive(it.href, it.exact);
-            return (
-              <Link
-                key={it.href}
-                href={it.href}
-                className={cx(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
-                  active ? "bg-ink text-white" : "text-ink/60 hover:bg-ink/5 hover:text-ink",
-                )}
-              >
-                <it.icon size={18} strokeWidth={2.2} />
-                {it.label}
-                {it.href === "/student" && ready && !doneToday && (
-                  <span className={cx("ml-auto size-2 rounded-full", active ? "bg-lemon" : "bg-lemon-deep")} />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto space-y-3">
-          <div className="rounded-xl border border-dashed border-ink/15 p-3">
-            <p className="text-sm font-semibold">Demo controls</p>
-            <p className="mt-1 text-xs text-ink/50">
+  return (
+    <Frame
+      home={`/${role}`}
+      tag="Demo"
+      above={switcher}
+      nav={items.map((it) => ({
+        href: it.href,
+        label: it.label,
+        active: isActive(it.href, it.exact),
+        due: it.href === "/student" && ready && !doneToday,
+      }))}
+      below={
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="font-semibold">{role === "student" ? YOU.name : "Ms. Chen"}</p>
+            <p className="text-ink/55">{role === "student" ? (ready ? `${s}-day streak` : "\u00a0") : "Teacher"}</p>
+          </div>
+          <div>
+            <p className="text-ink/55">
               {ready ? fmtDay(today) : "\u00a0"}
-              {state.dayOffset > 0 && ` · ${state.dayOffset} day${state.dayOffset === 1 ? "" : "s"} ahead`}
+              {state.dayOffset > 0 && ` (+${state.dayOffset})`}
             </p>
-            <div className="mt-2 grid gap-1">
-              <button
-                onClick={nextDay}
-                disabled={atLimit}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-ink/70 hover:bg-ink/5 disabled:pointer-events-none disabled:opacity-40"
-              >
-                <FastForward size={15} /> Skip to tomorrow
+            <div className="mt-1.5 flex gap-2">
+              <button onClick={nextDay} disabled={atLimit} className={small}>
+                Next day
               </button>
-              {atLimit && (
-                <p className="px-2 text-xs text-ink/50">
-                  The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
-                  <a href={SIGNUP_URL} className="font-semibold text-ink underline">
-                    Start a pilot
-                  </a>{" "}
-                  to use it with a real class.
-                </p>
-              )}
-              <button
-                onClick={() => confirm("Reset all demo data?") && reset()}
-                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm font-medium text-ink/70 hover:bg-ink/5"
-              >
-                <RotateCcw size={15} /> Reset demo
+              <button onClick={() => confirm("Reset all demo data?") && reset()} className={small}>
+                Reset
               </button>
             </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl px-2 py-1">
-            {role === "student" ? (
-              <>
-                <Avatar name={YOU.name} you />
-                <p className="min-w-0 flex-1 truncate text-sm font-semibold">{YOU.name}</p>
-                {ready && (
-                  <span className={cx("flex items-center gap-1 text-sm font-bold", s ? "text-ink" : "text-ink/35")}>
-                    <Flame size={16} className={s ? "fill-lemon-deep text-lemon-deep" : ""} />
-                    {s}
-                  </span>
-                )}
-              </>
-            ) : (
-              <>
-                <span className="grid size-8 place-items-center rounded-full bg-ink text-white">
-                  <GraduationCap size={16} />
-                </span>
-                <p className="min-w-0 truncate text-sm font-semibold">Ms. Chen</p>
-              </>
+            {atLimit && (
+              <p className="mt-2 text-ink/60">
+                The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
+                <a href={SIGNUP_URL} className="font-semibold text-ink underline">
+                  Start a pilot
+                </a>{" "}
+                to use it with a real class.
+              </p>
             )}
           </div>
         </div>
-      </aside>
-      </div>
-
-      {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur lg:hidden">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Link href="/">
-            <Logo />
-          </Link>
-          <div className="ml-auto grid grid-cols-2 rounded-lg bg-ink/5 p-0.5 text-xs font-semibold">
-            {(["student", "teacher"] as const).map((r) => (
-              <Link key={r} href={`/${r}`} className={cx("rounded-md px-2.5 py-1 capitalize", r === role ? "bg-white shadow-sm" : "text-ink/50")}>
-                {r}
-              </Link>
-            ))}
-          </div>
-          <button onClick={nextDay} disabled={atLimit} aria-label="Skip to tomorrow" className="rounded-lg p-1.5 text-ink/50 hover:bg-ink/5 disabled:opacity-30">
-            <FastForward size={18} />
-          </button>
-        </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
-          {items.map((it) => (
-            <Link
-              key={it.href}
-              href={it.href}
-              className={cx(
-                "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold",
-                isActive(it.href, it.exact) ? "bg-ink text-white" : "text-ink/60",
-              )}
-            >
-              <it.icon size={15} />
-              {it.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 lg:py-10">{children}</main>
-    </div>
+      }
+      mobileExtra={
+        <button onClick={nextDay} disabled={atLimit} className={small}>
+          Next day
+        </button>
+      }
+    >
+      {children}
+    </Frame>
   );
 }

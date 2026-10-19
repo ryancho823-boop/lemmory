@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
 import { byTopic, classFormulaHealth, recent, summary } from "@/lib/analytics";
 import { BarList } from "@/components/charts";
-import { Avatar, Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@/components/ui";
+import { Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function TeacherOverview() {
   const { ready, students, state, today } = useStore();
@@ -89,15 +89,10 @@ export default function TeacherOverview() {
               {attention.map(({ s, tag, detail }) => (
                 <li key={s.id}>
                   <Link href={`/teacher/students/${s.id}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas">
-                    <Avatar name={s.name} size={30} />
                     <span className="min-w-0 flex-1 truncate font-semibold" title={detail}>
                       {s.name}
                     </span>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        tag === "Behind" ? "bg-bad/10 text-bad" : "bg-warn/20 text-ink/70"
-                      }`}
-                    >
+                    <span className={`shrink-0 text-sm font-bold ${tag === "Behind" ? "text-bad" : "text-ink/70"}`}>
                       {tag}
                     </span>
                     <ArrowRight size={14} className="shrink-0 text-ink/30" />

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { studentInfo } from "@lemmory/db/teacher";
 import { StudentAnalytics } from "@lemmory/ui/StudentAnalytics";
-import { Avatar } from "@lemmory/ui/ui";
 import { getClass, requireTeacher } from "@/lib/session";
 import { ManageStudent } from "./ManageStudent";
 
@@ -19,7 +18,6 @@ export default async function StudentPage({ params }: PageProps<"/c/[classId]/st
         <ArrowLeft size={15} /> Students
       </Link>
       <div className="mb-6 flex flex-wrap items-center gap-4">
-        <Avatar name={s.name} size={52} />
         <div className="min-w-0 flex-1">
           <h1 className="text-[28px] font-extrabold leading-tight tracking-tight">{s.name}</h1>
           <p className="text-ink/55">

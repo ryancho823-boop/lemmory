@@ -15,7 +15,6 @@ export function LoginForm() {
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Logging in…" : "Log in"}
       </Button>
-      <p className="text-center text-xs text-ink/45">Forgot your password? Your teacher can reset it.</p>
     </form>
   );
 }

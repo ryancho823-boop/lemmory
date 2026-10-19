@@ -1,5 +1,8 @@
 "use client";
 
+// The demo's version of packages/ui/src/FormulaBrowser.tsx.
+// It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
+
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowRight, Lock, Search } from "lucide-react";
@@ -19,8 +22,8 @@ import {
   difficultyTier,
 } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { Tex } from "./Tex";
-import { LevelTag, Segmented, cx } from "./ui";
+import { Tex } from "@lemmory/ui/Tex";
+import { LevelTag, Segmented, cx } from "@lemmory/ui/ui";
 
 type Scope = "all" | "assigned" | "deck" | "unassigned";
 

@@ -13,9 +13,9 @@ export function Panel({ className, children }: { className?: string; children: R
 
 export function PanelHeader({ title, sub, info, action }: { title: string; sub?: React.ReactNode; info?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 px-5 pt-5">
+    <div className="flex items-start justify-between gap-3 border-b border-line bg-paper px-5 py-2.5">
       <div className="min-w-0">
-        <h2 className="flex items-center gap-1 text-[17px] font-semibold">
+        <h2 className="flex items-center gap-1 text-[16px] font-bold">
           {title}
           {info && <InfoTip title={title} align="left">{info}</InfoTip>}
         </h2>
@@ -51,7 +51,7 @@ export function Button({ href, onClick, variant = "primary", size = "md", classN
     size === "md" && "h-10 px-4 text-sm",
     size === "lg" && "h-12 px-6 text-[15px]",
     variant === "primary" && "bg-ink text-white hover:bg-ink/85",
-    variant === "lemon" && "bg-lemon text-ink shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)] hover:brightness-105",
+    variant === "lemon" && "bg-lemon text-ink hover:brightness-105",
     variant === "ghost" && "text-ink/65 hover:bg-ink/5 hover:text-ink",
     variant === "outline" && "border border-line bg-white text-ink hover:border-ink/25",
     className,
@@ -89,21 +89,6 @@ export function StageTag({ stage, mastered }: { stage: Stage; mastered?: boolean
   );
 }
 
-const AVATAR_TINTS = ["#dbeafe", "#fde2d3", "#d5f3e6", "#fdefc3", "#fbe0ec", "#d9f0d9", "#e2defa", "#fcdcdc"];
-export function Avatar({ name, you, size = 32 }: { name: string; you?: boolean; size?: number }) {
-  const initials = name.split(" ").map((p) => p[0]).slice(0, 2).join("");
-  let h = 0;
-  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return (
-    <span
-      className={cx("grid shrink-0 place-items-center rounded-full font-bold text-ink/75", you && "ring-2 ring-lemon ring-offset-2")}
-      style={{ width: size, height: size, fontSize: size * 0.36, background: you ? "#ffd43b" : AVATAR_TINTS[h % AVATAR_TINTS.length] }}
-    >
-      {initials}
-    </span>
-  );
-}
-
 export function Stat({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-line bg-white p-4">
@@ -123,8 +108,8 @@ export function Meter({ value, className }: { value: number | null; className?: 
   const v = value ?? 0;
   const color = v >= 0.85 ? "var(--color-good)" : v >= 0.65 ? "var(--color-warn)" : "var(--color-bad)";
   return (
-    <div className={cx("h-1.5 overflow-hidden rounded-full bg-ink/8", className)}>
-      <div className="h-full rounded-full" style={{ width: `${v * 100}%`, background: color }} />
+    <div className={cx("h-2 overflow-hidden bg-ink/8", className)}>
+      <div className="h-full" style={{ width: `${v * 100}%`, background: color }} />
     </div>
   );
 }
@@ -135,14 +120,14 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function Segmented<T extends string>({ value, options, onChange }: { value: T; options: { value: T; label: React.ReactNode }[]; onChange: (v: T) => void }) {
   return (
-    <div className="inline-flex rounded-xl bg-ink/5 p-1">
+    <div className="inline-flex border border-ink/25">
       {options.map((o) => (
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
           className={cx(
-            "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors",
-            value === o.value ? "bg-white text-ink shadow-sm" : "text-ink/55 hover:text-ink",
+            "px-3 py-1.5 text-sm font-semibold transition-colors",
+            value === o.value ? "bg-ink text-white" : "bg-white text-ink/70 hover:text-ink hover:underline",
           )}
         >
           {o.label}

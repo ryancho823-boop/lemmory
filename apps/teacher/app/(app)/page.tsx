@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronRight, Plus } from "lucide-react";
-import { Logo } from "@lemmory/ui/Shell";
+import { TopBar } from "@lemmory/ui/Shell";
 import { Button, Panel } from "@lemmory/ui/ui";
 import { getClasses, requirePlan } from "@/lib/session";
 import { LogoutButton } from "./LogoutButton";
@@ -13,12 +13,11 @@ export default async function Classes() {
   if (classes.length === 0) redirect("/new");
   if (classes.length === 1) redirect(`/c/${classes[0].id}`);
   return (
-    <div className="min-h-screen bg-canvas">
-      <header className="mx-auto flex max-w-3xl items-center justify-between px-5 py-6">
-        <Logo tag="Teacher" />
+    <div className="product min-h-screen bg-canvas">
+      <TopBar tag="Teacher" width="max-w-3xl">
         <LogoutButton />
-      </header>
-      <main className="mx-auto max-w-3xl px-5 pb-20">
+      </TopBar>
+      <main className="mx-auto max-w-3xl px-5 pb-20 pt-8">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-ink/45">{me.name}</p>

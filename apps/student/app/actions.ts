@@ -67,15 +67,21 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
 }
 
 export async function signup(_: FormState, fd: FormData): Promise<FormState> {
-  const values = { code: field(fd, "code").toUpperCase(), name: field(fd, "name"), username: field(fd, "username").toLowerCase() };
+  const values = {
+    code: field(fd, "code").toUpperCase(),
+    firstName: field(fd, "firstName"),
+    lastName: field(fd, "lastName"),
+    username: field(fd, "username").toLowerCase(),
+  };
+  const name = `${values.firstName} ${values.lastName}`.trim();
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
   const klass = await findClassByCode(values.code);
   if (!klass) return fail("No class has that code. Check with your teacher.");
-  if (values.name.length < 2 || values.name.length > 60) return fail("Enter your name as your teacher knows it.");
+  if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
-  const id = await createStudent(values.name, values.username, password);
+  const id = await createStudent(name, values.username, password);
   if (!id) return fail("That username is taken. Try another.");
   await joinClass(id, klass.id);
   await startSession(id, "student");

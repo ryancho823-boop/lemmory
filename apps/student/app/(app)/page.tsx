@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Flame, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
 import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
@@ -21,7 +21,7 @@ export default async function StudentHome() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-[32px] font-extrabold">Hi, {v.me.name.split(" ")[0]}</h1>
-        {v.klass?.contest && <p className="rounded-full border border-line bg-white px-3 py-1 text-sm">{v.klass.contest}</p>}
+        {v.klass?.contest && <p className="text-ink/75">{v.klass.contest}</p>}
       </div>
 
       {!v.klass && (
@@ -63,7 +63,7 @@ export default async function StudentHome() {
               </p>
               {v.klass && (
                 <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                  <Flame size={16} className="text-lemon-deep" /> +{bonus} streak bonus
+                  +{bonus} streak bonus
                 </p>
               )}
             </div>
