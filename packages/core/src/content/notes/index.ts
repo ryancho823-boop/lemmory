@@ -8,6 +8,7 @@ import { PROBABILITY_NOTES } from "./probability";
 import { TRIG_NOTES } from "./trig";
 import type { Notes } from "./types";
 import { ALGEBRA_V2_NOTES } from "./v2Algebra";
+import { NUMBER_THEORY_V2_NOTES } from "./v2NumberTheory";
 
 export type { Note } from "./types";
 
@@ -21,4 +22,5 @@ export const NOTES: Notes = {
   ...CALCULUS_NOTES,
   ...EXTRA_NOTES,
   ...ALGEBRA_V2_NOTES,
+  ...NUMBER_THEORY_V2_NOTES,
 };
