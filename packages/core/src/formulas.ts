@@ -18,6 +18,7 @@ import { GEOMETRY_3 } from "./content/extra/geometry";
 import { TRIG_3 } from "./content/extra/trig";
 import { ALGEBRA_V2 } from "./content/v2/algebra";
 import { NUMBER_THEORY_V2 } from "./content/v2/numberTheory";
+import { COMBINATORICS_V2 } from "./content/v2/combinatorics";
 import type { Formula } from "./content/types";
 
 export * from "./content/types";
@@ -38,6 +39,7 @@ export const FORMULAS: Formula[] = [
   ...NUMBER_THEORY_V2,
   ...COMBINATORICS,
   ...COMBINATORICS_2,
+  ...COMBINATORICS_V2,
   ...PROBABILITY,
   ...PROBABILITY_2,
   ...CALCULUS,
