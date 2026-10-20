@@ -2,40 +2,6 @@ import { defineTopic, pos } from "../types";
 
 export const GEOMETRY_2 = defineTopic("Geometry", [
   {
-    id: "midpoint",
-    name: "Midpoint Formula",
-    level: "AMC 8",
-    statement: "M = \\left(\\frac{x_1 + x_2}{2},\\ \\frac{y_1 + y_2}{2}\\right)",
-    setup: "The midpoint of $(x_1, y_1)$ and $(x_2, y_2)$ averages the coordinates.",
-    whenToUse: "The middle of a segment, or a missing endpoint when you know the midpoint.",
-    recall: [{ lhs: "M_x =", answer: "\\frac{x_1+x_2}{2}", vars: { x_1: pos, x_2: pos } }],
-    related: ["distance-formula", "centroid", "slope"],
-    problems: [
-      { id: "mp1", text: "Find the sum of the coordinates of the midpoint of $(2, -4)$ and $(8, 6)$.", answer: "6", solution: "The midpoint is $(5, 1)$." },
-      { id: "mp2", text: "$M = (3, 5)$ is the midpoint of $A = (1, 2)$ and $B$. Find the sum of $B$'s coordinates.", answer: "13", solution: "$B = (5, 8)$." },
-    ],
-  },
-  {
-    id: "circle-equation",
-    name: "Equation of a Circle",
-    level: "AMC 10",
-    statement: "(x-h)^2 + (y-k)^2 = r^2",
-    setup: "Center $(h, k)$, radius $r$. From $x^2 + y^2 + Dx + Ey + F = 0$, complete the square: $r = \\sqrt{\\frac{D^2}{4} + \\frac{E^2}{4} - F}$.",
-    whenToUse: "A circle is given by an expanded equation and you need its center or radius.",
-    recall: [
-      {
-        lhs: "r \\text{ for } x^2+y^2+Dx+Ey+F=0:",
-        answer: "\\sqrt{\\frac{D^2}{4}+\\frac{E^2}{4}-F}",
-        vars: { D: pos, E: pos, F: [-5, -1] },
-      },
-    ],
-    related: ["distance-formula", "point-line-distance"],
-    problems: [
-      { id: "ce1", text: "Find the radius of the circle $x^2 + y^2 - 6x + 8y = 0$.", answer: "5", solution: "$(x-3)^2 + (y+4)^2 = 25$." },
-      { id: "ce2", text: "Find the sum of the coordinates of the center of $x^2 + y^2 + 4x - 10y + 20 = 0$.", answer: "3", solution: "$(x+2)^2 + (y-5)^2 = 9$, so the center is $(-2, 5)$." },
-    ],
-  },
-  {
     id: "point-line-distance",
     name: "Point-to-Line Distance",
     level: "AMC 12",
@@ -45,58 +11,10 @@ export const GEOMETRY_2 = defineTopic("Geometry", [
     recall: [
       { lhs: "d =", answer: "\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}", vars: { A: pos, B: pos, C: pos, x_0: pos, y_0: pos } },
     ],
-    related: ["distance-formula", "circle-equation"],
+    related: [],
     problems: [
       { id: "pld1", text: "Find the distance from $(1, 2)$ to the line $3x + 4y - 1 = 0$.", answer: "2", solution: "$\\frac{|3 + 8 - 1|}{5} = 2$." },
       { id: "pld2", text: "Find the distance between the parallel lines $3x + 4y = 5$ and $3x + 4y = 20$.", answer: "3", solution: "$\\frac{|20 - 5|}{5} = 3$." },
-    ],
-  },
-  {
-    id: "trapezoid-area",
-    name: "Trapezoid Area",
-    level: "AMC 8",
-    statement: "K = \\frac{b_1 + b_2}{2}\\cdot h",
-    setup: "Parallel bases $b_1$, $b_2$ and height $h$.",
-    whenToUse: "Any quadrilateral with one pair of parallel sides.",
-    recall: [{ lhs: "K =", answer: "\\frac{b_1+b_2}{2}\\cdot h", vars: { b_1: pos, b_2: pos, h: pos } }],
-    related: ["rhombus-area", "shoelace"],
-    problems: [
-      { id: "tz1", text: "A trapezoid has bases $8$ and $14$ and height $5$. Find its area.", answer: "55", solution: "$11 \\cdot 5 = 55$." },
-      { id: "tz2", text: "A trapezoid has area $60$, height $5$, and one base $10$. Find the other base.", answer: "14", solution: "$\\frac{10 + b}{2}\\cdot5 = 60$." },
-    ],
-  },
-  {
-    id: "circle-area",
-    name: "Circle Area & Circumference",
-    level: "AMC 8",
-    statement: "A = \\pi r^2, \\qquad C = 2\\pi r",
-    setup: "Circle of radius $r$.",
-    whenToUse: "Circles, rings (annuli), or anything round in 2D.",
-    recall: [
-      { lhs: "A =", answer: "\\pi r^2", vars: { r: pos } },
-      { lhs: "C =", answer: "2\\pi r", vars: { r: pos } },
-    ],
-    related: ["arcs-sectors", "volumes"],
-    problems: [
-      { id: "cir1", text: "A circle has circumference $10\\pi$. Find its area.", answer: "25\\pi", solution: "$r = 5$, so $A = 25\\pi$." },
-      { id: "cir2", text: "Find the area of the ring between circles of radius $5$ and $3$ with the same center.", answer: "16\\pi", solution: "$25\\pi - 9\\pi$." },
-    ],
-  },
-  {
-    id: "special-right-triangles",
-    name: "Special Right Triangles",
-    level: "AMC 8",
-    statement: "45\\text{-}45\\text{-}90:\\ 1 : 1 : \\sqrt2, \\qquad 30\\text{-}60\\text{-}90:\\ 1 : \\sqrt3 : 2",
-    setup: "Side ratios, shortest side first.",
-    whenToUse: "Squares and their diagonals, equilateral triangles cut in half, or $30^\\circ$/$45^\\circ$/$60^\\circ$ angles.",
-    recall: [
-      { lhs: "\\text{Hypotenuse of 45-45-90 with leg } s =", answer: "s\\sqrt2", vars: { s: pos } },
-      { lhs: "\\text{Long leg of 30-60-90 with short leg } s =", answer: "s\\sqrt3", vars: { s: pos } },
-    ],
-    related: ["pythagorean", "special-angles", "equilateral-area"],
-    problems: [
-      { id: "srt1", text: "A square has diagonal $8$. Find its side length.", answer: "4\\sqrt{2}", solution: "$\\frac{8}{\\sqrt2} = 4\\sqrt2$." },
-      { id: "srt2", text: "A $30$-$60$-$90$ triangle has hypotenuse $12$. Find its longer leg.", answer: "6\\sqrt{3}", solution: "Short leg $6$, long leg $6\\sqrt3$." },
     ],
   },
   {
@@ -121,7 +39,7 @@ export const GEOMETRY_2 = defineTopic("Geometry", [
     setup: "From a point at distance $d$ from the center of a circle of radius $r$. Two tangents from the same point are equal.",
     whenToUse: "Tangent segments, or a circle inscribed in a polygon (each vertex's two tangents are equal).",
     recall: [{ lhs: "\\text{Tangent length} =", answer: "\\sqrt{d^2-r^2}", vars: { d: [3, 5], r: [1, 2] } }],
-    related: ["power-of-a-point", "inradius-circumradius", "pythagorean"],
+    related: ["power-of-a-point", "inradius-circumradius"],
     problems: [
       { id: "tl1", text: "A point is $13$ from the center of a circle of radius $5$. How long is a tangent from the point to the circle?", answer: "12", solution: "$\\sqrt{169 - 25} = 12$." },
       { id: "tl2", text: "A circle is inscribed in triangle $ABC$ with $AB = 7$, $BC = 8$, $CA = 9$. How long is the tangent segment from $A$ to the circle?", answer: "4", solution: "Equal tangents give $s - BC = 12 - 8 = 4$." },
@@ -135,55 +53,10 @@ export const GEOMETRY_2 = defineTopic("Geometry", [
     setup: "Vertices, edges, and faces of a convex polyhedron.",
     whenToUse: "A 3D solid where you know two of the counts and need the third.",
     recall: [{ lhs: "V - E + F =", answer: "2", vars: {} }],
-    related: ["polygon-angles"],
+    related: [],
     problems: [
       { id: "eu1", text: "A convex polyhedron has $12$ vertices and $30$ edges. How many faces does it have?", answer: "20", solution: "$12 - 30 + F = 2$." },
       { id: "eu2", text: "A soccer ball has $32$ faces and $60$ vertices. How many edges?", answer: "90", solution: "$60 - E + 32 = 2$." },
-    ],
-  },
-  {
-    id: "box-diagonal",
-    name: "Space Diagonal of a Box",
-    level: "AMC 8",
-    statement: "d = \\sqrt{a^2 + b^2 + c^2}",
-    setup: "Rectangular box with edges $a$, $b$, $c$. For a cube, $d = s\\sqrt3$.",
-    whenToUse: "The longest straight line inside a box, or the distance between opposite corners in 3D.",
-    recall: [{ lhs: "d =", answer: "\\sqrt{a^2+b^2+c^2}", vars: { a: pos, b: pos, c: pos } }],
-    related: ["pythagorean", "distance-formula"],
-    problems: [
-      { id: "bd1", text: "Find the space diagonal of a $3 \\times 4 \\times 12$ box.", answer: "13", solution: "$\\sqrt{9 + 16 + 144} = 13$." },
-      { id: "bd2", text: "A cube has space diagonal $6\\sqrt3$. Find its edge length.", answer: "6", solution: "$s\\sqrt3 = 6\\sqrt3$." },
-    ],
-  },
-  {
-    id: "cylinder",
-    name: "Cylinder Volume & Surface Area",
-    level: "AMC 8",
-    statement: "V = \\pi r^2 h, \\qquad SA = 2\\pi r^2 + 2\\pi r h",
-    setup: "Radius $r$, height $h$. The side unrolls into a $2\\pi r \\times h$ rectangle.",
-    whenToUse: "Cans, pipes, or anything with a circular cross-section.",
-    recall: [
-      { lhs: "V =", answer: "\\pi r^2h", vars: { r: pos, h: pos } },
-      { lhs: "SA =", answer: "2\\pi r^2+2\\pi rh", vars: { r: pos, h: pos } },
-    ],
-    related: ["volumes", "circle-area"],
-    problems: [
-      { id: "cy1", text: "Find the volume of a cylinder with radius $3$ and height $5$.", answer: "45\\pi", solution: "$9\\pi \\cdot 5$." },
-      { id: "cy2", text: "Find the total surface area of a cylinder with radius $2$ and height $5$.", answer: "28\\pi", solution: "$8\\pi + 20\\pi$." },
-    ],
-  },
-  {
-    id: "rhombus-area",
-    name: "Rhombus & Kite Area",
-    level: "AMC 8",
-    statement: "K = \\frac{d_1 d_2}{2}",
-    setup: "Diagonals $d_1$ and $d_2$ (they're perpendicular in a rhombus or kite).",
-    whenToUse: "A quadrilateral with perpendicular diagonals.",
-    recall: [{ lhs: "K =", answer: "\\frac{d_1d_2}{2}", vars: { d_1: pos, d_2: pos } }],
-    related: ["trapezoid-area", "pythagorean"],
-    problems: [
-      { id: "rh1", text: "A rhombus has diagonals $10$ and $24$. Find its area.", answer: "120", solution: "$\\frac{240}{2} = 120$." },
-      { id: "rh2", text: "A rhombus has diagonals $10$ and $24$. Find its side length.", answer: "13", uses: ["rhombus-area", "pythagorean"], solution: "Half-diagonals $5$ and $12$ form a right triangle with hypotenuse $13$." },
     ],
   },
   {
@@ -194,7 +67,7 @@ export const GEOMETRY_2 = defineTopic("Geometry", [
     setup: "Where the three medians meet. It splits each median $2 : 1$ from the vertex.",
     whenToUse: "Medians of a triangle, or the average of three vertices.",
     recall: [{ lhs: "G_x =", answer: "\\frac{x_1+x_2+x_3}{3}", vars: { x_1: pos, x_2: pos, x_3: pos } }],
-    related: ["midpoint", "median-length"],
+    related: ["median-length"],
     problems: [
       { id: "cn1", text: "Find the sum of the coordinates of the centroid of the triangle $(0,0)$, $(6,0)$, $(3,9)$.", answer: "6", solution: "The centroid is $(3, 3)$." },
       { id: "cn2", text: "A median of a triangle has length $12$. How far is the centroid from the vertex on that median?", answer: "8", solution: "$\\frac23 \\cdot 12 = 8$." },

@@ -3,16 +3,6 @@ import type { Notes } from "./types";
 // Notes for the formulas in lib/content/extra/.
 export const EXTRA_NOTES: Notes = {
   // ── algebra ──
-  "completing-square": {
-    explain:
-      "Any quadratic can be rewritten as a perfect square plus a constant. Once it's in that form you can read off the vertex, the minimum or maximum value, and the roots. It's also how you find the center and radius of a circle from its expanded equation.",
-    proof: "Expand $\\left(x + \\frac{b}{2}\\right)^2 = x^2 + bx + \\frac{b^2}{4}$, then subtract $\\frac{b^2}{4}$ to get back $x^2 + bx$.",
-  },
-  "cube-of-sum": {
-    explain:
-      "Cubing a sum gives four terms with coefficients $1, 3, 3, 1$. On contests it's most useful rearranged: $a^3 + b^3 = (a + b)^3 - 3ab(a + b)$, so you only need $a + b$ and $ab$.",
-    proof: "$(a + b)^3 = (a + b)(a^2 + 2ab + b^2) = a^3 + 2a^2b + ab^2 + a^2b + 2ab^2 + b^3 = a^3 + 3a^2b + 3ab^2 + b^3$.",
-  },
   "sum-of-three-cubes": {
     explain:
       "This identity factors $a^3 + b^3 + c^3 - 3abc$. Its most famous consequence: whenever $a + b + c = 0$, the cubes add up to exactly $3abc$. Combined with Vieta, it also gives the sum of cubes of a cubic's roots.",
@@ -44,17 +34,6 @@ export const EXTRA_NOTES: Notes = {
   },
 
   // ── coordinate geometry ──
-  "line-equations": {
-    explain:
-      "Point-slope form writes a line straight from one point and its slope, with no need to find the intercept first. Two lines are perpendicular when their slopes are negative reciprocals, like $2$ and $-\\frac12$.",
-    proof:
-      "Every point $(x, y)$ on the line satisfies $\\frac{y - y_1}{x - x_1} = m$. For perpendicular lines, rotating a direction $(1, m)$ by $90^\\circ$ gives $(-m, 1)$, whose slope is $-\\frac1m$.",
-  },
-  "section-formula": {
-    explain:
-      "A point that divides a segment in the ratio $m : n$ is a weighted average of the endpoints, with each endpoint weighted by the other part of the ratio. The midpoint is the case $m = n$.",
-    proof: "$P = A + \\frac{m}{m+n}(B - A) = \\frac{(m + n)A + mB - mA}{m + n} = \\frac{nA + mB}{m + n}$.",
-  },
   parabola: {
     explain:
       "A parabola is all the points equally far from a point (the focus) and a line (the directrix). For $x^2 = 4py$ the focus is $p$ above the vertex and the directrix is $p$ below. The distance from a point on it to the focus equals its height above the directrix.",
@@ -80,11 +59,6 @@ export const EXTRA_NOTES: Notes = {
   },
 
   // ── triangles ──
-  "exterior-angle": {
-    explain:
-      "Extend one side of a triangle and the outside angle equals the sum of the two far interior angles. It's often the fastest step in an angle chase.",
-    proof: "The exterior angle at $C$ and $\\angle C$ add to $180^\\circ$, and so do $\\angle A + \\angle B + \\angle C$. So the exterior angle equals $\\angle A + \\angle B$.",
-  },
   "bisector-length": {
     explain:
       "When you know all three sides of a triangle, this gives the length of an angle bisector directly. It comes from Stewart's theorem combined with the angle bisector theorem.",
@@ -130,33 +104,11 @@ export const EXTRA_NOTES: Notes = {
   },
 
   // ── polygons and solids ──
-  "polygon-diagonals": {
-    explain:
-      "From each vertex you can draw a diagonal to every other vertex except itself and its two neighbors. The exterior angles of any convex polygon add to $360^\\circ$, which is the quickest way to find $n$ for a regular polygon.",
-    proof:
-      "Each of the $n$ vertices has $n - 3$ diagonals, and each diagonal is counted from both ends, so there are $\\frac{n(n-3)}{2}$. Walking around the polygon you turn a full $360^\\circ$, one exterior angle at each corner.",
-  },
-  "hexagon-area": {
-    explain: "Lines from the center to the six corners split a regular hexagon into six equilateral triangles with side $s$. So the area is six times $\\frac{\\sqrt3}{4}s^2$.",
-    proof: "Each central angle is $60^\\circ$ and the two sides from the center are equal, so each triangle is equilateral. Then $6 \\cdot \\frac{\\sqrt3}{4}s^2 = \\frac{3\\sqrt3}{2}s^2$.",
-  },
   "british-flag": {
     explain:
       "For any point and any rectangle, the squared distances to opposite corners have the same sum. Given three of the distances, you get the fourth without finding the rectangle or the point.",
     proof:
       "Put the rectangle at $(0, 0)$, $(w, 0)$, $(w, h)$, $(0, h)$ and $P = (x, y)$. Both $PA^2 + PC^2$ and $PB^2 + PD^2$ expand to $x^2 + y^2 + (w - x)^2 + (h - y)^2$.",
-  },
-  "pyramid-prism": {
-    explain:
-      "Any solid with the same cross-section all the way up has volume base times height. Anything that tapers to a point (a pyramid or cone) has one third of that.",
-    proof:
-      "A prism is a stack of identical slices of area $B$. For a pyramid, a cube can be cut into three congruent pyramids with a square face as base and the cube's edge as height. In general, slices shrink like $\\left(\\frac{y}{h}\\right)^2$, and adding them up gives $\\frac13 Bh$.",
-  },
-  "surface-areas": {
-    explain:
-      "A sphere's surface is exactly four of its great circles. A cone's side unrolls into a sector of radius $l$. A box has three pairs of matching rectangles.",
-    proof:
-      "Cone: the unrolled side is a sector of radius $l$ with arc length $2\\pi r$, so its area is $\\frac12 \\cdot l \\cdot 2\\pi r = \\pi r l$. Sphere: Archimedes showed it matches the side of the cylinder that wraps it, $2\\pi r \\cdot 2r = 4\\pi r^2$.",
   },
   frustum: {
     explain:

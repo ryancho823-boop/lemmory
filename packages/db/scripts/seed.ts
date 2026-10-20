@@ -92,7 +92,7 @@ async function main() {
     joinCode: "LINCLN",
     gameDay: today,
   });
-  const clubFormulas = ["averages", "circle-area", "basic-probability"];
+  const clubFormulas = ["stars-and-bars", "inscribed-angle", "expected-value"];
   await db.insert(t.assignments).values(clubFormulas.map((formulaId) => ({ classId: clubId, formulaId, week: 1, day: today })));
   for (const id of ["you", "priya", "kevin"]) {
     const studentId = `student-${id}`;

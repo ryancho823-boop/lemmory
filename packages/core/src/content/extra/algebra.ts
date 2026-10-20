@@ -2,56 +2,6 @@ import { defineTopic, pos } from "../types";
 
 export const ALGEBRA_3 = defineTopic("Algebra", [
   {
-    id: "completing-square",
-    name: "Completing the Square",
-    level: "AMC 10",
-    statement: "x^2 + bx + c = \\left(x + \\frac{b}{2}\\right)^2 + c - \\frac{b^2}{4}",
-    setup: "Halve the $x$-coefficient, square it, and add and subtract it.",
-    whenToUse: "Finding the minimum or vertex of a quadratic, or turning an expanded circle equation into center-radius form.",
-    recall: [
-      {
-        lhs: "x^2+bx =",
-        answer: "\\left(x+\\frac{b}{2}\\right)^2-\\frac{b^2}{4}",
-        vars: { x: pos, b: pos },
-        banned: ["bx", "xb"],
-      },
-    ],
-    related: ["vertex", "quadratic-formula", "circle-equation"],
-    problems: [
-      { id: "x-cs1", text: "Find the minimum value of $x^2 - 6x + 14$.", answer: "5", solution: "$x^2 - 6x + 14 = (x - 3)^2 + 5$, so the minimum is $5$ at $x = 3$." },
-      {
-        id: "x-cs2",
-        text: "Write $x^2 + 10x + 7$ as $(x + h)^2 + k$. Find $h + k$.",
-        answer: "-13",
-        solution: "$x^2 + 10x + 7 = (x + 5)^2 - 18$, so $h + k = 5 - 18 = -13$.",
-      },
-    ],
-  },
-  {
-    id: "cube-of-sum",
-    name: "Cube of a Binomial",
-    level: "AMC 8",
-    statement: "(a+b)^3 = a^3 + 3a^2b + 3ab^2 + b^3",
-    setup: "The coefficients $1, 3, 3, 1$ are a row of Pascal's triangle.",
-    whenToUse: "Expanding a cube, or using $a^3 + b^3 = (a+b)^3 - 3ab(a+b)$ when you know $a + b$ and $ab$.",
-    recall: [{ lhs: "(a+b)^3 =", answer: "a^3+3a^2b+3ab^2+b^3", vars: { a: pos, b: pos }, form: "sum" }],
-    related: ["square-of-sum", "sum-of-cubes", "binomial-theorem"],
-    problems: [
-      {
-        id: "x-cb1",
-        text: "If $x + y = 5$ and $xy = 3$, find $x^3 + y^3$.",
-        answer: "80",
-        solution: "$x^3 + y^3 = (x + y)^3 - 3xy(x + y) = 125 - 45 = 80$.",
-      },
-      {
-        id: "x-cb2",
-        text: "If $a + \\frac1a = 3$, find $a^3 + \\frac{1}{a^3}$.",
-        answer: "18",
-        solution: "Cube both sides: $a^3 + \\frac{1}{a^3} + 3\\left(a + \\frac1a\\right) = 27$, so $a^3 + \\frac{1}{a^3} = 27 - 9 = 18$.",
-      },
-    ],
-  },
-  {
     id: "sum-of-three-cubes",
     name: "Sum of Three Cubes Identity",
     level: "AMC 12",
@@ -105,7 +55,7 @@ export const ALGEBRA_3 = defineTopic("Algebra", [
     setup: "Radical roots pair up when the coefficients are rational; complex roots pair up when they're real.",
     whenToUse: "A polynomial with rational or real coefficients has an irrational or complex root, and you need the others.",
     recall: [{ lhs: "\\text{If } a+b\\sqrt{c} \\text{ is a root, so is}", answer: "a-b\\sqrt{c}", vars: { a: pos, b: pos, c: pos } }],
-    related: ["vieta-quadratic", "quadratic-formula", "complex-modulus"],
+    related: ["vieta-quadratic", "complex-modulus"],
     problems: [
       {
         id: "x-cr1",
@@ -163,7 +113,7 @@ export const ALGEBRA_3 = defineTopic("Algebra", [
       { lhs: "\\text{QM} =", answer: "\\sqrt{\\frac{a^2+b^2}{2}}", vars: { a: pos, b: pos } },
       { lhs: "\\text{HM} =", answer: "\\frac{2ab}{a+b}", vars: { a: pos, b: pos } },
     ],
-    related: ["amgm", "cauchy-schwarz", "harmonic-speed"],
+    related: ["amgm", "cauchy-schwarz"],
     problems: [
       {
         id: "x-qm1",

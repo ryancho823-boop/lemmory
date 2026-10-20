@@ -4,37 +4,6 @@ const angle: [number, number] = [0.2, 1.3];
 
 export const TRIG_2 = defineTopic("Trigonometry", [
   {
-    id: "trig-ratios",
-    name: "Tangent & Reciprocal Ratios",
-    level: "AMC 10",
-    statement: "\\tan x = \\frac{\\sin x}{\\cos x}, \\quad \\sec x = \\frac{1}{\\cos x}, \\quad \\csc x = \\frac{1}{\\sin x}",
-    setup: "In a right triangle, $\\tan$ is opposite over adjacent.",
-    whenToUse: "Converting between trig functions, or finding $\\tan$ from $\\sin$ and $\\cos$.",
-    recall: [
-      { lhs: "\\tan x =", answer: "\\frac{\\sin x}{\\cos x}", vars: { x: angle }, banned: ["\\tan"] },
-      { lhs: "\\sec x =", answer: "\\frac{1}{\\cos x}", vars: { x: angle }, banned: ["\\sec"] },
-    ],
-    related: ["pythagorean-identity", "special-angles"],
-    problems: [
-      { id: "trr1", text: "$\\sin x = \\frac{5}{13}$ with $x$ acute. Find $\\tan x$.", answer: "\\frac{5}{12}", solution: "$\\cos x = \\frac{12}{13}$." },
-      { id: "trr2", text: "$\\tan x = \\frac34$ with $x$ acute. Find $\\sin x$.", answer: "\\frac{3}{5}", solution: "A $3$-$4$-$5$ triangle." },
-    ],
-  },
-  {
-    id: "cofunction",
-    name: "Cofunction Identities",
-    level: "AMC 10",
-    statement: "\\sin(90^\\circ - x) = \\cos x, \\qquad \\tan(90^\\circ - x) = \\frac{1}{\\tan x}",
-    setup: "Complementary angles swap sine and cosine.",
-    whenToUse: "Angles that add to $90^\\circ$ appear together, like $20^\\circ$ and $70^\\circ$.",
-    recall: [{ lhs: "\\sin(90^\\circ - x) =", answer: "\\cos x", vars: { x: angle }, banned: ["\\sin"] }],
-    related: ["pythagorean-identity", "trig-ratios"],
-    problems: [
-      { id: "cof1", text: "Compute $\\sin^2 20^\\circ + \\sin^2 70^\\circ$.", answer: "1", uses: ["cofunction", "pythagorean-identity"], solution: "$\\sin 70^\\circ = \\cos 20^\\circ$." },
-      { id: "cof2", text: "Compute $\\tan 10^\\circ \\cdot \\tan 80^\\circ$.", answer: "1", solution: "$\\tan 80^\\circ = \\frac{1}{\\tan 10^\\circ}$." },
-    ],
-  },
-  {
     id: "sum-to-product",
     name: "Sum-to-Product",
     level: "AIME",
@@ -97,24 +66,10 @@ export const TRIG_2 = defineTopic("Trigonometry", [
       { lhs: "x =", answer: "r\\cos t", vars: { r: pos, t: angle } },
       { lhs: "y =", answer: "r\\sin t", vars: { r: pos, t: angle } },
     ],
-    related: ["special-angles", "complex-modulus"],
+    related: ["complex-modulus"],
     problems: [
       { id: "pol1", text: "A point has polar coordinates $r = 4$, angle $60^\\circ$. Find its $x$-coordinate.", answer: "2", solution: "$4\\cos 60^\\circ = 2$." },
       { id: "pol2", text: "Find $r$ for the point $(-3, 3)$.", answer: "3\\sqrt{2}", solution: "$\\sqrt{9 + 9}$." },
-    ],
-  },
-  {
-    id: "trig-period",
-    name: "Period of Sine & Cosine",
-    level: "AMC 12",
-    statement: "\\sin(kx),\\ \\cos(kx) \\text{ have period } \\frac{2\\pi}{k}",
-    setup: "$\\tan(kx)$ has period $\\frac{\\pi}{k}$.",
-    whenToUse: "Counting solutions of a trig equation on an interval, or how often a graph repeats.",
-    recall: [{ lhs: "\\text{Period of } \\sin(kx) =", answer: "\\frac{2\\pi}{k}", vars: { k: pos } }],
-    related: ["radians", "special-angles"],
-    problems: [
-      { id: "per1", text: "What is the period of $\\sin(3x)$?", answer: "\\frac{2\\pi}{3}", solution: "$\\frac{2\\pi}{3}$." },
-      { id: "per2", text: "How many solutions does $\\sin(2x) = 0$ have with $0 \\le x < 2\\pi$?", answer: "4", solution: "$x = 0, \\frac\\pi2, \\pi, \\frac{3\\pi}{2}$." },
     ],
   },
   {
@@ -125,7 +80,7 @@ export const TRIG_2 = defineTopic("Trigonometry", [
     setup: "Combine with the tangent addition formula to add any two arctangents.",
     whenToUse: "A sum of inverse tangents, often of nice numbers like $1$, $2$, $3$.",
     recall: [{ lhs: "\\arctan x + \\arctan\\frac1x =", answer: "\\frac{\\pi}{2}", vars: {} }],
-    related: ["tan-addition", "cofunction"],
+    related: ["tan-addition"],
     problems: [
       { id: "atn1", text: "Compute $\\arctan 2 + \\arctan\\frac12$, in degrees.", answer: "90", solution: "Complementary angles." },
       { id: "atn2", text: "Compute $\\arctan 1 + \\arctan 2 + \\arctan 3$, in radians.", answer: "\\pi", uses: ["arctan-sum", "tan-addition"], solution: "$\\tan(\\arctan2 + \\arctan3) = \\frac{5}{-5} = -1$, so that sum is $\\frac{3\\pi}{4}$; adding $\\frac\\pi4$ gives $\\pi$." },

@@ -10,7 +10,7 @@ import { Button, Segmented } from "@lemmory/ui/ui";
 type Mode = "apply" | "recall";
 
 const PROBLEM = FORMULA_BY_ID["power-of-a-point"].problems[0];
-const OPTIONS = ["law-of-cosines", "power-of-a-point", "pythagorean", "inscribed-angle"];
+const OPTIONS = ["law-of-cosines", "power-of-a-point", "stewart", "inscribed-angle"];
 
 /** The real review cards, embedded so visitors can try them without opening the demo. */
 export function TryIt() {

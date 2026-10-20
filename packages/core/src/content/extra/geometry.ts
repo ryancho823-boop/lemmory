@@ -3,57 +3,6 @@ import { defineTopic, int, pos } from "../types";
 export const GEOMETRY_3 = defineTopic("Geometry", [
   // ── coordinate geometry ──
   {
-    id: "line-equations",
-    name: "Point-Slope Form & Perpendicular Lines",
-    level: "AMC 8",
-    statement: "y - y_1 = m(x - x_1), \\qquad m_\\perp = -\\frac{1}{m}",
-    setup: "The line through $(x_1, y_1)$ with slope $m$. Perpendicular slopes multiply to $-1$.",
-    whenToUse: "Writing a line from a point and a slope, or a line perpendicular to a given one.",
-    recall: [
-      { lhs: "y =", answer: "m(x-x_1)+y_1", vars: { m: pos, x: pos, x_1: pos, y_1: pos } },
-      { lhs: "m_\\perp =", answer: "-\\frac{1}{m}", vars: { m: pos } },
-    ],
-    related: ["slope", "point-line-distance", "midpoint"],
-    problems: [
-      {
-        id: "x-le1",
-        text: "The line through $(2, 3)$ perpendicular to $y = 2x + 1$ crosses the $y$-axis at $(0, b)$. Find $b$.",
-        answer: "4",
-        solution: "Its slope is $-\\frac12$, so $y - 3 = -\\frac12(x - 2)$. At $x = 0$, $y = 3 + 1 = 4$.",
-      },
-      {
-        id: "x-le2",
-        text: "The line through $(1, 4)$ with slope $3$ crosses the $x$-axis at $(a, 0)$. Find $a$.",
-        answer: "-\\frac{1}{3}",
-        solution: "$0 - 4 = 3(a - 1)$, so $a = 1 - \\frac43 = -\\frac13$.",
-      },
-    ],
-  },
-  {
-    id: "section-formula",
-    name: "Section Formula",
-    level: "AMC 10",
-    statement: "P = \\frac{nA + mB}{m + n} \\quad \\text{when } AP : PB = m : n",
-    setup: "Apply it to each coordinate. $P$ is closer to whichever endpoint has the larger weight.",
-    whenToUse: "A point splits a segment in a given ratio, including centroids and mass-point style problems.",
-    recall: [{ lhs: "P_x =", answer: "\\frac{nx_A+mx_B}{m+n}", vars: { m: pos, n: pos, x_A: pos, x_B: pos } }],
-    related: ["midpoint", "centroid", "distance-formula"],
-    problems: [
-      {
-        id: "x-sf1",
-        text: "$P$ is on the segment from $A = (1, 2)$ to $B = (10, 14)$ with $AP : PB = 1 : 2$. Find the sum of $P$'s coordinates.",
-        answer: "10",
-        solution: "$P = A + \\frac13(B - A) = (1 + 3,\\ 2 + 4) = (4, 6)$.",
-      },
-      {
-        id: "x-sf2",
-        text: "$P$ splits the segment from $(0, 0)$ to $(15, 5)$ so that the distances from each end are in the ratio $3 : 2$. Find $P$'s $x$-coordinate.",
-        answer: "9",
-        solution: "$P$ is $\\frac35$ of the way along, so $x = \\frac35 \\cdot 15 = 9$.",
-      },
-    ],
-  },
-  {
     id: "parabola",
     name: "Parabola: Focus & Directrix",
     level: "AMC 12",
@@ -61,7 +10,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     setup: "Every point on a parabola is as far from the focus as from the directrix.",
     whenToUse: "A problem mentions a focus and directrix, or a point's distance to a point equals its distance to a line.",
     recall: [{ lhs: "\\text{Focus } (0,p),\\ \\text{directrix } y=-p:\\ \\ y =", answer: "\\frac{x^2}{4p}", vars: { x: pos, p: pos } }],
-    related: ["circle-equation", "ellipse"],
+    related: ["ellipse"],
     problems: [
       { id: "x-pb1", text: "The parabola $y = \\frac{x^2}{12}$ has focus $(0, p)$. Find $p$.", answer: "3", solution: "$4p = 12$, so $p = 3$." },
       {
@@ -83,7 +32,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
       { lhs: "c =", answer: "\\sqrt{a^2-b^2}", vars: { a: [3, 5], b: [1, 2] } },
       { lhs: "\\text{Area} =", answer: "\\pi ab", vars: { a: pos, b: pos } },
     ],
-    related: ["hyperbola", "parabola", "circle-equation"],
+    related: ["hyperbola", "parabola"],
     problems: [
       { id: "x-el1", text: "Find the distance between the foci of $\\frac{x^2}{25} + \\frac{y^2}{9} = 1$.", answer: "8", solution: "$c^2 = 25 - 9 = 16$, so $c = 4$ and the foci are $8$ apart." },
       { id: "x-el2", text: "$P$ is on $\\frac{x^2}{36} + \\frac{y^2}{20} = 1$ with foci $F_1$, $F_2$. Find $PF_1 + PF_2$.", answer: "12", solution: "The sum is always $2a = 12$." },
@@ -131,30 +80,6 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
 
   // ── triangles ──
   {
-    id: "exterior-angle",
-    name: "Exterior Angle Theorem",
-    level: "AMC 8",
-    statement: "\\angle_{\\text{ext}} = \\angle A + \\angle B",
-    setup: "An exterior angle of a triangle equals the sum of the two interior angles that aren't next to it.",
-    whenToUse: "Angle chasing: get an outside angle in one step without finding the third interior angle.",
-    recall: [{ lhs: "\\text{Exterior angle at } C =", answer: "A+B", vars: { A: [10, 80], B: [10, 80] } }],
-    related: ["polygon-angles", "inscribed-angle"],
-    problems: [
-      {
-        id: "x-ea1",
-        text: "In triangle $ABC$, $\\angle A = 50^\\circ$ and $\\angle B = 65^\\circ$. Side $BC$ is extended past $C$ to $D$. Find $\\angle ACD$ in degrees.",
-        answer: "115",
-        solution: "$\\angle ACD = \\angle A + \\angle B = 115^\\circ$.",
-      },
-      {
-        id: "x-ea2",
-        text: "The exterior angle at the apex of an isosceles triangle is $100^\\circ$. Find each base angle in degrees.",
-        answer: "50",
-        solution: "The exterior angle equals the sum of the two equal base angles, so each is $50^\\circ$.",
-      },
-    ],
-  },
-  {
     id: "bisector-length",
     name: "Angle Bisector Length",
     level: "AMC 12",
@@ -186,7 +111,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     setup: "A straight line meets lines $AB$, $BC$, $CA$ at $F$, $D$, $E$. Write $\\frac{AF}{FB} = x$ and $\\frac{BD}{DC} = y$ (lengths, not signed).",
     whenToUse: "A straight line cuts across a triangle and you need a ratio along one side. (Ceva is for three lines through one point.)",
     recall: [{ lhs: "\\frac{CE}{EA} =", answer: "\\frac{1}{xy}", vars: { x: pos, y: pos } }],
-    related: ["ceva", "angle-bisector", "section-formula"],
+    related: ["ceva", "angle-bisector"],
     problems: [
       {
         id: "x-me1",
@@ -213,7 +138,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
       { lhs: "h =", answer: "\\frac{ab}{c}", vars: { a: pos, b: pos, c: pos } },
       { lhs: "h^2 =", answer: "pq", vars: { p: pos, q: pos } },
     ],
-    related: ["pythagorean", "similar-figures", "right-triangle-radii"],
+    related: ["right-triangle-radii"],
     problems: [
       { id: "x-ra1", text: "A right triangle has legs $6$ and $8$. Find the altitude to the hypotenuse.", answer: "\\frac{24}{5}", solution: "$h = \\frac{6\\cdot 8}{10} = \\frac{24}{5}$." },
       { id: "x-ra2", text: "The altitude to the hypotenuse of a right triangle splits it into pieces $4$ and $9$. Find the altitude.", answer: "6", solution: "$h^2 = 4\\cdot 9 = 36$." },
@@ -230,7 +155,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
       { lhs: "r =", answer: "\\frac{a+b-c}{2}", vars: { a: pos, b: pos, c: pos } },
       { lhs: "R =", answer: "\\frac{c}{2}", vars: { c: pos } },
     ],
-    related: ["inradius-circumradius", "pythagorean", "right-triangle-altitude"],
+    related: ["inradius-circumradius", "right-triangle-altitude"],
     problems: [
       { id: "x-rt1", text: "Find the inradius of the right triangle with sides $5$, $12$, $13$.", answer: "2", solution: "$r = \\frac{5 + 12 - 13}{2} = 2$." },
       { id: "x-rt2", text: "A right triangle has legs $7$ and $24$. Find the radius of its circumscribed circle.", answer: "\\frac{25}{2}", solution: "The hypotenuse is $25$, and $R = \\frac{25}{2}$." },
@@ -269,7 +194,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
       { lhs: "\\text{Secants from outside: angle} =", answer: "\\frac{x-y}{2}", vars: { x: [100, 300], y: [10, 90] } },
       { lhs: "\\text{Tangent and chord: angle} =", answer: "\\frac{x}{2}", vars: { x: [10, 350] } },
     ],
-    related: ["inscribed-angle", "power-of-a-point", "arcs-sectors"],
+    related: ["inscribed-angle", "power-of-a-point"],
     problems: [
       {
         id: "x-cag1",
@@ -312,42 +237,6 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
 
   // ── polygons and solids ──
   {
-    id: "polygon-diagonals",
-    name: "Diagonals & Exterior Angles",
-    level: "AMC 8",
-    statement: "\\#\\text{diagonals} = \\frac{n(n-3)}{2}, \\qquad \\text{exterior angle (regular)} = \\frac{360^\\circ}{n}",
-    setup: "Each of the $n$ vertices connects to $n - 3$ others by a diagonal. Exterior angles of any convex polygon add to $360^\\circ$.",
-    whenToUse: "Counting diagonals, or finding $n$ for a regular polygon from one of its angles.",
-    recall: [
-      { lhs: "\\#\\text{diagonals} =", answer: "\\frac{n(n-3)}{2}", vars: { n: int(4, 20) } },
-      { lhs: "\\text{Each exterior angle (regular)} =", answer: "\\frac{360}{n}", vars: { n: int(3, 20) }, banned: ["\\circ", "\\degree"] },
-    ],
-    related: ["polygon-angles", "handshakes"],
-    problems: [
-      { id: "x-pd1", text: "How many diagonals does a $12$-sided polygon have?", answer: "54", solution: "$\\frac{12\\cdot 9}{2} = 54$." },
-      {
-        id: "x-pd2",
-        text: "Each interior angle of a regular polygon is $156^\\circ$. How many sides does it have?",
-        answer: "15",
-        solution: "Each exterior angle is $24^\\circ$, and $\\frac{360}{24} = 15$.",
-      },
-    ],
-  },
-  {
-    id: "hexagon-area",
-    name: "Regular Hexagon Area",
-    level: "AMC 8",
-    statement: "K = \\frac{3\\sqrt3}{2}s^2",
-    setup: "A regular hexagon is six equilateral triangles of side $s$.",
-    whenToUse: "Any regular hexagon: split it into six equilateral triangles.",
-    recall: [{ lhs: "K =", answer: "\\frac{3\\sqrt3}{2}s^2", vars: { s: pos } }],
-    related: ["equilateral-area", "polygon-angles"],
-    problems: [
-      { id: "x-hx1", text: "Find the area of a regular hexagon with side $2$.", answer: "6\\sqrt{3}", solution: "$\\frac{3\\sqrt3}{2}\\cdot 4 = 6\\sqrt3$." },
-      { id: "x-hx2", text: "A regular hexagon has area $54\\sqrt3$. Find its side length.", answer: "6", solution: "$\\frac{3\\sqrt3}{2}s^2 = 54\\sqrt3$ gives $s^2 = 36$." },
-    ],
-  },
-  {
     id: "british-flag",
     name: "British Flag Theorem",
     level: "AMC 10",
@@ -355,60 +244,10 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     setup: "$P$ is any point and $ABCD$ is a rectangle, with $A$ opposite $C$. Write $PA = a$, $PB = b$, $PC = c$, $PD = d$.",
     whenToUse: "A point and a rectangle, with distances to three corners given: find the fourth.",
     recall: [{ lhs: "c^2 =", answer: "b^2+d^2-a^2", vars: { a: [1, 2], b: [2, 4], d: [2, 4] } }],
-    related: ["pythagorean", "distance-formula"],
+    related: [],
     problems: [
       { id: "x-bf1", text: "$P$ is inside rectangle $ABCD$ with $PA = 3$, $PB = 4$, $PC = 5$. Find $PD^2$.", answer: "18", solution: "$PD^2 = 9 + 25 - 16 = 18$." },
       { id: "x-bf2", text: "$P$ is inside rectangle $ABCD$ with $PA = 2$, $PB = 5$, $PD = 4$. Find $PC$.", answer: "\\sqrt{37}", solution: "$PC^2 = 25 + 16 - 4 = 37$." },
-    ],
-  },
-  {
-    id: "pyramid-prism",
-    name: "Prism & Pyramid Volume",
-    level: "AMC 8",
-    statement: "V_{\\text{prism}} = Bh, \\qquad V_{\\text{pyramid}} = \\tfrac13 Bh",
-    setup: "$B$ is the area of the base and $h$ the height. A cylinder is a prism and a cone is a pyramid.",
-    whenToUse: "Volume of a solid with a flat base: prisms and cylinders use $Bh$, pyramids and cones $\\tfrac13 Bh$.",
-    recall: [
-      { lhs: "V_{\\text{prism}} =", answer: "Bh", vars: { B: pos, h: pos } },
-      { lhs: "V_{\\text{pyramid}} =", answer: "\\frac{1}{3}Bh", vars: { B: pos, h: pos } },
-    ],
-    related: ["volumes", "cylinder", "frustum"],
-    problems: [
-      { id: "x-py1", text: "A pyramid has a square base of side $6$ and height $10$. Find its volume.", answer: "120", solution: "$\\frac13 \\cdot 36 \\cdot 10 = 120$." },
-      {
-        id: "x-py2",
-        text: "A prism has a right-triangle base with legs $3$ and $4$ and length $10$. Find its volume.",
-        answer: "60",
-        solution: "The base has area $6$, so $V = 6\\cdot 10 = 60$.",
-      },
-    ],
-  },
-  {
-    id: "surface-areas",
-    name: "Surface Area of Spheres, Cones & Boxes",
-    level: "AMC 10",
-    statement: "SA_{\\text{sphere}} = 4\\pi r^2, \\qquad \\text{cone side} = \\pi r l, \\qquad SA_{\\text{box}} = 2(ab + bc + ca)",
-    setup: "$l$ is the cone's slant height, $\\sqrt{r^2 + h^2}$. Add $\\pi r^2$ for the cone's base.",
-    whenToUse: "Painting, wrapping, or unrolling a solid: the outside, not the inside.",
-    recall: [
-      { lhs: "SA_{\\text{sphere}} =", answer: "4\\pi r^2", vars: { r: pos } },
-      { lhs: "\\text{Cone side area} =", answer: "\\pi rl", vars: { r: pos, l: pos } },
-      { lhs: "SA_{\\text{box}} =", answer: "2(ab+bc+ca)", vars: { a: pos, b: pos, c: pos } },
-    ],
-    related: ["volumes", "cylinder", "box-diagonal"],
-    problems: [
-      {
-        id: "x-sa1",
-        text: "A sphere has surface area $36\\pi$. Find its volume divided by $\\pi$.",
-        answer: "36",
-        solution: "$4\\pi r^2 = 36\\pi$ gives $r = 3$, so $V = \\frac43\\pi\\cdot 27 = 36\\pi$.",
-      },
-      {
-        id: "x-sa2",
-        text: "A cone has radius $3$ and height $4$. Find its total surface area divided by $\\pi$.",
-        answer: "24",
-        solution: "The slant height is $5$: side $15\\pi$ plus base $9\\pi$ is $24\\pi$.",
-      },
     ],
   },
   {
@@ -419,7 +258,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     setup: "A cone or pyramid with its top sliced off parallel to the base. $B_1$ and $B_2$ are the two base areas.",
     whenToUse: "A truncated cone or pyramid, like a cup or a lampshade. You can also subtract the small cone from the big one.",
     recall: [{ lhs: "V =", answer: "\\frac{h}{3}\\left(B_1+B_2+\\sqrt{B_1B_2}\\right)", vars: { h: pos, B_1: pos, B_2: pos } }],
-    related: ["pyramid-prism", "volumes", "similar-figures"],
+    related: [],
     problems: [
       {
         id: "x-fr1",
@@ -446,7 +285,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
       { lhs: "V =", answer: "\\frac{s^3}{6\\sqrt2}", vars: { s: pos } },
       { lhs: "h =", answer: "s\\sqrt{\\frac{2}{3}}", vars: { s: pos } },
     ],
-    related: ["pyramid-prism", "equilateral-area"],
+    related: [],
     problems: [
       { id: "x-te1", text: "Find the volume of a regular tetrahedron with edge $6$.", answer: "18\\sqrt{2}", solution: "$\\frac{216}{6\\sqrt2} = \\frac{36}{\\sqrt2} = 18\\sqrt2$." },
       { id: "x-te2", text: "Find the height of a regular tetrahedron with edge $3\\sqrt6$.", answer: "6", solution: "$3\\sqrt6\\cdot\\sqrt{\\frac23} = 3\\sqrt4 = 6$." },
@@ -460,7 +299,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     setup: "Spin a flat region of area $A$ around a line that doesn't cut it. $d$ is the distance from the region's centroid to the line.",
     whenToUse: "Volume of a solid of revolution, like a torus, without calculus.",
     recall: [{ lhs: "V =", answer: "2\\pi dA", vars: { d: pos, A: pos } }],
-    related: ["disk-method", "volumes", "centroid"],
+    related: ["disk-method", "centroid"],
     problems: [
       {
         id: "x-pa1",

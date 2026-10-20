@@ -4,34 +4,6 @@ const prob: [number, number] = [0.1, 0.9];
 
 export const PROBABILITY_2 = defineTopic("Probability", [
   {
-    id: "independent-events",
-    name: "Independent Events",
-    level: "AMC 8",
-    statement: "P(A \\cap B) = P(A)\\,P(B)",
-    setup: "When one event doesn't affect the other. Write $p = P(A)$, $q = P(B)$.",
-    whenToUse: "Separate coins, dice, or trials that all have to happen.",
-    recall: [{ lhs: "P(A\\cap B) =", answer: "pq", vars: { p: prob, q: prob } }],
-    related: ["addition-rule", "binomial-probability"],
-    problems: [
-      { id: "ind1", text: "A coin is flipped and a die is rolled. What is the probability of heads and a $6$?", answer: "\\frac{1}{12}", solution: "$\\frac12\\cdot\\frac16$." },
-      { id: "ind2", text: "A player makes $70\\%$ of free throws. What is the probability she makes $3$ in a row?", answer: "\\frac{343}{1000}", solution: "$0.7^3 = 0.343$." },
-    ],
-  },
-  {
-    id: "addition-rule",
-    name: "Addition Rule",
-    level: "AMC 8",
-    statement: "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)",
-    setup: "Write $p = P(A)$, $q = P(B)$, $x = P(A \\cap B)$. Subtract the overlap so it isn't counted twice.",
-    whenToUse: "\"$A$ or $B$\" probabilities.",
-    recall: [{ lhs: "P(A\\cup B) =", answer: "p+q-x", vars: { p: [0.3, 0.6], q: [0.3, 0.6], x: [0, 0.2] } }],
-    related: ["pie", "independent-events"],
-    problems: [
-      { id: "add1", text: "A card is drawn from a standard deck. What is the probability it is a heart or a king?", answer: "\\frac{4}{13}", solution: "$\\frac{13 + 4 - 1}{52} = \\frac{16}{52}$." },
-      { id: "add2", text: "$P(A) = 0.5$, $P(B) = 0.4$, and $P(A \\cap B) = 0.2$. Find $P(A \\cup B)$.", answer: "\\frac{7}{10}", solution: "$0.5 + 0.4 - 0.2$." },
-    ],
-  },
-  {
     id: "geometric-probability",
     name: "Geometric Probability",
     level: "AMC 10",
@@ -39,7 +11,7 @@ export const PROBABILITY_2 = defineTopic("Probability", [
     setup: "For a point chosen uniformly at random.",
     whenToUse: "A random point in a shape, or a random number from an interval.",
     recall: [{ lhs: "P(\\text{random point in a square is in its inscribed circle}) =", answer: "\\frac{\\pi}{4}", vars: {} }],
-    related: ["basic-probability", "circle-area"],
+    related: [],
     problems: [
       { id: "gp1", text: "A point is chosen at random in a square of side $2$. What is the probability it is within $1$ of the center?", answer: "\\frac{\\pi}{4}", solution: "$\\frac{\\pi}{4}$." },
       { id: "gp2", text: "A number $x$ is chosen at random from $[0, 10]$. What is the probability that $x^2 < 25$?", answer: "\\frac{1}{2}", solution: "$x < 5$." },
@@ -87,24 +59,10 @@ export const PROBABILITY_2 = defineTopic("Probability", [
         vars: { N: int(10, 14), K: int(4, 6), n: int(3, 4), k: int(1, 2) },
       },
     ],
-    related: ["perms-combs", "basic-probability"],
+    related: [],
     problems: [
       { id: "hy1", text: "A committee of $3$ is picked at random from $5$ boys and $4$ girls. What is the probability it has exactly $2$ girls?", answer: "\\frac{5}{14}", solution: "$\\frac{\\binom42\\binom51}{\\binom93} = \\frac{30}{84}$." },
       { id: "hy2", text: "A bag has $6$ red and $4$ blue marbles. Three are drawn. What is the probability exactly one is blue?", answer: "\\frac{1}{2}", solution: "$\\frac{4\\cdot15}{120}$." },
-    ],
-  },
-  {
-    id: "odds",
-    name: "Odds",
-    level: "AMC 8",
-    statement: "\\text{odds in favor} = \\frac{p}{1-p}",
-    setup: "Odds of $a : b$ in favor means $p = \\frac{a}{a+b}$.",
-    whenToUse: "A problem states odds instead of a probability.",
-    recall: [{ lhs: "\\text{Odds in favor} =", answer: "\\frac{p}{1-p}", vars: { p: prob } }],
-    related: ["basic-probability", "complement"],
-    problems: [
-      { id: "od1", text: "The odds in favor of an event are $3 : 5$. What is its probability?", answer: "\\frac{3}{8}", solution: "$\\frac{3}{3+5}$." },
-      { id: "od2", text: "An event has probability $0.2$. The odds against it are $x : 1$. Find $x$.", answer: "4", solution: "$\\frac{0.8}{0.2}$." },
     ],
   },
   {
@@ -129,7 +87,7 @@ export const PROBABILITY_2 = defineTopic("Probability", [
     setup: "$k$ independent picks from $n$ equally likely options.",
     whenToUse: "Dice showing different numbers, people with different birthdays.",
     recall: [{ lhs: "P =", answer: "\\frac{n!}{(n-k)!\\,n^k}", vars: { n: int(6, 12), k: int(2, 4) } }],
-    related: ["complement", "perms-combs"],
+    related: [],
     problems: [
       { id: "ad1", text: "Three fair dice are rolled. What is the probability they all show different numbers?", answer: "\\frac{5}{9}", solution: "$\\frac{6\\cdot5\\cdot4}{216}$." },
       { id: "ad2", text: "Four people each pick a random day of the week. What is the probability all four days differ?", answer: "\\frac{120}{343}", solution: "$\\frac{7\\cdot6\\cdot5\\cdot4}{7^4} = \\frac{840}{2401}$." },
@@ -143,7 +101,7 @@ export const PROBABILITY_2 = defineTopic("Probability", [
     setup: "For identically distributed $X$ and $Y$. Write $e = P(X = Y)$.",
     whenToUse: "Two players or dice in the same situation: \"who gets more?\"",
     recall: [{ lhs: "P(X>Y) =", answer: "\\frac{1-e}{2}", vars: { e: prob } }],
-    related: ["basic-probability", "complement"],
+    related: [],
     problems: [
       { id: "sym1", text: "Two fair dice are rolled. What is the probability the first is larger than the second?", answer: "\\frac{5}{12}", solution: "$\\frac{1 - \\frac16}{2}$." },
       { id: "sym2", text: "Two people each pick a random integer from $1$ to $10$. What is the probability the first is larger?", answer: "\\frac{9}{20}", solution: "$\\frac{1 - \\frac{1}{10}}{2}$." },

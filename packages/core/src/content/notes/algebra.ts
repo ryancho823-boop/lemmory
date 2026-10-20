@@ -1,12 +1,6 @@
 import type { Notes } from "./types";
 
 export const ALGEBRA_NOTES: Notes = {
-  "quadratic-formula": {
-    explain:
-      "Every quadratic $ax^2 + bx + c = 0$ can be solved with this one formula, even when it doesn't factor. The part under the square root, $b^2 - 4ac$, is the discriminant: positive means two real roots, zero means one repeated root, negative means no real roots. Many contest problems never ask for the roots at all, only for the discriminant's sign.",
-    proof:
-      "Divide by $a$ and complete the square: $x^2 + \\frac{b}{a}x = -\\frac{c}{a}$, so $\\left(x + \\frac{b}{2a}\\right)^2 = \\frac{b^2 - 4ac}{4a^2}$. Take square roots: $x + \\frac{b}{2a} = \\pm\\frac{\\sqrt{b^2-4ac}}{2a}$, and subtract $\\frac{b}{2a}$.",
-  },
   "vieta-quadratic": {
     explain:
       "Vieta's formulas tie the roots of a quadratic directly to its coefficients. If you only need the sum or product of the roots, or anything built from them like $r^2 + s^2 = (r+s)^2 - 2rs$, you never have to solve the equation. This is one of the most-used shortcuts on the AMC.",
@@ -73,45 +67,6 @@ export const ALGEBRA_NOTES: Notes = {
     proof:
       "Let $y = \\log_b a$, so $b^y = a$. Take the natural log of both sides: $y\\ln b = \\ln a$, so $y = \\frac{\\ln a}{\\ln b}$. Any other base works the same way.",
   },
-  "difference-of-squares": {
-    explain:
-      "A difference of two squares always factors as a sum times a difference. It makes arithmetic like $1001^2 - 999^2$ instant, and it's the reason $x^2 - y^2 = n$ problems become factor-pair problems.",
-    proof: "Expand: $(a + b)(a - b) = a^2 - ab + ab - b^2 = a^2 - b^2$.",
-  },
-  "square-of-sum": {
-    explain:
-      "Squaring a sum gives both squares plus twice the product. Rearranged, $a^2 + b^2 = (a + b)^2 - 2ab$ lets you find a sum of squares from just the sum and product, which pairs naturally with Vieta's formulas.",
-    proof: "$(a + b)^2 = (a + b)(a + b) = a^2 + ab + ba + b^2 = a^2 + 2ab + b^2$.",
-  },
-  "exponent-rules": {
-    explain:
-      "Multiplying powers of the same base adds exponents; raising a power to a power multiplies them; dividing subtracts. When bases differ, try writing them as powers of a common base, like $8 = 2^3$, so the exponents can be compared directly.",
-    proof:
-      "$a^m a^n$ is $m$ copies of $a$ times $n$ more copies, so $m + n$ copies. $(a^m)^n$ is $n$ groups of $m$ copies, so $mn$ copies. These counting arguments extend to all real exponents by the definitions of fractional and negative powers.",
-  },
-  "log-rules": {
-    explain:
-      "Logs turn multiplication into addition and powers into multiplication. Combining several logs of the same base into one log (or splitting one apart) is usually the first step in any log problem.",
-    proof:
-      "Let $\\log_b x = p$ and $\\log_b y = q$, so $x = b^p$ and $y = b^q$. Then $xy = b^{p+q}$, so $\\log_b(xy) = p + q$. Similarly $x^k = b^{kp}$, so $\\log_b(x^k) = kp$.",
-  },
-  averages: {
-    explain:
-      "The mean of a list is its sum divided by how many numbers there are, so the sum is the count times the mean. Working with sums instead of averages makes adding, removing, or combining groups simple: just add or subtract the sums.",
-    proof: "By definition, $\\text{mean} = \\frac{\\text{sum}}{n}$. Multiply both sides by $n$.",
-  },
-  "work-rate": {
-    explain:
-      "When people or machines work together, their rates add, not their times. Someone who finishes a job in $a$ hours does $\\frac1a$ of it per hour. Add the rates, then flip to get the time together.",
-    proof:
-      "Together they complete $\\frac1a + \\frac1b = \\frac{a + b}{ab}$ of the job per hour. One whole job takes $1 \\div \\frac{a+b}{ab} = \\frac{ab}{a+b}$ hours.",
-  },
-  "harmonic-speed": {
-    explain:
-      "When you cover equal distances at two speeds, the average speed is not the simple average. You spend more time at the slower speed, so it gets more weight. The answer is the harmonic mean $\\frac{2ab}{a+b}$, which is always below $\\frac{a+b}{2}$.",
-    proof:
-      "Say each leg has length $d$. Total time is $\\frac da + \\frac db = \\frac{d(a+b)}{ab}$. Average speed is total distance over total time: $\\frac{2d}{d(a+b)/(ab)} = \\frac{2ab}{a+b}$.",
-  },
   "remainder-theorem": {
     explain:
       "To find the remainder when a polynomial is divided by $x - a$, just plug in $a$. In particular, $x - a$ is a factor exactly when $P(a) = 0$, which is how you test candidate roots or solve for an unknown coefficient.",
@@ -130,38 +85,10 @@ export const ALGEBRA_NOTES: Notes = {
     proof:
       "Add and subtract $4a^2b^2$: $a^4 + 4b^4 = (a^2 + 2b^2)^2 - 4a^2b^2 = (a^2 + 2b^2)^2 - (2ab)^2$. Then use difference of squares.",
   },
-  slope: {
-    explain:
-      "Slope measures steepness: how much $y$ changes per unit change in $x$. Parallel lines have equal slopes and perpendicular slopes multiply to $-1$. Three points are collinear exactly when each pair gives the same slope.",
-    proof:
-      "Moving from $(x_1, y_1)$ to $(x_2, y_2)$ is a rise of $y_2 - y_1$ over a run of $x_2 - x_1$. Slope is defined as rise over run, and similar triangles show it's the same for any two points on the line.",
-  },
-  "arithmetic-nth": {
-    explain:
-      "To reach the $n$th term of an arithmetic sequence, start at $a_1$ and take $n - 1$ steps of size $d$. If you know two terms, the gap between them divided by the number of steps gives $d$.",
-    proof: "$a_2 = a_1 + d$, $a_3 = a_1 + 2d$, and each new term adds one more $d$, so after $n - 1$ steps $a_n = a_1 + (n-1)d$.",
-  },
-  "geometric-nth": {
-    explain:
-      "To reach the $n$th term of a geometric sequence, start at $a_1$ and multiply by $r$ a total of $n - 1$ times. Dividing two known terms gives a power of $r$, which pins down the ratio.",
-    proof: "$a_2 = a_1r$, $a_3 = a_1r^2$, and each step multiplies by one more $r$, so $a_n = a_1r^{n-1}$.",
-  },
   "newton-sums": {
     explain:
       "The sum of the squares of a polynomial's roots equals the square of their sum minus twice their pairwise products. Both of those come from Vieta, so you can find $\\sum r_i^2$ straight from the coefficients. Newton's sums extend this to cubes and higher powers.",
     proof:
       "Square the sum: $(r_1 + r_2 + r_3)^2 = r_1^2 + r_2^2 + r_3^2 + 2(r_1r_2 + r_2r_3 + r_3r_1)$. Solve for the sum of squares.",
-  },
-  "sum-of-odds": {
-    explain:
-      "Adding the first $n$ odd numbers always gives a perfect square: $1$, $1 + 3 = 4$, $1 + 3 + 5 = 9$, and so on. To add odd numbers in a range, subtract two of these squares.",
-    proof:
-      "It's an arithmetic series with $n$ terms, first term $1$, last term $2n - 1$: $\\frac{n(1 + 2n - 1)}{2} = n^2$. Picture: each odd number adds an L-shaped layer that grows an $(n-1) \\times (n-1)$ square into an $n \\times n$ square.",
-  },
-  vertex: {
-    explain:
-      "A parabola's vertex is its highest or lowest point, at $x = -\\frac{b}{2a}$. Maximizing an area or a product often reduces to a quadratic, and the vertex gives the answer without calculus.",
-    proof:
-      "Complete the square: $ax^2 + bx + c = a\\left(x + \\frac{b}{2a}\\right)^2 + c - \\frac{b^2}{4a}$. The squared term is $0$ at $x = -\\frac{b}{2a}$ and has one sign everywhere else, so that's the extreme point.",
   },
 };

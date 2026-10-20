@@ -64,7 +64,7 @@ const TOPICS: { topic: Topic; sample: string; tex: string }[] = [
   { topic: "Trigonometry", sample: "Law of Cosines", tex: "c^2 = a^2 + b^2 - 2ab\\cos C" },
   { topic: "Number Theory", sample: "Legendre's Formula", tex: "\\nu_p(n!) = \\sum_{i \\ge 1} \\left\\lfloor \\tfrac{n}{p^i} \\right\\rfloor" },
   { topic: "Combinatorics", sample: "Stars and Bars", tex: "\\binom{n+k-1}{k-1}" },
-  { topic: "Probability", sample: "Complementary Counting", tex: "P(A) = 1 - P(\\overline{A})" },
+  { topic: "Probability", sample: "Bayes' Theorem", tex: "P(A \\mid B) = \\tfrac{P(B \\mid A)\\,P(A)}{P(B)}" },
   { topic: "Calculus", sample: "Power Rule", tex: "\\tfrac{d}{dx}\\, x^n = n x^{n-1}" },
 ];
 

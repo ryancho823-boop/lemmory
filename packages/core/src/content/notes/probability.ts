@@ -1,16 +1,6 @@
 import type { Notes } from "./types";
 
 export const PROBABILITY_NOTES: Notes = {
-  "basic-probability": {
-    explain:
-      "When every outcome is equally likely, probability is just favorable outcomes over total outcomes. Make sure the outcomes really are equally likely: for two dice, list ordered pairs, not sums.",
-    proof: "If there are $n$ equally likely outcomes, each has probability $\\frac1n$. An event made of $f$ of them has probability $f \\cdot \\frac1n$.",
-  },
-  complement: {
-    explain:
-      "The chance something happens at least once is one minus the chance it never happens. \"Never\" is usually a single product of probabilities, which is much easier than adding up all the \"at least once\" cases.",
-    proof: "\"At least one\" and \"none\" are opposite events: exactly one of them happens, so their probabilities add to $1$.",
-  },
   "binomial-probability": {
     explain:
       "For $n$ independent tries, each succeeding with probability $p$, the chance of exactly $k$ successes is the number of ways to choose which tries succeed, times the probability of any one such pattern.",
@@ -39,16 +29,6 @@ export const PROBABILITY_NOTES: Notes = {
     proof:
       "Let $E$ be the expected number of tries. The first try always counts; with probability $1 - p$ it fails and you start over: $E = 1 + (1 - p)E$, so $E = \\frac1p$.",
   },
-  "independent-events": {
-    explain:
-      "When events don't influence each other, the chance they all happen is the product of their chances. Coin flips, die rolls, and drawing with replacement are independent; drawing without replacement is not.",
-    proof: "Independence means knowing $B$ doesn't change $A$'s chance: $P(A \\mid B) = P(A)$. Then $P(A \\cap B) = P(A \\mid B)P(B) = P(A)P(B)$.",
-  },
-  "addition-rule": {
-    explain:
-      "The chance of $A$ or $B$ is the chance of $A$ plus the chance of $B$, minus the overlap so it isn't counted twice. If the events can't both happen, the overlap is zero and you just add.",
-    proof: "The outcomes in both $A$ and $B$ are included once in $P(A)$ and once in $P(B)$. Subtracting $P(A \\cap B)$ counts them exactly once.",
-  },
   "geometric-probability": {
     explain:
       "When a point is chosen uniformly from a region, the probability of landing in a part is that part's share of the total length, area, or volume. Draw the region and compute areas.",
@@ -70,11 +50,6 @@ export const PROBABILITY_NOTES: Notes = {
       "When drawing without replacement, count instead of multiplying: ways to choose the special items you want, times ways to choose the rest, over all ways to draw. Committees and card hands work this way.",
     proof:
       "All $\\binom Nn$ draws are equally likely. A draw with exactly $k$ special items picks $k$ of the $K$ special ones and $n - k$ of the $N - K$ others: $\\binom Kk\\binom{N-K}{n-k}$ ways.",
-  },
-  odds: {
-    explain:
-      "Odds compare the chance of happening to the chance of not happening, instead of to the whole. Odds of $a : b$ in favor mean probability $\\frac{a}{a+b}$.",
-    proof: "By definition, odds in favor are $\\frac{P(\\text{happens})}{P(\\text{doesn't})} = \\frac{p}{1-p}$. If that equals $\\frac ab$, solving gives $p = \\frac{a}{a+b}$.",
   },
   "gamblers-ruin": {
     explain:

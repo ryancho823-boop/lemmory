@@ -2,37 +2,6 @@ import { defineTopic, int, pos } from "./types";
 
 export const ALGEBRA = defineTopic("Algebra", [
   {
-    id: "quadratic-formula",
-    name: "Quadratic Formula",
-    level: "AMC 8",
-    statement: "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}",
-    setup: "Roots of $ax^2 + bx + c = 0$. The discriminant $b^2 - 4ac$ tells you how many real roots there are.",
-    whenToUse: "A quadratic doesn't factor nicely, or the problem asks when it has one, two, or no real roots.",
-    recall: [
-      { lhs: "\\text{Discriminant} =", answer: "b^2-4ac", vars: { a: pos, b: pos, c: pos } },
-      {
-        lhs: "\\text{Larger root } (a>0) =",
-        answer: "\\frac{-b+\\sqrt{b^2-4ac}}{2a}",
-        vars: { a: [1, 2], b: [4, 6], c: [0.5, 1] },
-      },
-    ],
-    related: ["vieta-quadratic", "sum-of-cubes"],
-    problems: [
-      {
-        id: "qf1",
-        text: "For what positive value of $k$ does $x^2 + kx + 9 = 0$ have exactly one real solution?",
-        answer: "6",
-        solution: "One solution means the discriminant is zero: $k^2 - 36 = 0$, so $k = 6$.",
-      },
-      {
-        id: "qf2",
-        text: "Find the larger root of $2x^2 - 3x - 2 = 0$.",
-        answer: "2",
-        solution: "$x = \\frac{3 \\pm \\sqrt{9 + 16}}{4} = \\frac{3 \\pm 5}{4}$, so the larger root is $2$.",
-      },
-    ],
-  },
-  {
     id: "vieta-quadratic",
     name: "Vieta's Formulas (Quadratic)",
     level: "AMC 10",
@@ -43,7 +12,7 @@ export const ALGEBRA = defineTopic("Algebra", [
       { lhs: "r_1 + r_2 =", answer: "-\\frac{b}{a}", vars: { a: pos, b: pos, c: pos } },
       { lhs: "r_1 r_2 =", answer: "\\frac{c}{a}", vars: { a: pos, b: pos, c: pos } },
     ],
-    related: ["vieta-cubic", "quadratic-formula", "amgm"],
+    related: ["vieta-cubic", "amgm"],
     problems: [
       {
         id: "vq1",

@@ -2,33 +2,6 @@ import { defineTopic, int } from "./types";
 
 export const COMBINATORICS = defineTopic("Combinatorics", [
   {
-    id: "perms-combs",
-    name: "Permutations & Combinations",
-    level: "AMC 8",
-    statement: "P(n,r) = \\frac{n!}{(n-r)!}, \\qquad \\binom{n}{r} = \\frac{n!}{r!\\,(n-r)!}",
-    setup: "Choosing $r$ of $n$ distinct items: order matters for $P$, not for $\\binom{n}{r}$.",
-    whenToUse: "Choosing a group (combination) or filling ranked positions (permutation).",
-    recall: [
-      { lhs: "P(n,r) =", answer: "\\frac{n!}{(n-r)!}", vars: { n: int(6, 10), r: int(1, 5) } },
-      { lhs: "\\binom{n}{r} =", answer: "\\frac{n!}{r!(n-r)!}", vars: { n: int(6, 10), r: int(1, 5) }, banned: ["\\binom", "\\choose"] },
-    ],
-    related: ["multinomial", "lattice-paths", "circular-perms"],
-    problems: [
-      {
-        id: "pc1",
-        text: "In how many ways can a president, vice president, and secretary be chosen from $10$ people?",
-        answer: "720",
-        solution: "$10\\cdot9\\cdot8 = 720$.",
-      },
-      {
-        id: "pc2",
-        text: "How many $3$-person committees can be formed from $8$ people?",
-        answer: "56",
-        solution: "$\\binom83 = 56$.",
-      },
-    ],
-  },
-  {
     id: "lattice-paths",
     name: "Lattice Paths",
     level: "AMC 8",
@@ -36,7 +9,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     setup: "Paths using only unit steps right and up. Choose which of the $m + n$ steps go right.",
     whenToUse: "Counting shortest routes on a grid, possibly through or around a point.",
     recall: [{ lhs: "\\text{Paths to } (m,n) =", answer: "\\binom{m+n}{m}", vars: { m: int(1, 6), n: int(1, 6) } }],
-    related: ["perms-combs", "catalan", "binomial-theorem"],
+    related: ["catalan", "binomial-theorem"],
     problems: [
       {
         id: "lp1",
@@ -66,7 +39,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
         vars: { n: int(5, 10), k: int(1, 4) },
       },
     ],
-    related: ["perms-combs", "hockey-stick", "binomial-probability"],
+    related: ["hockey-stick", "binomial-probability"],
     problems: [
       {
         id: "bt1",
@@ -93,7 +66,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
       { lhs: "\\text{Nonnegative: }", answer: "\\binom{n+k-1}{k-1}", vars: { n: int(6, 10), k: int(2, 5) } },
       { lhs: "\\text{Positive: }", answer: "\\binom{n-1}{k-1}", vars: { n: int(6, 10), k: int(2, 5) } },
     ],
-    related: ["hockey-stick", "multinomial", "perms-combs"],
+    related: ["hockey-stick", "multinomial"],
     problems: [
       {
         id: "sb1",
@@ -153,7 +126,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
         vars: { a: [5, 9], b: [5, 9], c: [5, 9], x: [1, 3], y: [1, 3], z: [1, 3], t: [0, 1] },
       },
     ],
-    related: ["complement", "perms-combs"],
+    related: [],
     problems: [
       {
         id: "ie1",
@@ -183,7 +156,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
         vars: { n: int(6, 10), a: int(1, 3), b: int(1, 3), c: int(1, 3) },
       },
     ],
-    related: ["perms-combs", "stars-and-bars"],
+    related: ["stars-and-bars"],
     problems: [
       {
         id: "mn1",
@@ -207,7 +180,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     setup: "Arrangements of $n$ distinct people around a circle, where rotations count as the same.",
     whenToUse: "Seating around a round table, or beads on a ring that can rotate.",
     recall: [{ lhs: "\\text{Arrangements of } n \\text{ in a circle} =", answer: "(n-1)!", vars: { n: int(3, 8) } }],
-    related: ["perms-combs", "multinomial"],
+    related: ["multinomial"],
     problems: [
       {
         id: "cp1",
@@ -231,7 +204,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     setup: "Permutations where nothing stays in its original spot. Write $p = D_{n-1}$ and $q = D_{n-2}$. Also $D_n \\approx \\frac{n!}{e}$.",
     whenToUse: "Letters in wrong envelopes, hats returned to the wrong people, nobody gets their own gift.",
     recall: [{ lhs: "D_n =", answer: "(n-1)(p+q)", vars: { n: int(3, 9), p: [1, 50], q: [1, 50] } }],
-    related: ["pie", "perms-combs"],
+    related: ["pie"],
     problems: [
       {
         id: "de1",
@@ -261,7 +234,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
         vars: { m: int(2, 12), k: int(2, 6) },
       },
     ],
-    related: ["complement"],
+    related: [],
     problems: [
       {
         id: "ph1",
@@ -285,7 +258,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     setup: "Counts balanced parentheses, grid paths that never cross the diagonal, triangulations, and more.",
     whenToUse: "A counting problem with a \"never goes below\" or \"properly nested\" condition.",
     recall: [{ lhs: "C_n =", answer: "\\frac{1}{n+1}\\binom{2n}{n}", vars: { n: int(1, 8) } }],
-    related: ["lattice-paths", "perms-combs"],
+    related: ["lattice-paths"],
     problems: [
       {
         id: "ca1",

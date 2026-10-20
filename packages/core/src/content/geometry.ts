@@ -2,60 +2,6 @@ import { defineTopic, int, pos } from "./types";
 
 export const GEOMETRY = defineTopic("Geometry", [
   {
-    id: "pythagorean",
-    name: "Pythagorean Theorem",
-    level: "AMC 8",
-    statement: "a^2 + b^2 = c^2",
-    setup: "Right triangle with legs $a, b$ and hypotenuse $c$. Common triples: $3$-$4$-$5$, $5$-$12$-$13$, $8$-$15$-$17$, $7$-$24$-$25$.",
-    whenToUse: "There's a right angle anywhere: a ladder, a diagonal, a height dropped to a base.",
-    recall: [{ lhs: "c =", answer: "\\sqrt{a^2+b^2}", vars: { a: pos, b: pos } }],
-    related: ["distance-formula", "law-of-cosines"],
-    problems: [
-      {
-        id: "py1",
-        text: "A $25$-foot ladder leans against a wall with its foot $7$ feet from the wall. How high up the wall does it reach?",
-        answer: "24",
-        solution: "$\\sqrt{625 - 49} = \\sqrt{576} = 24$.",
-      },
-      {
-        id: "py2",
-        text: "Find the length of a diagonal of a $9 \\times 12$ rectangle.",
-        answer: "15",
-        solution: "$\\sqrt{81 + 144} = 15$.",
-      },
-    ],
-  },
-  {
-    id: "distance-formula",
-    name: "Distance Formula",
-    level: "AMC 8",
-    statement: "d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}",
-    setup: "Distance between points $(x_1, y_1)$ and $(x_2, y_2)$ in the coordinate plane.",
-    whenToUse: "Two points are given by coordinates and you need how far apart they are.",
-    recall: [
-      {
-        lhs: "d =",
-        answer: "\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}",
-        vars: { x_1: pos, y_1: pos, x_2: pos, y_2: pos },
-      },
-    ],
-    related: ["pythagorean", "shoelace"],
-    problems: [
-      {
-        id: "df1",
-        text: "Find the distance between $(1, 2)$ and $(7, 10)$.",
-        answer: "10",
-        solution: "$\\sqrt{6^2 + 8^2} = 10$.",
-      },
-      {
-        id: "df2",
-        text: "Point $(x, 0)$ is equally far from $(0, 4)$ and $(6, 2)$. Find $x$.",
-        answer: "2",
-        solution: "$x^2 + 16 = (x-6)^2 + 4$, so $12x = 24$ and $x = 2$.",
-      },
-    ],
-  },
-  {
     id: "shoelace",
     name: "Shoelace Formula",
     level: "AMC 10",
@@ -69,7 +15,7 @@ export const GEOMETRY = defineTopic("Geometry", [
         vars: { x_1: pos, y_1: pos, x_2: pos, y_2: pos, x_3: pos, y_3: pos },
       },
     ],
-    related: ["picks", "distance-formula", "heron"],
+    related: ["picks", "heron"],
     problems: [
       {
         id: "sh1",
@@ -86,108 +32,6 @@ export const GEOMETRY = defineTopic("Geometry", [
     ],
   },
   {
-    id: "triangle-inequality",
-    name: "Triangle Inequality",
-    level: "AMC 8",
-    statement: "|a - b| < c < a + b",
-    setup: "Any side of a triangle is shorter than the other two combined.",
-    whenToUse: "Counting possible side lengths, or checking whether three lengths can form a triangle.",
-    recall: [{ lhs: "c <", answer: "a+b", vars: { a: pos, b: pos } }],
-    related: ["pythagorean", "law-of-cosines"],
-    problems: [
-      {
-        id: "ti1",
-        text: "A triangle has sides $5$ and $9$. How many integer lengths are possible for the third side?",
-        answer: "9",
-        solution: "$4 < c < 14$, so $c \\in \\{5, \\dots, 13\\}$: $9$ values.",
-      },
-      {
-        id: "ti2",
-        text: "How many non-congruent triangles with integer sides have perimeter $12$?",
-        answer: "3",
-        solution: "With $a \\le b \\le c < 6$: $(2,5,5)$, $(3,4,5)$, $(4,4,4)$.",
-      },
-    ],
-  },
-  {
-    id: "polygon-angles",
-    name: "Polygon Angle Sum",
-    level: "AMC 8",
-    statement: "\\text{Sum} = 180^\\circ(n-2), \\qquad \\text{each (regular)} = \\frac{180^\\circ(n-2)}{n}",
-    setup: "Interior angles of an $n$-sided polygon. Exterior angles always sum to $360^\\circ$.",
-    whenToUse: "A problem gives an interior angle of a regular polygon, or asks about angles in a polygon.",
-    recall: [
-      { lhs: "\\text{Sum of interior angles} =", answer: "180(n-2)", vars: { n: int(3, 12) } },
-      { lhs: "\\text{Each angle (regular)} =", answer: "\\frac{180(n-2)}{n}", vars: { n: int(3, 12) } },
-    ],
-    related: ["inscribed-angle"],
-    problems: [
-      {
-        id: "pa1",
-        text: "Each interior angle of a regular polygon is $144^\\circ$. How many sides does it have?",
-        answer: "10",
-        solution: "Each exterior angle is $36^\\circ$, and $\\frac{360}{36} = 10$.",
-      },
-      {
-        id: "pa2",
-        text: "What is the sum of the interior angles of a heptagon, in degrees?",
-        answer: "900",
-        solution: "$180 \\cdot 5 = 900$.",
-      },
-    ],
-  },
-  {
-    id: "equilateral-area",
-    name: "Equilateral Triangle Area",
-    level: "AMC 8",
-    statement: "K = \\frac{\\sqrt{3}}{4}s^2, \\qquad h = \\frac{\\sqrt3}{2}s",
-    setup: "Equilateral triangle with side $s$. A regular hexagon is six of them.",
-    whenToUse: "Equilateral triangles or regular hexagons appear.",
-    recall: [{ lhs: "K =", answer: "\\frac{\\sqrt3}{4}s^2", vars: { s: pos } }],
-    related: ["heron", "area-sine"],
-    problems: [
-      {
-        id: "ea1",
-        text: "Find the area of an equilateral triangle with side length $6$.",
-        answer: "9\\sqrt{3}",
-        solution: "$\\frac{\\sqrt3}{4}\\cdot 36 = 9\\sqrt3$.",
-      },
-      {
-        id: "ea2",
-        text: "Find the area of a regular hexagon with side length $2$.",
-        answer: "6\\sqrt{3}",
-        solution: "Six equilateral triangles of area $\\sqrt3$ each: $6\\sqrt3$.",
-      },
-    ],
-  },
-  {
-    id: "arcs-sectors",
-    name: "Arc Length & Sector Area",
-    level: "AMC 8",
-    statement: "L = \\frac{d}{360}\\cdot 2\\pi r, \\qquad A = \\frac{d}{360}\\cdot \\pi r^2",
-    setup: "Central angle $d^\\circ$ in a circle of radius $r$. In radians: $L = r\\theta$, $A = \\frac12 r^2\\theta$.",
-    whenToUse: "Part of a circle: a slice of pizza, a fan, a curved track.",
-    recall: [
-      { lhs: "\\text{Arc length} =", answer: "\\frac{d}{360}\\cdot2\\pi r", vars: { d: [10, 350], r: pos } },
-      { lhs: "\\text{Sector area} =", answer: "\\frac{d}{360}\\cdot\\pi r^2", vars: { d: [10, 350], r: pos } },
-    ],
-    related: ["inscribed-angle", "radians"],
-    problems: [
-      {
-        id: "arc1",
-        text: "Find the area of a sector with radius $6$ and central angle $120^\\circ$.",
-        answer: "12\\pi",
-        solution: "$\\frac{120}{360}\\cdot 36\\pi = 12\\pi$.",
-      },
-      {
-        id: "arc2",
-        text: "Find the length of an arc with radius $9$ and central angle $40^\\circ$.",
-        answer: "2\\pi",
-        solution: "$\\frac{40}{360}\\cdot 18\\pi = 2\\pi$.",
-      },
-    ],
-  },
-  {
     id: "inscribed-angle",
     name: "Inscribed Angle Theorem",
     level: "AMC 10",
@@ -195,7 +39,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     setup: "An angle with its vertex on the circle is half its arc. So opposite angles of a cyclic quadrilateral sum to $180^\\circ$.",
     whenToUse: "Angles with vertices on a circle, or a quadrilateral inscribed in a circle.",
     recall: [{ lhs: "\\text{Inscribed angle on a } d^\\circ \\text{ arc} =", answer: "\\frac{d}{2}", vars: { d: [10, 350] } }],
-    related: ["power-of-a-point", "arcs-sectors", "ptolemy"],
+    related: ["power-of-a-point", "ptolemy"],
     problems: [
       {
         id: "ia1",
@@ -208,60 +52,6 @@ export const GEOMETRY = defineTopic("Geometry", [
         text: "Quadrilateral $ABCD$ is inscribed in a circle and $\\angle A = 70^\\circ$. Find $\\angle C$ in degrees.",
         answer: "110",
         solution: "$\\angle A$ and $\\angle C$ intercept arcs that make up the whole circle, so they sum to $180^\\circ$.",
-      },
-    ],
-  },
-  {
-    id: "similar-figures",
-    name: "Similar Figures",
-    level: "AMC 8",
-    statement: "\\text{lengths} \\times k, \\quad \\text{areas} \\times k^2, \\quad \\text{volumes} \\times k^3",
-    setup: "Two similar figures with scale factor $k$.",
-    whenToUse: "A figure is scaled, or a line parallel to a side cuts off a smaller copy of a triangle.",
-    recall: [
-      { lhs: "\\text{Area ratio} =", answer: "k^2", vars: { k: pos } },
-      { lhs: "\\text{Volume ratio} =", answer: "k^3", vars: { k: pos } },
-    ],
-    related: ["angle-bisector", "volumes"],
-    problems: [
-      {
-        id: "sim1",
-        text: "A triangle has area $81$. A line parallel to its base cuts the other two sides one third of the way from the apex. Find the area of the small triangle at the apex.",
-        answer: "9",
-        solution: "Scale factor $\\frac13$, so the area is $81 \\cdot \\frac19 = 9$.",
-      },
-      {
-        id: "sim2",
-        text: "Two similar triangles have areas $16$ and $25$. The smaller has perimeter $20$. Find the perimeter of the larger.",
-        answer: "25",
-        solution: "$k = \\sqrt{25/16} = \\frac54$, so the perimeter is $25$.",
-      },
-    ],
-  },
-  {
-    id: "volumes",
-    name: "Sphere & Cone Volume",
-    level: "AMC 8",
-    statement: "V_{\\text{sphere}} = \\tfrac43\\pi r^3, \\qquad V_{\\text{cone}} = \\tfrac13\\pi r^2 h",
-    setup: "A pyramid is also $\\frac13 \\cdot \\text{base} \\cdot h$. Sphere surface area is $4\\pi r^2$.",
-    whenToUse: "Any 3D solid with a round or pointed shape.",
-    recall: [
-      { lhs: "V_{\\text{sphere}} =", answer: "\\frac43\\pi r^3", vars: { r: pos } },
-      { lhs: "V_{\\text{cone}} =", answer: "\\frac13\\pi r^2h", vars: { r: pos, h: pos } },
-    ],
-    related: ["similar-figures"],
-    problems: [
-      {
-        id: "vo1",
-        text: "Find the volume of a cone with radius $3$ and height $4$.",
-        answer: "12\\pi",
-        solution: "$\\frac13\\pi\\cdot9\\cdot4 = 12\\pi$.",
-      },
-      {
-        id: "vo2",
-        text: "A sphere has volume $36\\pi$. Find its radius.",
-        answer: "3",
-        solution: "$\\frac43\\pi r^3 = 36\\pi$ gives $r^3 = 27$.",
       },
     ],
   },
@@ -336,7 +126,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     setup: "The bisector from $A$ meets $BC$ at $D$. Let $c = AB$, $b = AC$, $m = BD$, $n = DC$.",
     whenToUse: "An angle is bisected and the problem asks how it splits the opposite side.",
     recall: [{ lhs: "\\frac{m}{n} =", answer: "\\frac{c}{b}", vars: { b: pos, c: pos } }],
-    related: ["stewart", "similar-figures"],
+    related: ["stewart"],
     problems: [
       {
         id: "ab1",

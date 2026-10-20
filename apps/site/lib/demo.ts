@@ -9,31 +9,31 @@ import type { Notes } from "@lemmory/core/content/notes/types";
  */
 export const DEMO_IDS = [
   // Algebra
-  "quadratic-formula",
+  "amgm",
   "vieta-quadratic",
   "arithmetic-series",
   "geometric-series",
   "sfft",
   // Geometry
-  "pythagorean",
+  "stewart",
   "heron",
   "inscribed-angle",
   "power-of-a-point",
   // Trigonometry
-  "special-angles",
+  "double-angle",
   "law-of-cosines",
   "area-sine",
   // Number theory
   "num-divisors",
-  "gcd-lcm",
+  "fermat",
   "legendre",
   "chicken-mcnugget",
   // Combinatorics
-  "perms-combs",
+  "binomial-theorem",
   "stars-and-bars",
   "pie",
   // Probability
-  "complement",
+  "conditional-probability",
   "expected-value",
   // Calculus
   "power-rule",

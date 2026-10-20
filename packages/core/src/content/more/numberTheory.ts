@@ -2,48 +2,6 @@ import { defineTopic, int } from "../types";
 
 export const NUMBER_THEORY_2 = defineTopic("Number Theory", [
   {
-    id: "digit-sum-mod-9",
-    name: "Divisibility by 9 and 3",
-    level: "AMC 8",
-    statement: "n \\equiv \\text{(sum of its digits)} \\pmod 9",
-    setup: "So $n$ is divisible by $9$ (or $3$) exactly when its digit sum is.",
-    whenToUse: "Remainders mod $9$ or $3$, or a missing digit that makes a number divisible.",
-    recall: [{ lhs: "\\overline{xyz} \\equiv \\;?\\; \\pmod 9:", answer: "x+y+z", vars: { x: int(1, 9), y: int(0, 9), z: int(0, 9) } }],
-    related: ["base-conversion", "division-algorithm"],
-    problems: [
-      { id: "dsm1", text: "Find the remainder when $123456789$ is divided by $9$.", answer: "0", solution: "The digits sum to $45$." },
-      { id: "dsm2", text: "The four-digit number $\\overline{4d72}$ is divisible by $9$. Find the digit $d$.", answer: "5", solution: "$13 + d$ must be a multiple of $9$." },
-    ],
-  },
-  {
-    id: "division-algorithm",
-    name: "Division Algorithm",
-    level: "AMC 8",
-    statement: "a = bq + r, \\qquad 0 \\le r < b",
-    setup: "Dividing $a$ by $b$ gives quotient $q$ and remainder $r$. Remainders add and multiply.",
-    whenToUse: "Remainder problems: what happens to a remainder when you multiply or add.",
-    recall: [{ lhs: "a =", answer: "bq+r", vars: { b: int(2, 9), q: int(1, 20), r: int(0, 1) } }],
-    related: ["digit-sum-mod-9", "crt"],
-    problems: [
-      { id: "dva1", text: "When $n$ is divided by $7$ the remainder is $3$. What is the remainder when $4n$ is divided by $7$?", answer: "5", solution: "$4\\cdot3 = 12 \\equiv 5$." },
-      { id: "dva2", text: "What is the largest three-digit number that leaves remainder $2$ when divided by $9$?", answer: "992", solution: "$999 \\equiv 0$, so $992 = 9\\cdot110 + 2$." },
-    ],
-  },
-  {
-    id: "count-multiples",
-    name: "Counting Multiples",
-    level: "AMC 8",
-    statement: "\\#\\{\\text{multiples of } k \\text{ in } 1..n\\} = \\left\\lfloor \\frac{n}{k} \\right\\rfloor",
-    setup: "For a range $a..b$, subtract: $\\lfloor b/k \\rfloor - \\lfloor (a-1)/k \\rfloor$.",
-    whenToUse: "How many numbers in a range are divisible by something.",
-    recall: [{ lhs: "\\#\\text{multiples of } k \\text{ in } 1..n =", answer: "\\left\\lfloor\\frac{n}{k}\\right\\rfloor", vars: { n: int(10, 100), k: int(2, 9) } }],
-    related: ["pie", "legendre"],
-    problems: [
-      { id: "cmu1", text: "How many integers from $1$ to $500$ are multiples of $7$?", answer: "71", solution: "$\\lfloor 500/7 \\rfloor = 71$." },
-      { id: "cmu2", text: "How many three-digit numbers are divisible by $13$?", answer: "69", solution: "$\\lfloor 999/13 \\rfloor - \\lfloor 99/13 \\rfloor = 76 - 7$." },
-    ],
-  },
-  {
     id: "crt",
     name: "Chinese Remainder Theorem",
     level: "AMC 12",
@@ -51,24 +9,10 @@ export const NUMBER_THEORY_2 = defineTopic("Number Theory", [
     setup: "Find it by listing numbers that fit one condition and checking the other.",
     whenToUse: "A number is described by its remainders with respect to several coprime moduli.",
     recall: [{ lhs: "\\text{Number of solutions mod } mn:", answer: "1", vars: {} }],
-    related: ["division-algorithm", "gcd-lcm"],
+    related: [],
     problems: [
       { id: "crt1", text: "Find the smallest positive $x$ with $x \\equiv 2 \\pmod 3$ and $x \\equiv 3 \\pmod 5$.", answer: "8", solution: "$3, 8, 13, \\dots$ are $\\equiv 3 \\pmod 5$; $8 \\equiv 2 \\pmod 3$." },
       { id: "crt2", text: "Find the smallest positive $x$ with $x \\equiv 1 \\pmod 4$, $x \\equiv 2 \\pmod 3$, and $x \\equiv 0 \\pmod 5$.", answer: "5", solution: "$5$ works: $5 \\equiv 1 \\pmod 4$, $5 \\equiv 2 \\pmod 3$." },
-    ],
-  },
-  {
-    id: "number-of-digits",
-    name: "Number of Digits",
-    level: "AMC 10",
-    statement: "\\#\\text{digits of } n = \\lfloor \\log_{10} n \\rfloor + 1",
-    setup: "Group factors of $2$ and $5$ into powers of $10$.",
-    whenToUse: "How many digits a huge product or power has.",
-    recall: [{ lhs: "\\#\\text{digits of } n =", answer: "\\lfloor\\log_{10}n\\rfloor+1", vars: { n: [10, 99999] } }],
-    related: ["exponent-rules", "legendre"],
-    problems: [
-      { id: "nod1", text: "How many digits does $2^{10}\\cdot5^{12}$ have?", answer: "12", solution: "$10^{10}\\cdot 25$ is $25$ followed by $10$ zeros." },
-      { id: "nod2", text: "How many digits does $8^5\\cdot5^{10}\\cdot15^5$ have?", answer: "18", solution: "$2^{15}5^{15}3^5 = 243\\cdot10^{15}$." },
     ],
   },
   {
@@ -79,7 +23,7 @@ export const NUMBER_THEORY_2 = defineTopic("Number Theory", [
     setup: "$ax + by = c$ has integer solutions exactly when $\\gcd(a,b)$ divides $c$.",
     whenToUse: "Which amounts can be formed from integer combinations (positive or negative) of two numbers.",
     recall: [{ lhs: "\\text{Smallest positive } ax+by =", answer: "\\gcd(a,b)", vars: { a: int(2, 30), b: int(2, 30) } }],
-    related: ["gcd-lcm", "chicken-mcnugget"],
+    related: ["chicken-mcnugget"],
     problems: [
       { id: "bz1", text: "What is the smallest positive value of $12x + 18y$ for integers $x, y$?", answer: "6", solution: "$\\gcd(12, 18) = 6$." },
       { id: "bz2", text: "With a $9$-liter and a $15$-liter jug (fill, empty, pour), what is the smallest positive amount you can measure?", answer: "3", solution: "$\\gcd(9, 15) = 3$." },
@@ -121,7 +65,7 @@ export const NUMBER_THEORY_2 = defineTopic("Number Theory", [
     setup: "Every primitive triple comes from coprime $m > n$ of opposite parity.",
     whenToUse: "Finding integer right triangles, or all triangles with a given hypotenuse.",
     recall: [{ lhs: "\\text{Hypotenuse} =", answer: "m^2+n^2", vars: { m: int(3, 9), n: int(1, 2) } }],
-    related: ["pythagorean"],
+    related: [],
     problems: [
       { id: "ptr1", text: "How many primitive Pythagorean triples have hypotenuse $25$?", answer: "1", solution: "Only $m = 4, n = 3$: the triple $7, 24, 25$." },
       { id: "ptr2", text: "Find the area of the right triangle generated by $m = 3$, $n = 2$.", answer: "30", solution: "Legs $5$ and $12$." },
