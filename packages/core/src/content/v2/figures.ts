@@ -1,6 +1,7 @@
-// Diagrams for the geometry formulas and problems written before diagrams existed.
-// formulas.ts attaches them by id.
+// Diagrams for the formulas and problems written before diagrams existed: geometry here,
+// trigonometry in trigFigures.ts. formulas.ts attaches them by id.
 import type { Figure } from "../types";
+import { TRIG_FORMULA_FIGURES, TRIG_PROBLEM_FIGURES } from "./trigFigures";
 import {
   along, angleAt, circumcircle, curve, fig, foot, incircle, lineCircle, meet, mid, polar, tangentPoints, triangle,
   type Pt,
@@ -156,6 +157,7 @@ const tetraFig = () => {
 const tri131415 = triangle(14, 15, 13);
 
 export const FORMULA_FIGURES: Record<string, Figure> = {
+  ...TRIG_FORMULA_FIGURES,
   shoelace: onAxes([[0, 0], [4, 0], [5, 3], [1, 4]], [-0.6, 6, -0.6, 4.8]),
   "inscribed-angle": inscribed({ A: 215, B: 325, C: 100 }),
   heron: tri(6, 5, 4, ["a", "b", "c"]),
@@ -239,6 +241,7 @@ export const FORMULA_FIGURES: Record<string, Figure> = {
 };
 
 export const PROBLEM_FIGURES: Record<string, Figure> = {
+  ...TRIG_PROBLEM_FIGURES,
   sh1: onAxes([[1, 1], [5, 2], [3, 6]], [-0.6, 6, -0.6, 6.6]),
   sh2: FORMULA_FIGURES.shoelace,
   ia1: inscribed({ A: 215, B: 325, C: 100 }),
