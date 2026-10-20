@@ -20,6 +20,7 @@ import { ALGEBRA_V2 } from "./content/v2/algebra";
 import { NUMBER_THEORY_V2 } from "./content/v2/numberTheory";
 import { COMBINATORICS_V2 } from "./content/v2/combinatorics";
 import { PROBABILITY_V2 } from "./content/v2/probability";
+import { TRIG_V2 } from "./content/v2/trig";
 import type { Formula } from "./content/types";
 
 export * from "./content/types";
@@ -35,6 +36,7 @@ export const FORMULAS: Formula[] = [
   ...TRIG,
   ...TRIG_2,
   ...TRIG_3,
+  ...TRIG_V2,
   ...NUMBER_THEORY,
   ...NUMBER_THEORY_2,
   ...NUMBER_THEORY_V2,
