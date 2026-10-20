@@ -5,6 +5,7 @@ import { type Competition, type Student, pointsBetween } from "./analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
 import { DEMO_MAX_DAYS } from "./demo";
+import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 
 // Demo persistence: the demo student's data lives in localStorage; classmates are
 // re-simulated from the assignments. Swap for an API + database for real classes.
@@ -93,8 +94,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const t = realToday();
     try {
       const raw = localStorage.getItem(KEY);
+      const saved: State | null = raw ? JSON.parse(raw) : null;
+      // A save that mentions a formula no longer in the bank starts over instead of crashing.
+      const known = saved && saved.assignments.every((a) => FORMULA_BY_ID[a.formulaId]) && Object.keys(saved.cards).every((id) => FORMULA_BY_ID[id]);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from storage after mount
-      setState(raw ? JSON.parse(raw) : seed(t));
+      setState(known ? saved : seed(t));
     } catch {
       setState(seed(t));
     }
