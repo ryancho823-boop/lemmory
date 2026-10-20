@@ -12,6 +12,7 @@ import { NUMBER_THEORY_V2_NOTES } from "./v2NumberTheory";
 import { COMBINATORICS_V2_NOTES } from "./v2Combinatorics";
 import { PROBABILITY_V2_NOTES } from "./v2Probability";
 import { TRIG_V2_NOTES } from "./v2Trig";
+import { GEOMETRY_V2_NOTES } from "./v2Geometry";
 
 export type { Note } from "./types";
 
@@ -29,4 +30,5 @@ export const NOTES: Notes = {
   ...COMBINATORICS_V2_NOTES,
   ...PROBABILITY_V2_NOTES,
   ...TRIG_V2_NOTES,
+  ...GEOMETRY_V2_NOTES,
 };

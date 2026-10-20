@@ -53,6 +53,10 @@ export const PROBABILITY_V2_NOTES: Notes = {
     explain: "Shifting a variable doesn't change its spread; scaling by $a$ multiplies the variance by $a^2$. Independent variables' variances add, so two dice have twice the variance of one.",
     proof: "$\\operatorname{Var}(aX + b) = E[(aX + b - aE[X] - b)^2] = a^2E[(X - E[X])^2]$. For a sum, expanding gives $\\operatorname{Var}(X) + \\operatorname{Var}(Y) + 2\\operatorname{Cov}(X, Y)$, and the covariance is $0$ when $X$ and $Y$ are independent.",
   },
+  "union-bound": {
+    explain: "The chance that at least one of several events happens is never more than the sum of their chances. Overlaps only make the union smaller. Turned around, it gives the least possible overlap.",
+    proof: "By inclusion-exclusion for two events, $P(A \\cup B) = P(A) + P(B) - P(A \\cap B) \\le P(A) + P(B)$. For more events, add one at a time. Since $P(A \\cup B) \\le 1$, also $P(A \\cap B) \\ge P(A) + P(B) - 1$.",
+  },
   "conditional-independence": {
     explain: "Two flips of a known coin are independent. But if the coin is chosen at random, a head on the first flip makes the biased coin more likely, which raises the chance of a second head.",
     proof: "Given the coin, $P(HH \\mid C) = P(H \\mid C)^2$. Average over the coins with the law of total probability. Then $P(H_2 \\mid H_1) = \\frac{P(HH)}{P(H_1)}$, which is larger than $P(H_2)$ here.",

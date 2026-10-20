@@ -21,6 +21,8 @@ import { NUMBER_THEORY_V2 } from "./content/v2/numberTheory";
 import { COMBINATORICS_V2 } from "./content/v2/combinatorics";
 import { PROBABILITY_V2 } from "./content/v2/probability";
 import { TRIG_V2 } from "./content/v2/trig";
+import { GEOMETRY_V2 } from "./content/v2/geometry";
+import { GEOMETRY_V2B } from "./content/v2/geometry2";
 import type { Formula } from "./content/types";
 
 export * from "./content/types";
@@ -33,6 +35,8 @@ export const FORMULAS: Formula[] = [
   ...GEOMETRY,
   ...GEOMETRY_2,
   ...GEOMETRY_3,
+  ...GEOMETRY_V2,
+  ...GEOMETRY_V2B,
   ...TRIG,
   ...TRIG_2,
   ...TRIG_3,

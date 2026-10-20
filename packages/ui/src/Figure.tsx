@@ -8,7 +8,9 @@ export function Figure({ figure: f, className }: { figure: FigureData; className
   return (
     <svg
       viewBox={`0 0 ${f.w} ${f.h}`}
-      className={className ?? "mx-auto block h-auto w-full max-w-[300px]"}
+      className={className ?? "mx-auto block h-auto w-full"}
+      // Tall figures stay narrow, so every figure is about the same height.
+      style={{ maxWidth: Math.round(f.w * 0.85) }}
       role="img"
       aria-label={`Diagram with points ${Object.keys(f.pts).filter((n) => !f.hide.includes(n)).join(", ")}`}
     >

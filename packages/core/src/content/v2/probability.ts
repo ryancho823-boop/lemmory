@@ -174,16 +174,30 @@ export const PROBABILITY_V2 = defineTopic("Probability", [
   },
   {
     id: "variance-sum",
-    name: "Variance Rules",
+    name: "Variance of a Sum",
     level: "AMC 12",
-    statement: "\\operatorname{Var}(aX + b) = a^2\\operatorname{Var}(X), \\qquad \\operatorname{Var}(X + Y) = \\operatorname{Var}(X) + \\operatorname{Var}(Y)",
-    setup: "The sum rule needs $X$ and $Y$ independent. Adding a constant doesn't change the spread.",
+    statement: "\\operatorname{Var}(X + Y) = \\operatorname{Var}(X) + \\operatorname{Var}(Y) + 2\\operatorname{Cov}(X, Y), \\qquad \\operatorname{Var}(aX + b) = a^2\\operatorname{Var}(X)",
+    setup: "For independent $X$ and $Y$ the covariance is $0$, so the variances just add. Adding a constant doesn't change the spread.",
     whenToUse: "Variance of a scaled value or of a sum of independent pieces.",
     recall: [{ lhs: "\\operatorname{Var}(aX+b) \\text{ when } \\operatorname{Var}(X)=v:", answer: "a^2v", vars: { a: pos, b: pos, v: pos } }],
     related: ["variance", "binomial-variance"],
     problems: [
       { id: "v2-vs1", text: "A die roll has variance $\\frac{35}{12}$. What is the variance of the sum of two dice?", answer: "\\frac{35}{6}", solution: "$2 \\cdot \\frac{35}{12}$." },
       { id: "v2-vs2", text: "$X$ is a die roll. What is $\\operatorname{Var}(3X + 2)$?", answer: "\\frac{105}{4}", solution: "$9 \\cdot \\frac{35}{12}$." },
+    ],
+  },
+  {
+    id: "union-bound",
+    name: "Union Bound",
+    level: "AMC 12",
+    statement: "P(A_1 \\cup A_2 \\cup \\cdots \\cup A_n) \\le P(A_1) + P(A_2) + \\cdots + P(A_n)",
+    setup: "Equality holds exactly when no two of the events can happen together.",
+    whenToUse: "A quick upper bound on the chance that at least one thing goes wrong.",
+    recall: [{ lhs: "P(A_1\\cup\\cdots\\cup A_n) \\text{ with each } P(A_i)=p \\text{ is at most}", answer: "np", vars: { n: int(2, 9), p: [0.01, 0.1] } }],
+    related: ["pie-probability", "indicator-variables"],
+    problems: [
+      { id: "v2-ub1", text: "Each of $3$ events has probability $\\frac15$. What is the largest possible probability that at least one happens?", answer: "\\frac35", solution: "The union bound gives $\\frac35$, reached when the events are disjoint." },
+      { id: "v2-ub2", text: "Events $A$ and $B$ have $P(A) = 0.7$ and $P(B) = 0.6$. What is the smallest possible value of $P(A \\cap B)$?", answer: "\\frac{3}{10}", solution: "$P(A \\cap B) = 1.3 - P(A \\cup B) \\ge 1.3 - 1$." },
     ],
   },
   {

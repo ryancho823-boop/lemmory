@@ -42,6 +42,66 @@ export function incircle(a: Pt, b: Pt, c: Pt): { c: Pt; r: number } {
   const s = p / 2;
   return { c: center, r: Math.sqrt(((s - la) * (s - lb) * (s - lc)) / s) };
 }
+/** Where line ab crosses a circle: the two points, in order from a toward b. */
+export function lineCircle(a: Pt, b: Pt, circle: { c: Pt; r: number }): [Pt, Pt] {
+  const d = sub(b, a), f = sub(a, circle.c);
+  const A = d[0] ** 2 + d[1] ** 2, B = 2 * (f[0] * d[0] + f[1] * d[1]), C = f[0] ** 2 + f[1] ** 2 - circle.r ** 2;
+  const root = Math.sqrt(Math.max(0, B * B - 4 * A * C));
+  return [along(a, b, (-B - root) / (2 * A)), along(a, b, (-B + root) / (2 * A))];
+}
+/** The mirror image of p over line ab. */
+export const reflect = (p: Pt, a: Pt, b: Pt): Pt => sub(mul(foot(p, a, b), 2), p);
+/** The excircle opposite a (tangent to side bc). */
+export function excircle(a: Pt, b: Pt, c: Pt): { c: Pt; r: number } {
+  const [la, lb, lc] = [dist(b, c), dist(c, a), dist(a, b)];
+  const w = -la + lb + lc;
+  const center: Pt = [(-la * a[0] + lb * b[0] + lc * c[0]) / w, (-la * a[1] + lb * b[1] + lc * c[1]) / w];
+  const s = (la + lb + lc) / 2;
+  return { c: center, r: Math.sqrt((s * (s - lb) * (s - lc)) / (s - la)) };
+}
+/** Where the altitudes of a triangle meet. */
+export function orthocenter(a: Pt, b: Pt, c: Pt): Pt {
+  const o = circumcircle(a, b, c).c;
+  return [a[0] + b[0] + c[0] - 2 * o[0], a[1] + b[1] + c[1] - 2 * o[1]];
+}
+/** The two points where tangents from p touch a circle. */
+export function tangentPoints(p: Pt, circle: { c: Pt; r: number }): [Pt, Pt] {
+  const d = dist(p, circle.c);
+  const base = (Math.atan2(p[1] - circle.c[1], p[0] - circle.c[0]) * 180) / Math.PI;
+  const t = (Math.acos(circle.r / d) * 180) / Math.PI;
+  return [polar(circle.c, circle.r, base + t), polar(circle.c, circle.r, base - t)];
+}
+/** Where to write an angle's size: inside angle a-v-b, at distance r from the vertex v. */
+export function angleAt(v: Pt, a: Pt, b: Pt, r: number): Pt {
+  const u = (p: Pt): Pt => mul(sub(p, v), 1 / dist(p, v));
+  const m = add(u(a), u(b));
+  return add(v, mul(m, r / (Math.hypot(m[0], m[1]) || 1)));
+}
+/** The third corner of an equilateral triangle on pq, on the side away from `away`. */
+export function equilateralOn(p: Pt, q: Pt, away: Pt): Pt {
+  const m = mid(p, q), d = sub(q, p);
+  const n: Pt = [(-d[1] * Math.sqrt(3)) / 2, (d[0] * Math.sqrt(3)) / 2];
+  const a = add(m, n), b = sub(m, n);
+  return dist(a, away) > dist(b, away) ? a : b;
+}
+/** Where two circles cross. */
+export function circleMeet(p: { c: Pt; r: number }, q: { c: Pt; r: number }): [Pt, Pt] {
+  const d = dist(p.c, q.c);
+  const a = (p.r ** 2 - q.r ** 2 + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, p.r ** 2 - a * a));
+  const m = along(p.c, q.c, a / d);
+  const u: Pt = [(q.c[1] - p.c[1]) / d, -(q.c[0] - p.c[0]) / d];
+  return [add(m, mul(u, h)), sub(m, mul(u, h))];
+}
+/** Points along a curve, named prefix0, prefix1, ..., joined by segments, for arcs, ellipses and other curves. */
+export function curve(prefix: string, points: Pt[], style?: string) {
+  const pts = Object.fromEntries(points.map((p, i) => [`${prefix}${i}`, p]));
+  const names = Object.keys(pts);
+  return { pts, hide: names, lines: names.slice(1).map((n, i) => `${names[i]}-${n}${style ? `:${style}` : ""}`), names };
+}
+/** Points on a circular arc from one angle to another, in degrees. */
+export const arc = (c: Pt, r: number, from: number, to: number, n = 24): Pt[] =>
+  Array.from({ length: n + 1 }, (_, i) => polar(c, r, from + ((to - from) * i) / n));
 /** A triangle with side lengths a = BC, b = CA, c = AB, with B at the origin and C on the x-axis. */
 export function triangle(a: number, b: number, c: number): { A: Pt; B: Pt; C: Pt } {
   const x = (a * a + c * c - b * b) / (2 * a);
@@ -80,9 +140,9 @@ export function fig(spec: Spec): Figure {
     : [0, 0];
   // Labels sit 14px from their point, pointing away from the middle of the figure.
   const away = (p: Pt, gap: number): Pt => {
-    const d = sub(p, center);
-    const len = Math.hypot(d[0], d[1]) || 1;
-    return add(p, mul(d, gap / len));
+    let d = sub(p, center);
+    if (Math.hypot(d[0], d[1]) < 4) d = [-1, -1]; // a point at the middle gets its label up and to the left
+    return add(p, mul(d, gap / Math.hypot(d[0], d[1])));
   };
   const labels = Object.fromEntries(shown.map(([n, p]) => [n, add(away(p, 14), spec.nudge?.[n] ?? [0, 0])]));
   const texts = (spec.texts ?? []).map((t) => {
