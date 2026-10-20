@@ -58,7 +58,8 @@ function topHead(latex: string) {
 
 function sameValue(blank: RecallBlank, answer: string, input: string) {
   let checked = 0;
-  for (let i = 0; i < TRIALS * 3 && checked < TRIALS; i++) {
+  // Plenty of tries, so answers whose domain skips half the samples (like (-1)^{(p-1)/2}) still get checked.
+  for (let i = 0; i < TRIALS * 8 && checked < TRIALS; i++) {
     const values = Object.fromEntries(Object.entries(blank.vars).map(([k, [lo, hi, int]]) => [k, rand(lo, hi, int)]));
     const want = evaluate(answer, values);
     const got = evaluate(input, values);

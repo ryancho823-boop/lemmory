@@ -65,11 +65,81 @@ const projFig = (t: { A: Pt; B: Pt; C: Pt }, texts: Text[]) => {
   return triFig(t, texts, { pts: { D }, lines: ["A-D:dashed"], rights: ["A-D-C"] });
 };
 
+/** The semicircle picture behind power reduction and half angles: P at angle 2x, seen at angle x from W. */
+const semicircle = (outer: string, inner: string) => {
+  const W: Pt = [-1, 0], E: Pt = [1, 0], O: Pt = [0, 0], P = polar(O, 1, 70), F: Pt = [P[0], 0];
+  return fig({
+    pts: { W, E, O, P, F },
+    hide: ["O", "F"],
+    circles: [{ c: O, r: 1 }],
+    lines: ["W-E", "W-P:blue", "P-E", "O-P", "P-F:dashed"],
+    rights: ["W-P-E", "P-F-E"],
+    texts: [{ at: angleAt(W, E, P, 0.42), text: inner }, { at: angleAt(O, E, P, 0.3), text: outer }],
+  });
+};
+
+/** Rays from the center at multiples of one angle, with each cosine dropped onto the x-axis. */
+const multiples = (deg: number, n: number, name: string) => {
+  const p = plane(-1.3, 1.4, -1.3, 1.4);
+  const pts: Record<string, Pt> = { ...p.pts };
+  const lines = [...p.lines];
+  const texts: Text[] = [...p.texts];
+  for (let k = 1; k <= n; k++) {
+    pts[`p${k}`] = polar([0, 0], 1, deg * k);
+    pts[`f${k}`] = [Math.cos((deg * k * Math.PI) / 180), 0];
+    lines.push(`O-p${k}${k === 1 ? ":blue" : ""}`, `p${k}-f${k}:dashed`);
+    texts.push({ at: polar([0, 0], 1.16, deg * k), text: k === 1 ? name : `${k}${name}` });
+  }
+  return fig({ pts, hide: [...p.hide, ...Object.keys(pts).filter((k) => /^[pf]\d/.test(k))], circles: [{ c: [0, 0], r: 1 }], lines, texts });
+};
+
 // Angle A sits opposite the side the problem asks about.
 const t345 = { A: [4, 0] as Pt, B: [0, 3] as Pt, C: [0, 0] as Pt };
 const generic = triangle(6, 5, 4.2);
 
 export const TRIG_FORMULA_FIGURES: Record<string, Figure> = {
+  "tan-addition": (() => {
+    const p = plane(-0.3, 1.5, -0.3, 2.3), T = (d: number): Pt => [1, Math.tan((d * Math.PI) / 180)];
+    const P = T(25), Q = T(62), u: Pt = [1, -0.2], v: Pt = [1, 2.2];
+    return fig({
+      pts: { ...p.pts, P, Q, u, v },
+      hide: [...p.hide, "u", "v"],
+      lines: [...p.lines, "u-v:dashed", "O-P:blue", "O-Q:rose"],
+      texts: [...p.texts, { at: [1.32, P[1]], text: "tan a" }, { at: [1.42, Q[1]], text: "tan(a+b)" }, { at: angleAt([0, 0], [1, 0], P, 0.3), text: "a" }, { at: angleAt([0, 0], P, Q, 0.45), text: "b" }, { at: [1.08, -0.12], text: "1" }],
+    });
+  })(),
+  "power-reduction": semicircle("2x", "x"),
+  "half-angle": semicircle("x", "x/2"),
+  "sum-to-product": (() => {
+    const p = plane(-1.3, 1.4, -1.3, 1.4), P = polar([0, 0], 1, 20), Q = polar([0, 0], 1, 100), M: Pt = [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2];
+    return fig({ pts: { ...p.pts, P, Q, M }, hide: p.hide, circles: [{ c: [0, 0], r: 1 }], lines: [...p.lines, "O-P", "O-Q", "P-Q", "O-M:blue"], rights: ["O-M-P"], texts: [...p.texts, { at: angleAt([0, 0], [1, 0], P, 0.3), text: "a" }, { at: polar([0, 0], 0.22, 85), text: "b" }] });
+  })(),
+  "triple-angle": multiples(25, 3, "x"),
+  "chebyshev-poly": multiples(20, 4, "θ"),
+  "sine-ap-sum": (() => {
+    // Unit arrows turning by d each time; their heights add up to the sum of sines.
+    const pts: Record<string, Pt> = { O: [0, 0] };
+    let at: Pt = [0, 0];
+    for (let k = 0; k < 5; k++) {
+      at = [at[0] + Math.cos(((15 + 28 * k) * Math.PI) / 180), at[1] + Math.sin(((15 + 28 * k) * Math.PI) / 180)];
+      pts[`p${k + 1}`] = at;
+    }
+    const chain = [0, 1, 2, 3, 4].map((k) => `${k ? `p${k}` : "O"}-p${k + 1}`);
+    return fig({ pts: { ...pts, b: [0, 0], g: [at[0], 0] }, hide: Object.keys(pts).concat("b", "g"), lines: [...chain, "O-p5:blue", "p5-g:dashed", "b-g"], texts: [{ at: [0.35, 0.22], text: "a" }] });
+  })(),
+  "sine-product": (() => {
+    const pts: Record<string, Pt> = {};
+    for (let k = 0; k < 6; k++) pts[`v${k}`] = polar([0, 0], 1, 180 + 60 * k);
+    const names = Object.keys(pts);
+    return fig({ pts, hide: names, circles: [{ c: [0, 0], r: 1, dashed: true }], lines: [...names.map((n, i) => `${n}-${names[(i + 1) % 6]}`), "v0-v2:blue", "v0-v3:blue", "v0-v4:blue"] });
+  })(),
+  "triangle-tan-identity": (() => {
+    const t = byAngles(55, 70, 5), D = foot(t.A, t.B, t.C);
+    return triFig(t, [], { pts: { D }, hide: ["D"], lines: ["A-D:dashed"], rights: ["A-D-C"] });
+  })(),
+  "cos-squares-identity": (() => {
+    return triFig(byAngles(55, 70, 5), []);
+  })(),
   "double-angle": unitAngles([["P", 35], ["Q", 70]], [{ at: polar([0, 0], 0.32, 17), text: "x" }, { at: polar([0, 0], 0.5, 50), text: "2x" }]),
   "angle-addition": unitAngles([["P", 30], ["Q", 75]], [{ at: polar([0, 0], 0.32, 15), text: "a" }, { at: polar([0, 0], 0.42, 52), text: "b" }]),
   "area-sine": triFig(generic, [{ on: "B-C", text: "a" }, { on: "C-A", text: "b" }]),
