@@ -11,6 +11,7 @@ import { MathInput } from "@lemmory/ui/MathInput";
 import { Rich, Tex } from "@lemmory/ui/Tex";
 import { Button, StageTag, cx } from "@lemmory/ui/ui";
 import { Feedback } from "./RecallCard";
+import { Figure } from "@lemmory/ui/Figure";
 
 interface Props {
   problem: Problem;
@@ -45,6 +46,7 @@ export function ApplyCard({ problem, options, onDone }: Props) {
       <p className="mt-4 text-lg leading-relaxed">
         <Rich text={problem.text} />
       </p>
+      {problem.figure && <Figure figure={problem.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
 
       <div className="mt-7 flex items-center gap-2">
         <Step n={1} done={pickRight !== null} />

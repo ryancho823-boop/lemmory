@@ -16,6 +16,7 @@ import { TRIG_2 } from "./content/more/trig";
 import { ALGEBRA_3 } from "./content/extra/algebra";
 import { GEOMETRY_3 } from "./content/extra/geometry";
 import { TRIG_3 } from "./content/extra/trig";
+import { ALGEBRA_V2 } from "./content/v2/algebra";
 import type { Formula } from "./content/types";
 
 export * from "./content/types";
@@ -24,6 +25,7 @@ export const FORMULAS: Formula[] = [
   ...ALGEBRA,
   ...ALGEBRA_2,
   ...ALGEBRA_3,
+  ...ALGEBRA_V2,
   ...GEOMETRY,
   ...GEOMETRY_2,
   ...GEOMETRY_3,

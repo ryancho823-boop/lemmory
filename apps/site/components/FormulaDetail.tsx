@@ -5,6 +5,7 @@ import { ChevronDown, Lightbulb, Sigma } from "lucide-react";
 import { NOTES, type Formula } from "@/lib/bank";
 import { Rich, Tex } from "@lemmory/ui/Tex";
 import { LevelTag, Panel, TopicTag } from "@lemmory/ui/ui";
+import { Figure } from "@lemmory/ui/Figure";
 
 /** Header, statement, explanation with an expandable proof, when to use it, and an example. */
 export function FormulaDetail({ f, aside, actions }: { f: Formula; aside?: React.ReactNode; actions?: React.ReactNode }) {
@@ -28,6 +29,7 @@ export function FormulaDetail({ f, aside, actions }: { f: Formula; aside?: React
             <p className="mt-2 text-sm text-ink/60">
               <Rich text={f.setup} />
             </p>
+            {f.figure && <Figure figure={f.figure} className="mx-auto mt-6 h-auto w-full max-w-[300px]" />}
           </Panel>
 
           <Panel className="p-6">
@@ -63,6 +65,7 @@ export function FormulaDetail({ f, aside, actions }: { f: Formula; aside?: React
             <p className="mt-2 leading-relaxed">
               <Rich text={example.text} />
             </p>
+            {example.figure && <Figure figure={example.figure} className="mt-3 h-auto w-full max-w-[240px]" />}
             <details className="group mt-3">
               <summary className="cursor-pointer text-sm font-semibold text-ink/50 hover:text-ink">Show solution</summary>
               <p className="mt-2 leading-relaxed text-ink/80">

@@ -7,6 +7,7 @@ import { MathInput } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, cx } from "../ui";
 import { Feedback } from "./RecallCard";
+import { Figure } from "../Figure";
 
 interface Props {
   prompt: ApplyPrompt;
@@ -51,6 +52,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
       <p className="mt-4 text-lg leading-relaxed">
         <Rich text={prompt.text} />
       </p>
+      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
 
       <div className="mt-7 flex items-center gap-2">
         <Step n={1} done={!!pick} />
