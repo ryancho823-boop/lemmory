@@ -9,12 +9,15 @@ export function TeacherShell({
   className,
   classes,
   teacher,
+  trialDaysLeft,
   children,
 }: {
   classId: string;
   className: string;
   classes: { id: string; name: string }[];
   teacher: string;
+  /** Days left on the free trial, or null once they've paid. */
+  trialDaysLeft: number | null;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -52,7 +55,9 @@ export function TeacherShell({
           <p className="truncate font-semibold" title={className}>
             {teacher}
           </p>
-          <p className="text-ink/55">Teacher</p>
+          <p className="text-ink/55">
+            {trialDaysLeft === null ? "Teacher" : `Free trial: ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left`}
+          </p>
         </>
       }
     >

@@ -126,25 +126,52 @@ export const reviewSessions = sqliteTable("review_sessions", {
 });
 
 /**
- * A teacher's plan. Checkout is simulated for now (no payment provider yet), so
- * "paying" just records the choice. Swap in Stripe Checkout + a webhook later.
+ * A teacher's plan. Every teacher starts with a free trial of the plan they pick; after it
+ * ends they must enter their academy or school's details and pay. Checkout is simulated for
+ * now (no payment provider yet), so "paying" just records it. Swap in Stripe later.
  */
 export const plans = sqliteTable("plans", {
   teacherId: text("teacher_id").primaryKey(),
+  /** "pilot" is the old trial with no plan picked; new teachers pick academy or club. */
   kind: text("kind", { enum: ["pilot", "academy", "club"] }).notNull(),
   /** Academy or school name. */
   orgName: text("org_name"),
-  /** Clubs sign up with a school address; the club price applies once it's verified. */
+  /** City and state of the academy or school. */
+  orgLocation: text("org_location"),
+  /** Who gets the bills, for academies. */
+  billingName: text("billing_name"),
+  billingEmail: text("billing_email"),
+  /** Clubs give a school address; the club price applies once it's verified. */
   schoolEmail: text("school_email"),
   clubStatus: text("club_status", { enum: ["pending", "verified", "rejected"] }),
-  /** When a free pilot runs out. */
+  /** When the free trial runs out. Kept after paying, so a trial can't be restarted. */
   pilotEndsAt: integer("pilot_ends_at", { mode: "timestamp_ms" }),
   /** Set by the (simulated) checkout. */
   paidAt: integer("paid_at", { mode: "timestamp_ms" }),
 });
 
-/** Individual students who pay for themselves ($2/month). Also simulated for now. */
+/** Students on their own ($2/month): a free trial, then a (simulated) payment. */
 export const studentPlans = sqliteTable("student_plans", {
   studentId: text("student_id").primaryKey(),
-  paidAt: integer("paid_at", { mode: "timestamp_ms" }).notNull(),
+  trialEndsAt: integer("trial_ends_at", { mode: "timestamp_ms" }),
+  paidAt: integer("paid_at", { mode: "timestamp_ms" }),
+  /** A parent or guardian, for the receipt. */
+  billingName: text("billing_name"),
+  billingEmail: text("billing_email"),
 });
+
+/**
+ * Where each free trial came from, so one person can't keep starting new ones. Values are
+ * SHA-256 hashes: a normalized email, a browser cookie id, or an IP address.
+ */
+export const trialClaims = sqliteTable(
+  "trial_claims",
+  {
+    id: text("id").primaryKey(),
+    role: text("role", { enum: ["teacher", "student"] }).notNull(),
+    kind: text("kind", { enum: ["email", "device", "ip"] }).notNull(),
+    hash: text("hash").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("trial_claims_hash").on(t.kind, t.hash)],
+);

@@ -116,7 +116,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
               <p className="mt-2 text-ink/60">
                 The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
                 <a href={SIGNUP_URL} className="font-semibold text-ink underline">
-                  Start a pilot
+                  Start a free trial
                 </a>{" "}
                 to use it with a real class.
               </p>

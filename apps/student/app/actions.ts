@@ -2,16 +2,17 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { refresh } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { accountExists, checkLogin, createStudent } from "@lemmory/db/accounts";
-import { currentUser, endSession, startSession } from "@lemmory/db/auth";
+import { currentUser, endSession, startSession, trialSource } from "@lemmory/db/auth";
 import { PASSWORD_MIN } from "@lemmory/db/password";
-import { checkoutStudent } from "@lemmory/db/billing";
+import { checkoutStudent, startStudentTrial } from "@lemmory/db/billing";
 import {
   type Mode,
   ReviewError,
   addToDeck,
   answerPick,
+  canStudentReview,
   answerRecall,
   answerSolve,
   findClassByCode,
@@ -33,6 +34,13 @@ async function me() {
   const user = await currentUser("student");
   if (!user) throw new ReviewError("Signed out. Log in again.");
   return user.id;
+}
+
+/** The student, if a trial, payment or class covers them. Cards and the deck are locked otherwise. */
+async function unlocked() {
+  const id = await me();
+  if (!(await canStudentReview(id))) throw new ReviewError("Your free trial has ended. Go to Plan & classes to keep going.");
+  return id;
 }
 
 const str = (v: unknown, max = 200): string => {
@@ -117,10 +125,23 @@ export async function switchClass(classId: unknown) {
   refresh();
 }
 
-/** Simulated checkout for the individual plan. Nothing is charged. */
-export async function buyStudentPlan() {
-  await checkoutStudent(await me());
-  refresh();
+/** Start the free trial of the individual plan. One per person: see trialProblem in billing. */
+export async function startTrialAction(): Promise<FormState> {
+  const error = await startStudentTrial(await me(), await trialSource());
+  if (error) return { error };
+  // The sidebar unlocks too, so re-render the layout, not just the page.
+  revalidatePath("/", "layout");
+  redirect("/bank");
+}
+
+/** Simulated checkout for the individual plan, with a parent or guardian for the receipt. Nothing is charged. */
+export async function buyStudentPlan(_: FormState, fd: FormData): Promise<FormState> {
+  const values = { billingName: field(fd, "billingName"), billingEmail: field(fd, "billingEmail") };
+  if (values.billingName.length < 2 || values.billingName.length > 80) return { error: "Enter a parent or guardian's name.", values };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.billingEmail) || values.billingEmail.length > 200) return { error: "Enter a valid email for the receipt.", values };
+  await checkoutStudent(await me(), values.billingName, values.billingEmail);
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 export async function logout() {
@@ -135,36 +156,36 @@ export async function getPrompt(formulaId: unknown, m: unknown) {
 }
 
 export async function checkRecall(formulaId: unknown, inputs: unknown, m: unknown, typoUsed: unknown) {
-  const r = await answerRecall(await me(), str(formulaId), strs(inputs), mode(m), typoUsed === true);
+  const r = await answerRecall(await unlocked(), str(formulaId), strs(inputs), mode(m), typoUsed === true);
   if (r.outcome?.finished) refresh();
   return r;
 }
 
 export async function checkPick(formulaId: unknown, problemId: unknown, picked: unknown, m: unknown) {
-  const r = await answerPick(await me(), str(formulaId), str(problemId), strs(picked), mode(m));
+  const r = await answerPick(await unlocked(), str(formulaId), str(problemId), strs(picked), mode(m));
   if (r.outcome?.finished) refresh();
   return r;
 }
 
 export async function checkSolve(formulaId: unknown, problemId: unknown, picked: unknown, input: unknown, m: unknown) {
-  const r = await answerSolve(await me(), str(formulaId), str(problemId), strs(picked), str(input, 500), mode(m));
+  const r = await answerSolve(await unlocked(), str(formulaId), str(problemId), strs(picked), str(input, 500), mode(m));
   if (r.outcome?.finished) refresh();
   return r;
 }
 
 export async function markDone() {
-  await finishIfEmpty(await me());
+  await finishIfEmpty(await unlocked());
   refresh();
 }
 
 // ── deck ──
 
 export async function addCard(formulaId: unknown) {
-  await addToDeck(await me(), str(formulaId));
+  await addToDeck(await unlocked(), str(formulaId));
   refresh();
 }
 
 export async function removeCard(formulaId: unknown) {
-  await removeFromDeck(await me(), str(formulaId));
+  await removeFromDeck(await unlocked(), str(formulaId));
   refresh();
 }

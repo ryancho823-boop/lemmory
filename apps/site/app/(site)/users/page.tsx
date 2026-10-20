@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import { PILOT_DAYS, TIERS } from "@/lib/pricing";
+import { TRIAL_DAYS, TIERS } from "@/lib/pricing";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
 
 // What a visitor deciding what to buy needs: the plans and how Lemmory compares.
 const INTRO = {
   title: "Plans and pricing",
-  sub: `Pick the plan that matches how you teach. Every teacher plan starts with a free ${PILOT_DAYS}-day pilot, and students in a paid class never pay.`,
+  sub: `Pick the plan that matches how you teach. Every teacher plan starts with a free ${TRIAL_DAYS}-day free trial, and students in a paid class never pay.`,
 };
 
 // "Yes", "No", or a short note. Keep claims about other tools conservative.
@@ -49,7 +49,7 @@ export default function ForUsers() {
                   href={t.id === "student" ? INDIVIDUAL_SIGNUP_URL : SIGNUP_URL}
                   className="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-ink px-4 font-semibold text-white hover:bg-ink/85"
                 >
-                  {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}
+                  {t.id === "student" ? "Sign up as a student" : "Start a free trial"}
                 </a>
                 <Link href={`/plans#${t.id}`} className="mt-3 text-center text-sm font-semibold underline underline-offset-2 hover:text-ink/70">
                   Learn more

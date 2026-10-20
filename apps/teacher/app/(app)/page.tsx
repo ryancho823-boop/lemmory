@@ -7,7 +7,7 @@ import { getClasses, requirePlan } from "@/lib/session";
 import { LogoutButton } from "./LogoutButton";
 
 export default async function Classes() {
-  // New teachers (and ones whose pilot ended) pick a plan first, then make their first class.
+  // New teachers (and ones whose trial ended) go to the plan page first, then make their first class.
   const me = await requirePlan();
   const classes = await getClasses();
   if (classes.length === 0) redirect("/new");

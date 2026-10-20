@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FORMULAS, FORMULA_BY_ID, TOPICS, TOPIC_COLOR } from "@lemmory/core/formulas";
 import { type Card, mastery } from "@lemmory/core/srs";
 import { Button, PageHeader, cx } from "@lemmory/ui/ui";
-import { getView } from "@/lib/session";
+import { getUnlockedView } from "@/lib/session";
 import { RemoveButton } from "../DeckButtons";
 
 export const metadata = { title: "My deck · Lemmory" };
@@ -10,7 +10,7 @@ export const metadata = { title: "My deck · Lemmory" };
 const BANK_ORDER = new Map(FORMULAS.map((f, i) => [f.id, i]));
 
 export default async function DeckPage({ searchParams }: PageProps<"/deck">) {
-  const v = await getView();
+  const v = await getUnlockedView();
   const byMastery = (await searchParams).order === "mastery";
   const cards = Object.values(v.record.cards);
   const groups = byMastery

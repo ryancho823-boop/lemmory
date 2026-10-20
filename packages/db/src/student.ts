@@ -20,7 +20,7 @@ import {
 import type { StudentRecord } from "@lemmory/core/records";
 import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } from "@lemmory/core/session";
 import { isNew, newCard, review } from "@lemmory/core/srs";
-import { getStudentPlan, teacherActive } from "./billing";
+import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, loadClass, loadRecords, settle } from "./records";
 import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
@@ -46,16 +46,21 @@ export interface StudentView {
   completedToday: number;
   doneToday: boolean;
   nothingDue: boolean;
-  /** False when every class's free pilot has ended unpaid: the student can't start reviews. */
+  /** False when nothing covers the student (no trial or payment of their own, no active class): the app is locked. */
   canReview: boolean;
 }
 
 /**
- * Can this student do reviews? Yes if they pay for themselves (the individual plan), or if
- * any of their classes is on an active plan or pilot. Without a class they need the plan.
+ * Can this student use Lemmory? Yes if their own individual plan is on its free trial or
+ * paid, or if any of their classes' teachers is. Otherwise everything but the plan page is locked.
  */
 export async function canStudentReview(studentId: string) {
-  if (await getStudentPlan(studentId)) return true;
+  const { state } = studentPlanState(await getStudentPlan(studentId));
+  return state === "trial" || state === "active" || (await classCovers(studentId));
+}
+
+/** Is any of the student's classes on a teacher's trial or paid plan? */
+export async function classCovers(studentId: string) {
   const mine = await studentClasses(studentId);
   for (const teacherId of new Set(mine.map((c) => c.teacherId))) if (await teacherActive(teacherId)) return true;
   return false;
@@ -82,7 +87,7 @@ export async function loadStudentView(user: { id: string; name: string; username
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
 
   if (!view) {
-    // Not in a class: they can browse the bank, and review their own cards on the individual plan.
+    // Not in a class: the individual plan (trial or paid) covers them.
     const today = dayInZone("UTC");
     const record = (await loadRecords([user.id])).get(user.id)!;
     const session = await loadSession(user.id, today);
@@ -98,7 +103,7 @@ export async function loadStudentView(user: { id: string; name: string; username
       queue: isDoneToday(record, today) ? [] : buildQueue(record.cards, session, today),
       completedToday: session.completed.length,
       doneToday: isDoneToday(record, today),
-      canReview: !!(await getStudentPlan(user.id)),
+      canReview: await canStudentReview(user.id),
       nothingDue: nothingDue(record, today),
     };
   }
@@ -162,8 +167,7 @@ function formula(id: string) {
 /** The card to show next. In review mode it must be one of today's cards. */
 export async function promptFor(studentId: string, formulaId: string, mode: Mode): Promise<Prompt> {
   const f = formula(formulaId);
-  if (mode === "review" && !(await canStudentReview(studentId)))
-    throw new ReviewError("Reviews need a plan. Your teacher's plan covers you in a class, or get the individual plan on My classes.");
+  if (!(await canStudentReview(studentId))) throw new ReviewError("Your free trial has ended. Go to Plan & classes to keep going.");
   return db.transaction(async (q) => {
     const { today, record, session } = await context(q, studentId);
     const card = record.cards[formulaId];

@@ -11,6 +11,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       classes={v.classes}
       streak={streak(v.record.doneDays, v.today)}
       doneToday={v.doneToday}
+      locked={!v.canReview}
     >
       {children}
     </StudentShell>

@@ -8,7 +8,7 @@ import { TryIt } from "@/components/site/TryIt";
 import { ForgettingCurve, RESEARCH } from "@/components/site/research";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ProductTour } from "@/components/site/ProductTour";
-import { PILOT_DAYS } from "@/lib/pricing";
+import { TRIAL_DAYS } from "@/lib/pricing";
 import { ACCENT, ACCENT_CYCLE } from "@/lib/accents";
 
 // The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
@@ -17,7 +17,7 @@ const TEXT = {
     title: "Remember every formula. Know when to use it.",
     body: "Lemmory is daily formula practice for competition math classes. Each student gets a deck that grows with the course, and every formula comes back right before they'd forget it.",
     button: "Try the demo",
-    note: <>Free for students in a paid class. Teachers start with a free {PILOT_DAYS}-day pilot.</>,
+    note: <>Free for students in a paid class. Teachers start with a free {TRIAL_DAYS}-day free trial.</>,
   },
   bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {

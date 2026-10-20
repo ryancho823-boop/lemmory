@@ -17,3 +17,13 @@ export const CLASS_COOKIE = "lemmory_class";
 
 /** Everything the app shows about the signed-in student. Loaded once per request. */
 export const getView = cache(async () => loadStudentView(await requireStudent(), (await cookies()).get(CLASS_COOKIE)?.value));
+
+/**
+ * The same, for every page but Plan & classes. Without a trial, a payment or a class that
+ * covers them, students can't see anything else, so they're sent there.
+ */
+export const getUnlockedView = cache(async () => {
+  const v = await getView();
+  if (!v.canReview) redirect("/class");
+  return v;
+});
