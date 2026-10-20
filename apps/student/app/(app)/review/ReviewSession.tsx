@@ -120,7 +120,7 @@ export function ReviewSession({
         <p className="flex items-center justify-center gap-1 text-sm font-semibold text-ink/45">
           Daily review
         </p>
-        <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{initial.length} cards</h1>
+        <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{initial.length} {initial.length === 1 ? "card" : "cards"}</h1>
         <div className="mt-4 flex justify-center gap-4 text-[15px] text-ink/80">
           <Chip n={initial.length - fresh - apply} label="recall" />
           <Chip n={apply} label="application" />

@@ -5,20 +5,25 @@ import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
 import { signup } from "../../actions";
 
-export function JoinForm({ code, username }: { code: string; username: string }) {
+/** `onOwn` drops the class code, for students on the individual plan. */
+export function JoinForm({ code, username, onOwn }: { code: string; username: string; onOwn?: boolean }) {
   const [state, action, pending] = useActionState(signup, undefined);
   const v = state?.values;
   return (
     <form action={action} className="space-y-4">
-      <Field
-        label="Class code"
-        name="code"
-        required
-        autoCapitalize="characters"
-        autoComplete="off"
-        defaultValue={v?.code ?? code}
-        className="uppercase tracking-[0.2em]"
-      />
+      {onOwn ? (
+        <input type="hidden" name="own" value="1" />
+      ) : (
+        <Field
+          label="Class code"
+          name="code"
+          required
+          autoCapitalize="characters"
+          autoComplete="off"
+          defaultValue={v?.code ?? code}
+          className="uppercase tracking-[0.2em]"
+        />
+      )}
       <div className="grid grid-cols-2 gap-3">
         <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={v?.firstName} />
         <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={v?.lastName} />

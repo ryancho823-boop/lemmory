@@ -51,7 +51,8 @@ Other commands:
 ## Logging in and signing up
 
 - **Log in.** The main site's only button is **Log in** (`/login`), which asks "teacher or student?" and opens that site's login page: "Teacher log in" (email) or "Student log in" (username). Each has a **New? Sign up** link.
-- **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, name, username, password. The switch links between the two sites.
+- **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, first and last name, username, password. The switch links between the two sites.
+- **Students on their own.** `/join?own=1` (linked as "No class code? Sign up on your own", and from the pricing pages) skips the class code. They land on **Plan & classes** to get the individual plan; without a class or that plan they can browse the bank but not review.
 - **No account yet.** Logging in with an email or username that doesn't exist goes to sign-up with it filled in (carried in a short-lived cookie, not the URL).
 - Already-logged-in visitors skip the login page. Sessions last 30 days.
 

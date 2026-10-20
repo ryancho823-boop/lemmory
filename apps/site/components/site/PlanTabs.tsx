@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cx } from "@lemmory/ui/ui";
-import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
+import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
 import type { Tier } from "@/lib/pricing";
 
 /**
@@ -78,7 +78,7 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
         )}
 
         <a
-          href={t.id === "student" ? JOIN_URL : SIGNUP_URL}
+          href={t.id === "student" ? INDIVIDUAL_SIGNUP_URL : SIGNUP_URL}
           className="mt-8 inline-flex h-11 items-center rounded-lg bg-ink px-5 font-semibold text-white hover:bg-ink/85"
         >
           {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}

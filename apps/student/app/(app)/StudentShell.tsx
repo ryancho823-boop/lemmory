@@ -52,7 +52,7 @@ export function StudentShell({
         { href: "/bank", label: "Formula bank" },
         { href: "/stats", label: "My stats" },
         { href: "/leaderboard", label: "Leaderboard" },
-        { href: "/class", label: classes.length > 1 ? "My classes" : "My class" },
+        { href: "/class", label: classes.length > 1 ? "My classes" : classes.length ? "My class" : "Plan & classes" },
       ]}
       footer={
         <>
