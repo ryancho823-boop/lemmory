@@ -86,6 +86,8 @@ export interface Figure {
   texts: { at: Pt; text: string }[];
   /** Right-angle marks: "A-B-C" puts the mark at B. */
   rights: string[];
+  /** Unlabeled dots, like lattice points. */
+  dots?: Pt[];
 }
 
 export interface Problem {

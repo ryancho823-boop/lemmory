@@ -116,6 +116,8 @@ interface Spec {
   /** Text at a point, or on a segment ("A-B") placed just outside the figure. */
   texts?: { at?: Pt; on?: string; text: string }[];
   rights?: string[];
+  /** Unlabeled dots, like lattice points. */
+  dots?: Pt[];
   hide?: string[];
   /** Move a label: extra offset in drawing pixels, e.g. { A: [0, -6] }. */
   nudge?: Record<string, Pt>;
@@ -126,7 +128,7 @@ const PAD = 26; // room for labels
 
 /** Fit a figure written in math coordinates (y up) into a drawing box (y down). */
 export function fig(spec: Spec): Figure {
-  const all: Pt[] = Object.values(spec.pts);
+  const all: Pt[] = [...Object.values(spec.pts), ...(spec.dots ?? [])];
   for (const c of spec.circles ?? []) all.push([c.c[0] - c.r, c.c[1] - c.r], [c.c[0] + c.r, c.c[1] + c.r]);
   const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
   const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
@@ -161,5 +163,6 @@ export function fig(spec: Spec): Figure {
     circles: (spec.circles ?? []).map((c) => ({ c: to(c.c), r: c.r * k, dashed: c.dashed })),
     texts,
     rights: spec.rights ?? [],
+    ...(spec.dots ? { dots: spec.dots.map(to) } : {}),
   };
 }

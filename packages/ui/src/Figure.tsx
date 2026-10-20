@@ -51,6 +51,7 @@ export function Figure({ figure: f, className }: { figure: FigureData; className
         ];
         return <polyline key={r} points={pts.map((q) => q.join(",")).join(" ")} fill="none" stroke="#0f1121" strokeWidth={1.2} />;
       })}
+      {f.dots?.map((q, i) => <circle key={`dot${i}`} cx={q[0]} cy={q[1]} r={2} fill="#0f1121" fillOpacity={0.45} />)}
       {Object.entries(f.pts)
         .filter(([n]) => !f.hide.includes(n))
         .map(([n, q]) => (

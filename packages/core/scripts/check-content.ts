@@ -1,6 +1,8 @@
 import { FORMULAS, FORMULA_BY_ID } from "../src/formulas";
 import { gradeRecall, gradeNumber, findTypo } from "../src/grade";
 import { NOTES } from "../src/content/notes";
+import { FORMULA_FIGURES, PROBLEM_FIGURES } from "../src/content/v2/figures";
+import type { Figure } from "../src/content/types";
 import katex from "katex";
 let fail = 0;
 const ids = new Set<string>(), pids = new Set<string>();
@@ -57,5 +59,15 @@ for (const f of FORMULAS) {
     });
   }
 }
+// Diagrams: every point is a real number, every named segment exists, and attached ids are real.
+const badFigure = (f: Figure) =>
+  ![f.w, f.h, ...Object.values(f.pts).flat()].every(Number.isFinite) ||
+  [...f.lines.map((l) => l.split(":")[0]), ...f.shapes, ...f.rights].some((s) => s.split("-").some((n) => !f.pts[n]));
+for (const f of FORMULAS) {
+  if (f.figure && badFigure(f.figure)) { fail++; console.log("BAD FIGURE", f.id); }
+  for (const p of f.problems) if (p.figure && badFigure(p.figure)) { fail++; console.log("BAD FIGURE", p.id); }
+}
+for (const id of Object.keys(FORMULA_FIGURES)) if (!FORMULA_BY_ID[id]) { fail++; console.log("ORPHAN FIGURE", id); }
+for (const id of Object.keys(PROBLEM_FIGURES)) if (!pids.has(id)) { fail++; console.log("ORPHAN FIGURE", id); }
 for (const id of Object.keys(NOTES)) if (!FORMULA_BY_ID[id]) { fail++; console.log("ORPHAN NOTE", id); }
 console.log(FORMULAS.length, "formulas,", pids.size, "problems;", fail ? `${fail} failures` : "all checks pass");
