@@ -10,6 +10,7 @@ import type { Notes } from "./types";
 import { ALGEBRA_V2_NOTES } from "./v2Algebra";
 import { NUMBER_THEORY_V2_NOTES } from "./v2NumberTheory";
 import { COMBINATORICS_V2_NOTES } from "./v2Combinatorics";
+import { PROBABILITY_V2_NOTES } from "./v2Probability";
 
 export type { Note } from "./types";
 
@@ -25,4 +26,5 @@ export const NOTES: Notes = {
   ...ALGEBRA_V2_NOTES,
   ...NUMBER_THEORY_V2_NOTES,
   ...COMBINATORICS_V2_NOTES,
+  ...PROBABILITY_V2_NOTES,
 };
