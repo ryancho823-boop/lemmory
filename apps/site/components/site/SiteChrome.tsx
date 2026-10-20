@@ -63,12 +63,23 @@ export function SiteHeader() {
   );
 }
 
+/** Where questions go. Shown in the footer of every page. */
+const CONTACT_EMAIL = "ryancho823@gmail.com";
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-ink/60">
         <Logo />
-        <p>Spaced-repetition practice for competition math. Not affiliated with the MAA or AoPS.</p>
+        <div className="sm:text-right">
+          <p>Spaced-repetition practice for competition math. Not affiliated with the MAA or AoPS.</p>
+          <p className="mt-1">
+            Questions? Email{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold text-ink underline underline-offset-2">
+              {CONTACT_EMAIL}
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
