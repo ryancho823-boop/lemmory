@@ -66,7 +66,12 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   redirect("/");
 }
 
+/**
+ * Student sign-up. With a class code the student joins that class. "On your own" (own=1)
+ * skips the code; they land on My classes to get the individual plan.
+ */
 export async function signup(_: FormState, fd: FormData): Promise<FormState> {
+  const onOwn = fd.get("own") === "1";
   const values = {
     code: field(fd, "code").toUpperCase(),
     firstName: field(fd, "firstName"),
@@ -76,16 +81,16 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const name = `${values.firstName} ${values.lastName}`.trim();
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
-  const klass = await findClassByCode(values.code);
-  if (!klass) return fail("No class has that code. Check with your teacher.");
+  const klass = onOwn ? null : await findClassByCode(values.code);
+  if (!onOwn && !klass) return fail("No class has that code. Check with your teacher.");
   if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
   const id = await createStudent(name, values.username, password);
   if (!id) return fail("That username is taken. Try another.");
-  await joinClass(id, klass.id);
+  if (klass) await joinClass(id, klass.id);
   await startSession(id, "student");
-  redirect("/");
+  redirect(klass ? "/" : "/class");
 }
 
 const CLASS_COOKIE = "lemmory_class";

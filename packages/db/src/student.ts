@@ -51,12 +51,12 @@ export interface StudentView {
 }
 
 /**
- * Can this student do reviews? Yes if any of their classes is on an active plan or pilot,
- * if they pay for themselves, or if they aren't in a class (their own deck is free).
+ * Can this student do reviews? Yes if they pay for themselves (the individual plan), or if
+ * any of their classes is on an active plan or pilot. Without a class they need the plan.
  */
 export async function canStudentReview(studentId: string) {
+  if (await getStudentPlan(studentId)) return true;
   const mine = await studentClasses(studentId);
-  if (!mine.length || (await getStudentPlan(studentId))) return true;
   for (const teacherId of new Set(mine.map((c) => c.teacherId))) if (await teacherActive(teacherId)) return true;
   return false;
 }
@@ -82,7 +82,7 @@ export async function loadStudentView(user: { id: string; name: string; username
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
 
   if (!view) {
-    // Not in a class: they can still browse the bank and review their own cards.
+    // Not in a class: they can browse the bank, and review their own cards on the individual plan.
     const today = dayInZone("UTC");
     const record = (await loadRecords([user.id])).get(user.id)!;
     const session = await loadSession(user.id, today);
@@ -98,7 +98,7 @@ export async function loadStudentView(user: { id: string; name: string; username
       queue: isDoneToday(record, today) ? [] : buildQueue(record.cards, session, today),
       completedToday: session.completed.length,
       doneToday: isDoneToday(record, today),
-      canReview: true,
+      canReview: !!(await getStudentPlan(user.id)),
       nothingDue: nothingDue(record, today),
     };
   }
@@ -163,7 +163,7 @@ function formula(id: string) {
 export async function promptFor(studentId: string, formulaId: string, mode: Mode): Promise<Prompt> {
   const f = formula(formulaId);
   if (mode === "review" && !(await canStudentReview(studentId)))
-    throw new ReviewError("Your class's free trial has ended. Ask your teacher to pick a plan.");
+    throw new ReviewError("Reviews need a plan. Your teacher's plan covers you in a class, or get the individual plan on My classes.");
   return db.transaction(async (q) => {
     const { today, record, session } = await context(q, studentId);
     const card = record.cards[formulaId];

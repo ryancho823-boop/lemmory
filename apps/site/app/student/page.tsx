@@ -43,7 +43,7 @@ export default function StudentHome() {
           ) : (
             <div>
               <p className="flex items-center gap-1 text-4xl font-extrabold">
-                {queue.length} cards today
+                {queue.length} {queue.length === 1 ? "card" : "cards"} today
                 <InfoTip title="Today's cards" align="left">
                   About {Math.max(2, Math.round(queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
-import { JOIN_URL, SIGNUP_URL } from "@/lib/links";
+import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
 import { PILOT_DAYS, TIERS } from "@/lib/pricing";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
@@ -46,7 +46,7 @@ export default function ForUsers() {
                 </p>
                 <p className="mt-1 min-h-6 font-semibold">{t.note}</p>
                 <a
-                  href={t.id === "student" ? JOIN_URL : SIGNUP_URL}
+                  href={t.id === "student" ? INDIVIDUAL_SIGNUP_URL : SIGNUP_URL}
                   className="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-ink px-4 font-semibold text-white hover:bg-ink/85"
                 >
                   {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}

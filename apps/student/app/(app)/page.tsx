@@ -6,6 +6,7 @@ import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
 import { Button, Meter, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
+import { PRICES } from "@lemmory/db/billing";
 import { getView } from "@/lib/session";
 
 export default async function StudentHome() {
@@ -16,6 +17,7 @@ export default async function StudentHome() {
   const weak = weakest(me, v.today, 5);
   // Finishing today continues the streak (or starts one), so the bonus is for streak + 1.
   const bonus = streakBonus(v.doneToday ? s : s + 1);
+  const emptyDeck = Object.keys(v.record.cards).length === 0;
 
   return (
     <div className="space-y-6">
@@ -27,14 +29,20 @@ export default async function StudentHome() {
       {!v.klass && (
         <Panel className="flex flex-wrap items-center gap-4 p-5">
           <Users className="text-ink/40" />
-          <p className="min-w-0 flex-1">You&apos;re not in a class. Join one with the code from your teacher to get assigned formulas.</p>
-          <Button href="/class" size="sm">
-            Join a class
+          <p className="min-w-0 flex-1">
+            {!v.canReview
+              ? `To start reviewing, get the individual plan ($${PRICES.student.monthly} a month), or join a class with a code from your teacher.`
+              : emptyDeck
+                ? "Add formulas from the Formula bank. They'll show up in your daily review."
+                : "You're on the individual plan. If your teacher gives you a class code, you can join their class too."}
+          </p>
+          <Button href={!v.canReview ? "/class" : emptyDeck ? "/bank" : "/class"} size="sm">
+            {!v.canReview ? "Get started" : emptyDeck ? "Formula bank" : "Join a class"}
           </Button>
         </Panel>
       )}
 
-      {!v.canReview && (
+      {v.klass && !v.canReview && (
         <Panel className="border-2 border-lemon p-6">
           <p className="text-xl font-extrabold">Your class&apos;s free trial has ended</p>
           <p className="mt-1 text-ink/75">Ask your teacher to pick a plan. Your cards and progress are saved and will be here when it&apos;s back.</p>
@@ -56,7 +64,7 @@ export default async function StudentHome() {
           ) : (
             <div>
               <p className="flex items-center gap-1 text-4xl font-extrabold">
-                {v.queue.length} cards today
+                {v.queue.length} {v.queue.length === 1 ? "card" : "cards"} today
                 <InfoTip title="Today's cards" align="left">
                   About {Math.max(2, Math.round(v.queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>
