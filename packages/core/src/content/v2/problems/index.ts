@@ -5,6 +5,7 @@ import { NUMBER_THEORY_PROBLEMS } from "./numberTheory";
 import { COMBINATORICS_PROBLEMS } from "./combinatorics";
 import { PROBABILITY_PROBLEMS } from "./probability";
 import { CALCULUS_PROBLEMS } from "./calculus";
+import { TRIG_PROBLEMS } from "./trig";
 
 export const MORE_PROBLEMS: Record<string, Omit<Problem, "uses">[]> = {
   ...ALGEBRA_PROBLEMS,
@@ -12,4 +13,5 @@ export const MORE_PROBLEMS: Record<string, Omit<Problem, "uses">[]> = {
   ...COMBINATORICS_PROBLEMS,
   ...PROBABILITY_PROBLEMS,
   ...CALCULUS_PROBLEMS,
+  ...TRIG_PROBLEMS,
 };

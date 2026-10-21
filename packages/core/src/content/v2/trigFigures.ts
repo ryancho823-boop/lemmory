@@ -97,6 +97,31 @@ const multiples = (deg: number, n: number, name: string) => {
 const t345 = { A: [4, 0] as Pt, B: [0, 3] as Pt, C: [0, 0] as Pt };
 const generic = triangle(6, 5, 4.2);
 
+// Shapes for problems: label sides with their lengths and corners with their angles.
+type Side = "a" | "b" | "c";
+const sideOf: Record<Side, string> = { a: "B-C", b: "C-A", c: "A-B" };
+const sideTexts = (sides: Partial<Record<Side, string>>): Text[] => (Object.keys(sides) as Side[]).map((k) => ({ on: sideOf[k], text: sides[k]! }));
+
+/** Two sides from B (to A and to C) and the angle B between them, in degrees. */
+export const sasFig = (ba: number, bc: number, deg: number, sides: Partial<Record<Side, string>>, angle = true) => {
+  const t = { A: polar([0, 0], ba, deg), B: [0, 0] as Pt, C: [bc, 0] as Pt };
+  return triFig(t, [...sideTexts(sides), ...(angle ? cornerTexts(t, { B: `${deg}°` }, Math.min(ba, bc) * 0.22) : [])]);
+};
+
+/** Three sides a = BC, b = CA, c = AB, with any extras (incircle, circumcircle, altitude). */
+export const sssFig = (a: number, b: number, c: number, sides: Partial<Record<Side, string>>, extra?: "incircle" | "circumcircle" | "altitude") => {
+  const t = triangle(a, b, c);
+  const texts = sideTexts(sides);
+  return extra === "incircle" ? incircleFig(t, texts) : extra === "circumcircle" ? circumFig(t, texts) : extra === "altitude" ? projFig(t, texts) : triFig(t, texts);
+};
+
+/** Angles B and C (degrees) and side a = BC, with the given corner labels. */
+export const aasFig = (B: number, C: number, a: number, sides: Partial<Record<Side, string>>, corners: { A?: string; B?: string; C?: string }, extra?: "circumcircle") => {
+  const t = byAngles(B, C, a);
+  const texts = [...sideTexts(sides), ...cornerTexts(t, corners, a * 0.16)];
+  return extra === "circumcircle" ? circumFig(t, texts) : triFig(t, texts);
+};
+
 export const TRIG_FORMULA_FIGURES: Record<string, Figure> = {
   "tan-addition": (() => {
     const p = plane(-0.3, 1.5, -0.3, 2.3), T = (d: number): Pt => [1, Math.tan((d * Math.PI) / 180)];
