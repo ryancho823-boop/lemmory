@@ -18,7 +18,8 @@ for (const f of FORMULAS) {
     const onlyNames = /^[\s a-zA-Z]*$/.test(lhs);
     if (lhs.trim() && !onlyNames && gradeRecall(b, lhs)) { fail++; console.log("LHS PASSES", f.id, lhs); }
   }
-  if (f.problems.length < 2) { fail++; console.log("FEW PROBLEMS", f.id); }
+  // A worked example plus four to quiz, so a card that comes back the same day gets a fresh problem.
+  if (f.problems.length < 5) { fail++; console.log("FEW PROBLEMS", f.id); }
   for (const p of f.problems) {
     if (pids.has(p.id)) { fail++; console.log("DUP PROBLEM", p.id); } pids.add(p.id);
     for (const u of p.uses) if (!FORMULA_BY_ID[u]) { fail++; console.log("BAD USES", p.id, u); }

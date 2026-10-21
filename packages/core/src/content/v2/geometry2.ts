@@ -19,7 +19,7 @@ const axes = (x0: number, x1: number, y0: number, y1: number) => ({
 /** A simple oblique view of 3D points: x right, z up, y going back and up. */
 const proj = ([x, y, z]: [number, number, number]): Pt => [x + 0.45 * y, z + 0.32 * y];
 
-const quadDiag = (p1: number, p2: number, q1: number, q2: number, deg: number, texts: { at: Pt; text: string }[] = [], right = false) => {
+export const quadDiag = (p1: number, p2: number, q1: number, q2: number, deg: number, texts: { at: Pt; text: string }[] = [], right = false) => {
   const X: Pt = [0, 0];
   const A = polar(X, p1, 180), C = polar(X, p2, 0), B = polar(X, q1, 180 + deg), D = polar(X, q2, deg);
   return fig({ pts: { A, B, C, D, X }, hide: ["X"], shapes: ["A-B-C-D"], lines: ["A-B", "B-C", "C-D", "D-A", "A-C:blue", "B-D:blue"], rights: right ? ["C-X-D"] : [], texts });
@@ -35,7 +35,7 @@ const sameHeight = (bd: number, extra?: "median") => {
   return fig({ pts: { A, B, C, D, H }, hide: ["H"], shapes: ["A-B-D"], lines: ["A-B", "B-C", "C-A", "A-D", "A-H:dashed"], rights: ["A-H-C"], texts: [{ on: "B-D", text: "2" }, { on: "D-C", text: "3" }] });
 };
 
-const ngon = (n: number) => {
+export const ngon = (n: number) => {
   const O: Pt = [0, 0];
   const vs = Array.from({ length: n }, (_, i) => polar(O, 1, 90 + (360 * i) / n));
   const pts: Record<string, Pt> = { O };
@@ -50,7 +50,7 @@ const ngon = (n: number) => {
   });
 };
 
-const tangentsFig = (r1: number, r2: number, d: number, labels: boolean) => {
+export const tangentsFig = (r1: number, r2: number, d: number, labels: boolean) => {
   const P: Pt = [0, 0], Q: Pt = [d, 0];
   const e = (Math.acos((r1 - r2) / d) * 180) / Math.PI, i = (Math.acos((r1 + r2) / d) * 180) / Math.PI;
   const pts = { P, Q, a: polar(P, r1, e), b: polar(Q, r2, e), c: polar(P, r1, -i), f: polar(Q, r2, 180 - i) };
@@ -64,21 +64,21 @@ const tangentsFig = (r1: number, r2: number, d: number, labels: boolean) => {
   });
 };
 
-const chordFig = (r: number, d: number, texts: (k: string) => { on: string; text: string }[]) => {
+export const chordFig = (r: number, d: number, texts: (k: string) => { on: string; text: string }[]) => {
   const O: Pt = [0, 0], M: Pt = [0, -d];
   const h = Math.sqrt(r * r - d * d);
   const A: Pt = [-h, -d], B: Pt = [h, -d];
   return fig({ pts: { O, A, B, M }, hide: ["M"], circles: [{ c: O, r }], lines: ["A-B:blue", "O-M:dashed", "O-B"], rights: ["O-M-B"], texts: texts("") });
 };
 
-const segmentFig = (r: number, deg: number, texts: { at?: Pt; on?: string; text: string }[]) => {
+export const segmentFig = (r: number, deg: number, texts: { at?: Pt; on?: string; text: string }[]) => {
   const O: Pt = [0, 0];
   const from = -90 - deg / 2, to = -90 + deg / 2;
   const a = curve("s", arc(O, r, from, to));
   return fig({ pts: { O, ...a.pts }, hide: a.hide, circles: [{ c: O, r }], shapes: [a.names.join("-")], lines: [`O-${a.names[0]}`, `O-${a.names[a.names.length - 1]}`, `${a.names[0]}-${a.names[a.names.length - 1]}`], texts });
 };
 
-const capFig = (r: number, h: number, top: boolean, texts: { on?: string; at?: Pt; text: string }[]) => {
+export const capFig = (r: number, h: number, top: boolean, texts: { on?: string; at?: Pt; text: string }[]) => {
   const O: Pt = [0, 0];
   const y = top ? r - h : -(r - h);
   const t = (Math.asin(y / r) * 180) / Math.PI;
@@ -94,7 +94,7 @@ const spiral = (() => {
   return fig({ pts: { A, B, C, D, X, S }, circles: [circumcircle(A, B, X), circumcircle(C, D, X)].map((c) => ({ ...c, dashed: true })), lines: ["A-B:blue", "C-D:blue", "A-X", "B-X"], nudge: { X: [12, 0] } });
 })();
 
-const miquelFig = (A: Pt, B: Pt, C: Pt, D: Pt, E: Pt, F: Pt) => {
+export const miquelFig = (A: Pt, B: Pt, C: Pt, D: Pt, E: Pt, F: Pt) => {
   const c1 = circumcircle(A, E, F), c2 = circumcircle(B, F, D), c3 = circumcircle(C, D, E);
   const [m1, m2] = circleMeet(c1, c2);
   const M = dist(m1, F) > dist(m2, F) ? m1 : m2;

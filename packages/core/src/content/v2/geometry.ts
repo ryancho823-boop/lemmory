@@ -38,12 +38,12 @@ const butterfly = (() => {
   const X = meet(A, D, P, Q), Y = meet(B, C, P, Q);
   return { circle, pts: { P, Q, M, A, B, C, D, X, Y } };
 })();
-const butterflyFig = (texts: { on: string; text: string }[] = []) =>
+export const butterflyFig = (texts: { on: string; text: string }[] = []) =>
   fig({ pts: butterfly.pts, circles: [butterfly.circle], lines: ["P-Q", "A-B", "C-D", "A-D", "B-C"], texts, nudge: { M: [0, 12], X: [0, 12], Y: [0, 12] } });
 
 const t131415 = triangle(14, 15, 13);
 
-const carnotFig = (A: Pt, B: Pt, C: Pt, texts: { on: string; text: string }[] = []) => {
+export const carnotFig = (A: Pt, B: Pt, C: Pt, texts: { on: string; text: string }[] = []) => {
   const O = circumcircle(A, B, C).c;
   const X = foot(O, B, C), Y = foot(O, C, A), Z = foot(O, A, B);
   return fig({ pts: { A, B, C, O, X, Y, Z }, hide: ["X", "Y", "Z"], shapes: ["A-B-C"], lines: ["A-B", "B-C", "C-A", "O-X:dashed", "O-Y:dashed", "O-Z:dashed"], rights: ["O-X-C", "O-Y-A", "O-Z-B"], texts, nudge: { O: [12, -4] } });
@@ -51,7 +51,7 @@ const carnotFig = (A: Pt, B: Pt, C: Pt, texts: { on: string; text: string }[] = 
 
 const descartes = { A: [0, 0] as Pt, B: [3, 0] as Pt, C: [0, 4] as Pt };
 
-const incEx = (() => {
+export const incEx = (() => {
   const { A, B, C } = triangle(6, 7.5, 5);
   const I = incircle(A, B, C).c, J = excircle(A, B, C).c;
   const circ = circumcircle(A, B, C);
@@ -68,7 +68,7 @@ const monge = (() => {
   return fig({ pts, hide: ["x", "y", "z"], circles: [c1, c2, c3], lines, nudge: { Y: [8, 12] } });
 })();
 
-const routhFig = (k: number, texts: { on: string; text: string }[]) => {
+export const routhFig = (k: number, texts: { on: string; text: string }[]) => {
   const { A, B, C } = triangle(7, 6, 5.5);
   const t = k / (k + 1);
   const D = along(B, C, t), E = along(C, A, t), F = along(A, B, t);
@@ -76,26 +76,26 @@ const routhFig = (k: number, texts: { on: string; text: string }[]) => {
   return fig({ pts: { A, B, C, D, E, F, P, Q, R }, hide: ["P", "Q", "R"], shapes: ["P-Q-R"], lines: ["A-B", "B-C", "C-A", "A-D", "B-E", "C-F"], texts });
 };
 
-const cevians = (A: Pt, B: Pt, C: Pt, af: number, ae: number, texts: { on: string; text: string }[] = []) => {
+export const cevians = (A: Pt, B: Pt, C: Pt, af: number, ae: number, texts: { on: string; text: string }[] = []) => {
   const F = along(A, B, af), E = along(A, C, ae);
   const O = meet(B, E, C, F), D = meet(A, O, B, C);
   return fig({ pts: { A, B, C, D, E, F, O }, lines: ["A-B", "B-C", "C-A", "A-D", "B-E", "C-F"], texts, nudge: { O: [12, -2] } });
 };
 
-const vivianiFig = (P: Pt, s: number, texts: { on: string; text: string }[] = []) => {
+export const vivianiFig = (P: Pt, s: number, texts: { on: string; text: string }[] = []) => {
   const B: Pt = [0, 0], C: Pt = [s, 0], A: Pt = [s / 2, (s * Math.sqrt(3)) / 2];
   const X = foot(P, B, C), Y = foot(P, C, A), Z = foot(P, A, B);
   return fig({ pts: { A, B, C, P, X, Y, Z }, hide: ["X", "Y", "Z"], shapes: ["A-B-C"], lines: ["A-B", "B-C", "C-A", "P-X:blue", "P-Y:blue", "P-Z:blue"], rights: ["P-X-C", "P-Y-A", "P-Z-B"], texts });
 };
 
-const massFig = (bd: number, ae: number, texts: { on: string; text: string }[]) => {
+export const massFig = (bd: number, ae: number, texts: { on: string; text: string }[]) => {
   const { A, B, C } = triangle(7, 6, 5);
   const D = along(B, C, bd), E = along(A, C, ae);
   const P = meet(A, D, B, E);
   return fig({ pts: { A, B, C, D, E, P }, lines: ["A-B", "B-C", "C-A", "A-D", "B-E"], texts, nudge: { P: [-12, 2] } });
 };
 
-const homothetyFig = (r1: number, r2: number, d: number, inner: boolean, labels = true) => {
+export const homothetyFig = (r1: number, r2: number, d: number, inner: boolean, labels = true) => {
   const P: Pt = [0, 0], Q: Pt = [d, 0];
   const X: Pt = inner ? [(d * r1) / (r1 + r2), 0] : [(-d * r1) / (r2 - r1), 0];
   // Tangent points that line up with X: the same angle from each center, or opposite ones for internal tangents.
@@ -118,28 +118,28 @@ const eulerTri = (() => {
   return { A, B, C, O, H, G };
 })();
 
-const fermat = (() => {
+export const fermat = (() => {
   const { A, B, C } = triangle(7, 5.5, 4.6);
   const A2 = equilateralOn(B, C, A), B2 = equilateralOn(C, A, B);
   const P = meet(A, A2, B, B2);
   return fig({ pts: { A, B, C, P }, shapes: ["A-B-C"], lines: ["A-B", "B-C", "C-A", "P-A:blue", "P-B:blue", "P-C:blue"], texts: [{ at: angleAt(P, A, B, 0.55), text: "120°" }, { at: angleAt(P, B, C, 0.55), text: "120°" }, { at: angleAt(P, C, A, 0.55), text: "120°" }], nudge: { P: [8, 10] } });
 })();
 
-const simson = (() => {
+export const simson = (() => {
   const circ = { c: [0, 0] as Pt, r: 2 };
   const A = polar(circ.c, 2, 110), B = polar(circ.c, 2, 205), C = polar(circ.c, 2, 330), P = polar(circ.c, 2, 50);
   const D = foot(P, B, C), E = foot(P, C, A), F = foot(P, A, B);
   return fig({ pts: { A, B, C, P, D, E, F }, circles: [circ], lines: ["A-B", "B-C", "C-A", "B-D", "C-D", "C-E", "A-E", "A-F", "B-F", "P-D:dashed", "P-E:dashed", "P-F:dashed", "D-F:blue"], rights: ["P-D-C", "P-E-A", "P-F-A"] });
 })();
 
-const orthoRefl = (A: Pt, B: Pt, C: Pt, texts: { on: string; text: string }[] = []) => {
+export const orthoRefl = (A: Pt, B: Pt, C: Pt, texts: { on: string; text: string }[] = []) => {
   const H = orthocenter(A, B, C), D = foot(A, B, C);
   const circ = circumcircle(A, B, C);
   const E = lineCircle(A, D, circ)[1];
   return fig({ pts: { A, B, C, H, D, E }, circles: [circ], lines: ["A-B", "B-C", "C-A", "A-E", "B-H:dashed", "C-H:dashed"], rights: ["A-D-C"], texts, nudge: { H: [12, 0], D: [10, 10] } });
 };
 
-const trigCevaFig = (Bang: number, Cang: number, pb: number, pc: number, texts: (v: Record<string, Pt>) => { at: Pt; text: string }[]) => {
+export const trigCevaFig = (Bang: number, Cang: number, pb: number, pc: number, texts: (v: Record<string, Pt>) => { at: Pt; text: string }[]) => {
   const B: Pt = [0, 0], C: Pt = [5, 0];
   const A = meet(B, polar(B, 1, Bang), C, polar(C, 1, 180 - Cang));
   const P = meet(B, polar(B, 1, pb), C, polar(C, 1, 180 - pc));
@@ -267,7 +267,7 @@ export const GEOMETRY_V2 = defineTopic("Geometry", [
     id: "routh",
     name: "Routh's Theorem",
     level: "AIME",
-    statement: "\\frac{[\\text{inner}]}{[ABC]} = \\frac{(xyz - 1)^2}{(xy + y + 1)(yz + z + 1)(zx + x + 1)}",
+    statement: "\\frac{[\\text{inner}]}{[ABC]} = \\frac{(xyz - 1)^2}{(xy + x + 1)(yz + y + 1)(zx + z + 1)}",
     setup: "Cevians $AD$, $BE$, $CF$ with $\\frac{BD}{DC} = x$, $\\frac{CE}{EA} = y$, $\\frac{AF}{FB} = z$ cut out an inner triangle. If all three ratios are $x$, it's $\\frac{(x-1)^2}{x^2 + x + 1}$.",
     whenToUse: "The area of the triangle made by three cevians.",
     figure: routhFig(2, []),
