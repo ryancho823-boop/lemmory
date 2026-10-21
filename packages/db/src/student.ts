@@ -66,6 +66,13 @@ export async function classCovers(studentId: string) {
   return false;
 }
 
+/** Where "today" is for a student: their first class's time zone, or their own if they have no class. */
+async function zoneOf(studentId: string, mine: { timezone: string }[], q: Tx | typeof db = db) {
+  if (mine[0]) return mine[0].timezone;
+  const row = await q.select({ timezone: users.timezone }).from(users).where(eq(users.id, studentId)).get();
+  return row?.timezone ?? "UTC";
+}
+
 /** The student's classes, oldest first. */
 export async function studentClasses(studentId: string, q: Tx | typeof db = db) {
   return q
@@ -88,7 +95,7 @@ export async function loadStudentView(user: { id: string; name: string; username
 
   if (!view) {
     // Not in a class: the individual plan (trial or paid) covers them.
-    const today = dayInZone("UTC");
+    const today = dayInZone(await zoneOf(user.id, mine));
     const record = (await loadRecords([user.id])).get(user.id)!;
     const session = await loadSession(user.id, today);
     return {
@@ -145,7 +152,7 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
  */
 async function context(q: Tx, studentId: string) {
   const mine = await studentClasses(studentId, q);
-  const today = dayInZone(mine[0]?.timezone ?? "UTC");
+  const today = dayInZone(await zoneOf(studentId, mine, q));
   const records = await loadRecords([studentId], q);
   await settle(
     mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough })),
@@ -173,6 +180,8 @@ export async function promptFor(studentId: string, formulaId: string, mode: Mode
     const card = record.cards[formulaId];
     if (!card) throw new ReviewError("That formula isn't in your deck.");
     if (mode === "review" && !buildQueue(record.cards, session, today).includes(formulaId)) throw new ReviewError("That card isn't due today.");
+    if (mode === "practice" && (isNew(card) || buildQueue(record.cards, session, today).includes(formulaId)))
+      throw new ReviewError("Do this card in today's review first.");
     if (card.stage === "recall") return recallPrompt(f);
     const deck = Object.keys(record.cards);
     if (mode === "practice") return applyPrompt(f, undefined, deck);
@@ -232,6 +241,20 @@ function assertDue(ctx: Awaited<ReturnType<typeof context>>, formulaId: string) 
   if (!buildQueue(ctx.record.cards, ctx.session, ctx.today).includes(formulaId)) throw new ReviewError("That card isn't due today.");
 }
 
+/**
+ * Practice shows the right answer after each try and isn't recorded, so it only works on cards
+ * already in the deck and reviewed, and never on one still waiting in today's review. Otherwise a
+ * student could look up today's answers in practice first.
+ */
+async function assertPractice(studentId: string, formulaId: string) {
+  await db.transaction(async (q) => {
+    const ctx = await context(q, studentId);
+    const card = ctx.record.cards[formulaId];
+    if (!card || isNew(card)) throw new ReviewError("Practice cards you've already reviewed.");
+    if (buildQueue(ctx.record.cards, ctx.session, ctx.today).includes(formulaId)) throw new ReviewError("Do this card in today's review first.");
+  });
+}
+
 export async function answerRecall(
   studentId: string,
   formulaId: string,
@@ -241,7 +264,10 @@ export async function answerRecall(
   typoUsed = false,
 ): Promise<{ result: RecallResult; outcome: Outcome | null }> {
   const f = formula(formulaId);
-  if (mode === "practice") return { result: checkRecall(f, inputs, !typoUsed), outcome: null };
+  if (mode === "practice") {
+    await assertPractice(studentId, formulaId);
+    return { result: checkRecall(f, inputs, !typoUsed), outcome: null };
+  }
   return db.transaction(async (q) => {
     const ctx = await context(q, studentId);
     assertDue(ctx, formulaId);
@@ -262,7 +288,7 @@ async function issuedProblem(studentId: string, formulaId: string, problemId: st
   if (mode === "review") {
     const session = await loadSession(studentId, await todayFor(studentId));
     if (session.problems[formulaId] !== problemId) throw new ReviewError("That problem wasn't handed out today.");
-  }
+  } else await assertPractice(studentId, formulaId);
   return problem;
 }
 
@@ -305,7 +331,7 @@ export async function answerSolve(
 }
 
 async function todayFor(studentId: string) {
-  return dayInZone((await studentClasses(studentId))[0]?.timezone ?? "UTC");
+  return dayInZone(await zoneOf(studentId, await studentClasses(studentId)));
 }
 
 /** Mark today done when there's nothing left in the queue. */

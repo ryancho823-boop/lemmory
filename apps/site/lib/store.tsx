@@ -5,7 +5,7 @@ import { type Competition, type Student, pointsBetween } from "./analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
 import { DEMO_MAX_DAYS } from "./demo";
-import { FORMULA_BY_ID } from "@lemmory/core/formulas";
+import { FORMULA_BY_ID } from "./bank";
 
 // Demo persistence: the demo student's data lives in localStorage; classmates are
 // re-simulated from the assignments. Swap for an API + database for real classes.
@@ -171,9 +171,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .sort((a, b) => a.memory.due - b.memory.due)
       .map((c) => c.formulaId);
     const room = Math.max(0, NEW_PER_DAY - session.newStarted.length);
+    // Assigned homework first, so cards added on your own can't push it back.
     const fresh = cards
       .filter((c) => isNew(c) && !pending.includes(c.formulaId))
-      .sort((a, b) => a.addedDay - b.addedDay)
+      .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.addedDay - b.addedDay)
       .slice(0, room)
       .map((c) => c.formulaId);
     // Interleave new cards among reviews (mixed practice beats blocked practice).

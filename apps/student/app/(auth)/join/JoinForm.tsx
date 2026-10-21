@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
+import { TimeZoneField } from "../TimeZoneField";
 import { signup } from "../../actions";
 
 /** `onOwn` drops the class code, for students on the individual plan. */
@@ -11,6 +12,7 @@ export function JoinForm({ code, username, onOwn }: { code: string; username: st
   const v = state?.values;
   return (
     <form action={action} className="space-y-4">
+      <TimeZoneField />
       {onOwn ? (
         <input type="hidden" name="own" value="1" />
       ) : (

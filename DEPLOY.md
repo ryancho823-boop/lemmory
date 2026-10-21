@@ -47,7 +47,7 @@ Open `/health` on the teacher and student sites:
 - https://lemmory-teacher.vercel.app/health
 - https://lemmory-student.vercel.app/health
 
-Both should show `"database":"connected (… accounts)"` and `"token_shape":"348 characters, 3 parts"`. It never shows the token itself. If one says `MISSING`, that variable isn't set on that project (or it was added without redeploying).
+Both should show `"database":"connected"` and `"token_shape":"348 characters, 3 parts"`. It never shows the token itself. If one says `MISSING`, that variable isn't set on that project (or it was added without redeploying).
 
 Then try the whole thing:
 

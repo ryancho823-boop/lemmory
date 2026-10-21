@@ -17,12 +17,12 @@ const TEXT = {
     title: "Remember every formula. Know when to use it.",
     body: "Lemmory is daily formula practice for competition math classes. Each student gets a deck that grows with the course, and every formula comes back right before they'd forget it.",
     button: "Try the demo",
-    note: <>Free for students in a paid class. Teachers start with a free {TRIAL_DAYS}-day free trial.</>,
+    note: <>Every plan starts with a {TRIAL_DAYS}-day free trial. Students in a paid class never pay.</>,
   },
   bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {
     title: "Courses move on. Memory fades.",
-    body: "More than 350,000 students take the AMC each year. About 6,000 qualify for the AIME, and about 500 reach the USAMO. The formulas they learn in September have to last until contest day.",
+    body: "Hundreds of thousands of students take the AMC each year. A few thousand qualify for the AIME, and about 500 reach the USAMO or USAJMO. The formulas they learn in September have to last until contest day.",
   },
   mission: {
     quote: "Every formula a student learns should still be there on contest day.",
@@ -77,12 +77,15 @@ const STEPS = [
   { title: "It comes back on time", body: "Each card returns right before it would be forgotten." },
 ];
 
-// Intervals FSRS gives a card answered correctly each time (default parameters, 90% target).
+// The days a card answered right every time comes back, from packages/core/src/srs.ts (FSRS defaults,
+// 90% target). Once recall is solid it becomes an application card with its own fresh schedule.
 const TIMELINE = [
   { day: "Class", note: "Learned" },
-  { day: "Day 3", note: "1st review" },
-  { day: "Day 17", note: "2nd review" },
-  { day: "Day 74", note: "3rd review" },
+  { day: "Day 3", note: "Recall review" },
+  { day: "Day 4", note: "First problem" },
+  { day: "Day 7", note: "Problem" },
+  { day: "Day 21", note: "Problem" },
+  { day: "Day 78", note: "Problem" },
 ];
 
 export default function Overview() {
@@ -215,7 +218,7 @@ export default function Overview() {
           <div data-reveal className="mt-20">
             <h3 className="text-2xl font-extrabold">{TEXT.how.schedulerTitle}</h3>
             <p className="mt-2 max-w-2xl text-ink/80">{TEXT.how.schedulerBody}</p>
-            <ol className="mt-10 grid max-w-4xl grid-cols-4 border-t-2 border-ink/20">
+            <ol className="mt-10 grid max-w-4xl grid-cols-3 gap-y-8 border-t-2 border-ink/20 sm:grid-cols-6">
               {TIMELINE.map((t, i) => (
                 <li key={t.day} className="relative pt-5">
                   <span className={`absolute -top-[9px] left-0 size-4 rounded-full border-[3px] border-white ${i === 0 ? "bg-ink" : "bg-lemon-deep"}`} />

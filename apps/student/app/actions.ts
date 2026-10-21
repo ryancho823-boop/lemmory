@@ -3,8 +3,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { accountExists, checkLogin, createStudent } from "@lemmory/db/accounts";
-import { currentUser, endSession, startSession, trialSource } from "@lemmory/db/auth";
+import { accountExists, checkLogin, createStudent, setTimezone } from "@lemmory/db/accounts";
+import { isTimeZone } from "@lemmory/core/days";
+import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
+import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutStudent, startStudentTrial } from "@lemmory/db/billing";
 import {
@@ -56,13 +58,23 @@ const mode = (v: unknown): Mode => {
   return v;
 };
 const field = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
+/** The browser's time zone from the sign-up or login form, if it's a real one. */
+const zoneField = (fd: FormData) => {
+  const tz = field(fd, "timezone");
+  return tz && tz.length < 64 && isTimeZone(tz) ? tz : undefined;
+};
 
 // ── accounts ──
 
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const username = field(fd, "username");
+  const { ip } = await requester();
+  if (await isLimited("loginAccount", `student:${username}`)) return { error: LIMIT_MESSAGE.loginAccount, values: { username } };
+  if (await isLimited("loginNetwork", ip)) return { error: LIMIT_MESSAGE.loginNetwork, values: { username } };
   const id = await checkLogin("student", username, String(fd.get("password") ?? ""));
   if (!id) {
+    await noteAttempt("loginAccount", `student:${username}`);
+    await noteAttempt("loginNetwork", ip);
     // No account with that username: go join a class, with the username already filled in.
     if (username && !(await accountExists("student", username))) {
       (await cookies()).set(SIGNUP_HINT, username.toLowerCase(), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
@@ -70,6 +82,8 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
     }
     return { error: "That password isn't right for this username.", values: { username } };
   }
+  const tz = zoneField(fd);
+  if (tz) await setTimezone(id, tz);
   await startSession(id, "student");
   redirect("/");
 }
@@ -89,13 +103,20 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const name = `${values.firstName} ${values.lastName}`.trim();
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
+  const { ip, device } = await requester();
+  if (await isLimited("signup", ip, device)) return fail(LIMIT_MESSAGE.signup);
+  if (!onOwn && (await isLimited("classCode", ip, device))) return fail(LIMIT_MESSAGE.classCode);
   const klass = onOwn ? null : await findClassByCode(values.code);
-  if (!onOwn && !klass) return fail("No class has that code. Check with your teacher.");
+  if (!onOwn && !klass) {
+    await noteAttempt("classCode", ip, device);
+    return fail("No class has that code. Check with your teacher.");
+  }
   if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
-  const id = await createStudent(name, values.username, password);
+  const id = await createStudent(name, values.username, password, zoneField(fd));
   if (!id) return fail("That username is taken. Try another.");
+  await noteAttempt("signup", ip, device);
   if (klass) await joinClass(id, klass.id);
   await startSession(id, "student");
   redirect(klass ? "/" : "/class");
@@ -109,8 +130,13 @@ const showClass = async (classId: string) =>
 export async function joinWithCode(_: FormState, fd: FormData): Promise<FormState> {
   const studentId = await me();
   const code = field(fd, "code").toUpperCase();
+  const { ip, device } = await requester();
+  if (await isLimited("classCode", studentId, ip, device)) return { error: LIMIT_MESSAGE.classCode, values: { code } };
   const klass = await findClassByCode(code);
-  if (!klass) return { error: "No class has that code. Check with your teacher.", values: { code } };
+  if (!klass) {
+    await noteAttempt("classCode", studentId, ip, device);
+    return { error: "No class has that code. Check with your teacher.", values: { code } };
+  }
   await joinClass(studentId, klass.id);
   await showClass(klass.id);
   redirect("/");

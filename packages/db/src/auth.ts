@@ -52,14 +52,14 @@ export const currentUser = cache(async (role: Role) => {
 
 export type SessionUser = NonNullable<Awaited<ReturnType<typeof currentUser>>>;
 
-/** A random id for this browser, kept for two years, so a browser can't start a second free trial. */
+/** A random id for this browser, kept for two years: one free trial per browser, and limits on guessing. */
 const DEVICE_COOKIE = "lemmory_device";
 
 /**
- * Who is starting a free trial: this browser's id (set now if it has none), the request's
- * IP address, and the email if there is one. Call it from a server action.
+ * Who is making this request: this browser's id (set now if it has none) and the IP address,
+ * when the host provides one. Call it from a server action, which is allowed to set cookies.
  */
-export async function trialSource(email?: string): Promise<TrialSource> {
+export async function requester(): Promise<{ device: string; ip?: string }> {
   const jar = await cookies();
   let device = jar.get(DEVICE_COOKIE)?.value;
   if (!device) {
@@ -70,6 +70,10 @@ export async function trialSource(email?: string): Promise<TrialSource> {
   // The host (Vercel) sets these; locally there is none, and a loopback address isn't a real network.
   const ip = (h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0])?.trim();
   const local = !ip || ip === "::1" || ip.startsWith("127.") || ip === "::ffff:127.0.0.1";
-  return { email, device, ip: local ? undefined : ip };
+  return { device, ip: local ? undefined : ip };
 }
 
+/** Who is starting a free trial: the requester, plus the email if there is one. */
+export async function trialSource(email?: string): Promise<TrialSource> {
+  return { email, ...(await requester()) };
+}

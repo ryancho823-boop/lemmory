@@ -16,12 +16,17 @@ export async function createTeacher(name: string, email: string, password: strin
   return id;
 }
 
-export async function createStudent(name: string, username: string, password: string) {
+export async function createStudent(name: string, username: string, password: string, timezone?: string) {
   const normalized = username.trim().toLowerCase();
   if (await db.select({ id: users.id }).from(users).where(eq(users.username, normalized)).get()) return null;
   const id = newId();
-  await db.insert(users).values({ id, role: "student", name, username: normalized, passwordHash: await hashPassword(password) });
+  await db.insert(users).values({ id, role: "student", name, username: normalized, passwordHash: await hashPassword(password), timezone });
   return id;
+}
+
+/** Remember the student's time zone, for "today" when they aren't in a class. */
+export async function setTimezone(userId: string, timezone: string) {
+  await db.update(users).set({ timezone }).where(eq(users.id, userId));
 }
 
 /** The user id if the login (email for teachers, username for students) and password match. */

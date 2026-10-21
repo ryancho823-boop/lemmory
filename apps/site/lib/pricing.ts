@@ -79,6 +79,7 @@ export const TIERS: Tier[] = [
     bestFor: "You're studying on your own, not in a class.",
     price: `$${student.monthly}`,
     per: "per month",
+    note: `The first ${TRIAL_DAYS} days are free`,
     intro: "For students preparing for contests on their own.",
     details: [
       {

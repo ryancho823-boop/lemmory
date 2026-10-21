@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Search } from "lucide-react";
 import { LEVELS, LEVEL_LABEL, TOPICS, TOPIC_COLOR, type Level, type Topic } from "@lemmory/core/content/types";
 import type { BankEntry } from "@lemmory/core/bank";
 import { Tex } from "./Tex";
 import { LevelTag, Segmented, cx } from "./ui";
+import { type Scope, useBankFilters } from "./useBankFilters";
 
-type Scope = "all" | "assigned" | "deck" | "unassigned";
 
 interface Props {
   /** The bank, easiest first (from `bankEntries()` on the server). */
@@ -26,10 +26,7 @@ interface Props {
 
 /** Topic sidebar + compact rows grouped by topic. Shared by the student bank and the teacher's assign page. */
 export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta, assigned: assignedIds, deck = [] }: Props) {
-  const [q, setQ] = useState("");
-  const [topic, setTopic] = useState<Topic | "All">(TOPICS[0]);
-  const [level, setLevel] = useState<Level | "All">("All");
-  const [scope, setScope] = useState<Scope>("all");
+  const { q, setQ, topic, setTopic, level, setLevel, scope, setScope } = useBankFilters();
   const assigned = useMemo(() => new Set(assignedIds), [assignedIds]);
   const inDeck = useMemo(() => new Set(deck), [deck]);
 

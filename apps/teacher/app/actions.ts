@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
 import { accountExists, checkLogin, createTeacher } from "@lemmory/db/accounts";
-import { currentUser, endSession, startSession, trialSource } from "@lemmory/db/auth";
+import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
+import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { type PlanKind, checkoutTeacher, getPlan, planState, schoolEmailProblem, startTrial } from "@lemmory/db/billing";
 import {
@@ -54,8 +55,13 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const email = field(fd, "email");
+  const { ip } = await requester();
+  if (await isLimited("loginAccount", `teacher:${email}`)) return { error: LIMIT_MESSAGE.loginAccount, values: { email } };
+  if (await isLimited("loginNetwork", ip)) return { error: LIMIT_MESSAGE.loginNetwork, values: { email } };
   const id = await checkLogin("teacher", email, String(fd.get("password") ?? ""));
   if (!id) {
+    await noteAttempt("loginAccount", `teacher:${email}`);
+    await noteAttempt("loginNetwork", ip);
     // No account with that email: go make one, with the email already filled in.
     if (email && !(await accountExists("teacher", email))) {
       (await cookies()).set(SIGNUP_HINT, email, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
@@ -71,11 +77,14 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const values = { name: field(fd, "name"), email: field(fd, "email").toLowerCase() };
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
+  const { ip, device } = await requester();
+  if (await isLimited("signup", ip, device)) return fail(LIMIT_MESSAGE.signup);
   if (values.name.length < 2 || values.name.length > 60) return fail("Enter the name students know you by, like Ms. Chen.");
   if (!EMAIL.test(values.email) || values.email.length > 200) return fail("Enter a valid email.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
   const id = await createTeacher(values.name, values.email, password);
   if (!id) return fail("There's already an account with that email. Log in instead.");
+  await noteAttempt("signup", ip, device);
   await startSession(id, "teacher");
   redirect("/plan");
 }

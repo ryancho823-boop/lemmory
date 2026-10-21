@@ -2,13 +2,14 @@ import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
 import { TRIAL_DAYS, TIERS } from "@/lib/pricing";
+import { TOTAL_FORMULAS } from "@/lib/bank";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
 
 // What a visitor deciding what to buy needs: the plans and how Lemmory compares.
 const INTRO = {
   title: "Plans and pricing",
-  sub: `Pick the plan that matches how you teach. Every teacher plan starts with a free ${TRIAL_DAYS}-day free trial, and students in a paid class never pay.`,
+  sub: `Pick the plan that matches how you teach. Every plan starts with a ${TRIAL_DAYS}-day free trial, and students in a paid class never pay.`,
 };
 
 // "Yes", "No", or a short note. Keep claims about other tools conservative.
@@ -16,7 +17,7 @@ const COMPARE = {
   // Podsie: free, by the nonprofit Teaching Lab. Teachers make cards or have AI generate them.
   columns: ["Lemmory", "Podsie", "Anki", "Quizlet", "Studying alone"],
   rows: [
-    { label: "Competition formulas, ready to assign", cells: ["Yes, 187", "Make your own or AI-made", "Make your own", "Make your own", "No"] },
+    { label: "Competition formulas, ready to assign", cells: [`Yes, ${TOTAL_FORMULAS}`, "Make your own or AI-made", "Make your own", "Make your own", "No"] },
     { label: "Checks typed math in any equivalent form", cells: ["Yes", "No", "No", "No", "No"] },
     { label: "Practice picking the right formula for a problem", cells: ["Yes", "No", "No", "No", "No"] },
     { label: "Reviews spaced so formulas aren't forgotten", cells: ["Yes", "Yes", "Yes", "Partly", "No"] },

@@ -15,6 +15,8 @@ export const users = sqliteTable("users", {
   email: text("email").unique(),
   username: text("username").unique(),
   passwordHash: text("password_hash").notNull(),
+  /** Students on their own have no class time zone, so "today" uses their browser's (IANA name). */
+  timezone: text("timezone"),
   createdAt: createdAt(),
 });
 
@@ -175,3 +177,18 @@ export const trialClaims = sqliteTable(
   },
   (t) => [index("trial_claims_hash").on(t.kind, t.hash)],
 );
+
+/**
+ * Recent attempts at things worth slowing down: failed logins, wrong class codes, new accounts.
+ * `key` is a SHA-256 hash of what was tried (an account, an IP address or a browser), never the raw value.
+ */
+export const attempts = sqliteTable(
+  "attempts",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("attempts_key").on(t.key, t.createdAt)],
+);
+
