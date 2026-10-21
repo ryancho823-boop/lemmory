@@ -8,7 +8,8 @@
     "./content/notes": "./src/content/notes/index.ts"
   },
   "scripts": {
-    "check": "tsx scripts/check-content.ts"
+    "check": "tsx scripts/check-content.ts",
+    "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@cortex-js/compute-engine": "^0.151.0",

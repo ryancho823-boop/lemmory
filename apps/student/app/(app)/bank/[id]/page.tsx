@@ -8,6 +8,7 @@ import { FormulaDetail } from "@lemmory/ui/FormulaDetail";
 import { Panel, StageTag, pct, relDay } from "@lemmory/ui/ui";
 import { getUnlockedView } from "@/lib/session";
 import { DeckButton } from "../../DeckButtons";
+import { NOTES } from "@lemmory/core/content/notes";
 
 export async function generateMetadata({ params }: PageProps<"/bank/[id]">) {
   const f = FORMULA_BY_ID[(await params).id];
@@ -29,6 +30,7 @@ export default async function FormulaPage({ params }: PageProps<"/bank/[id]">) {
       </Link>
       <FormulaDetail
         f={f}
+        note={NOTES[f.id]}
         actions={<DeckButton formulaId={id} inDeck={!!card} source={card?.source} size="md" />}
         aside={
           card ? (

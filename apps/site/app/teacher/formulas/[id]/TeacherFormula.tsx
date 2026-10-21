@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
-import { FORMULA_BY_ID } from "@/lib/bank";
+import { FORMULA_BY_ID, NOTES } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { formulaAcrossClass } from "@/lib/analytics";
+import { formulaAcrossClass } from "@lemmory/core/analytics";
 import { isMastered } from "@lemmory/core/srs";
 import { Tex } from "@lemmory/ui/Tex";
-import { FormulaDetail } from "@/components/FormulaDetail";
+import { FormulaDetail } from "@lemmory/ui/FormulaDetail";
 import { Button, LevelTag, Meter, Panel, PanelHeader, Skeleton, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
 
 export function TeacherFormula({ id }: { id: string }) {
@@ -27,6 +27,7 @@ export function TeacherFormula({ id }: { id: string }) {
         {back}
         <FormulaDetail
           f={f}
+          note={NOTES[f.id]}
           actions={
             <Button onClick={() => assign(id)}>
               <Plus size={15} strokeWidth={3} /> Assign to week {state.currentWeek}

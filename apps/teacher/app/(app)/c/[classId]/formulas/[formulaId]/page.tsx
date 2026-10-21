@@ -9,6 +9,7 @@ import { Tex } from "@lemmory/ui/Tex";
 import { LevelTag, Meter, Panel, PanelHeader, StageSteps, StatStrip, TopicTag, pct } from "@lemmory/ui/ui";
 import { getClass } from "@/lib/session";
 import { AssignButton } from "../../AssignButton";
+import { NOTES } from "@lemmory/core/content/notes";
 
 export async function generateMetadata({ params }: PageProps<"/c/[classId]/formulas/[formulaId]">) {
   const f = FORMULA_BY_ID[(await params).formulaId];
@@ -34,6 +35,7 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
         {back}
         <FormulaDetail
           f={f}
+          note={NOTES[f.id]}
           actions={<AssignButton classId={classId} formulaId={formulaId} week={klass.currentWeek} />}
           aside={<Panel className="p-5 text-sm text-ink/60">Not assigned yet. Once it is, class analytics show up here.</Panel>}
         />

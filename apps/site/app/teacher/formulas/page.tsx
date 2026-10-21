@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { FORMULA_BY_ID } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { classFormulaHealth } from "@/lib/analytics";
+import { classFormulaHealth } from "@lemmory/core/analytics";
 import { Meter, PageHeader, Panel, Skeleton, TopicPill, pct } from "@lemmory/ui/ui";
 
 export default function FormulaAnalyticsIndex() {

@@ -1,5 +1,9 @@
 import type { Figure as FigureData, Pt } from "@lemmory/core/content/types";
 
+// Plain values (not CSS variables) so figures render the same outside the app's stylesheet.
+// INK and SHADE match --color-ink and --color-lemon-soft in theme.css.
+const INK = "#0f1121";
+const SHADE = "#fff7d1";
 const COLORS: Record<string, string> = { blue: "#2563eb", rose: "#e11d48" };
 
 /** Draws a formula or problem diagram. Points are labeled in italics like the math. */
@@ -15,10 +19,10 @@ export function Figure({ figure: f, className }: { figure: FigureData; className
       aria-label={`Diagram with points ${Object.keys(f.pts).filter((n) => !f.hide.includes(n)).join(", ")}`}
     >
       {f.shapes.map((s) => (
-        <polygon key={s} points={s.split("-").map((n) => p(n).join(",")).join(" ")} fill="#fff7d1" stroke="none" />
+        <polygon key={s} points={s.split("-").map((n) => p(n).join(",")).join(" ")} fill={SHADE} stroke="none" />
       ))}
       {f.circles.map((c, i) => (
-        <circle key={i} cx={c.c[0]} cy={c.c[1]} r={c.r} fill="none" stroke="#0f1121" strokeWidth={1.6} strokeDasharray={c.dashed ? "5 4" : undefined} />
+        <circle key={i} cx={c.c[0]} cy={c.c[1]} r={c.r} fill="none" stroke={INK} strokeWidth={1.6} strokeDasharray={c.dashed ? "5 4" : undefined} />
       ))}
       {f.lines.map((l) => {
         const [seg, style] = l.split(":");
@@ -30,7 +34,7 @@ export function Figure({ figure: f, className }: { figure: FigureData; className
             y1={p(a)[1]}
             x2={p(b)[0]}
             y2={p(b)[1]}
-            stroke={COLORS[style] ?? "#0f1121"}
+            stroke={COLORS[style] ?? INK}
             strokeWidth={style && style !== "dashed" ? 2.6 : 1.6}
             strokeDasharray={style === "dashed" ? "5 4" : undefined}
             strokeLinecap="round"
@@ -49,21 +53,21 @@ export function Figure({ figure: f, className }: { figure: FigureData; className
           [b[0] + u[0] + v[0], b[1] + u[1] + v[1]],
           [b[0] + v[0], b[1] + v[1]],
         ];
-        return <polyline key={r} points={pts.map((q) => q.join(",")).join(" ")} fill="none" stroke="#0f1121" strokeWidth={1.2} />;
+        return <polyline key={r} points={pts.map((q) => q.join(",")).join(" ")} fill="none" stroke={INK} strokeWidth={1.2} />;
       })}
-      {f.dots?.map((q, i) => <circle key={`dot${i}`} cx={q[0]} cy={q[1]} r={2} fill="#0f1121" fillOpacity={0.45} />)}
+      {f.dots?.map((q, i) => <circle key={`dot${i}`} cx={q[0]} cy={q[1]} r={2} fill={INK} fillOpacity={0.45} />)}
       {Object.entries(f.pts)
         .filter(([n]) => !f.hide.includes(n))
         .map(([n, q]) => (
           <g key={n}>
-            <circle cx={q[0]} cy={q[1]} r={3} fill="#0f1121" />
-            <text x={f.labels[n][0]} y={f.labels[n][1]} textAnchor="middle" dominantBaseline="central" fontSize={15} fontStyle="italic" fontFamily="KaTeX_Math, 'Times New Roman', serif" fill="#0f1121">
+            <circle cx={q[0]} cy={q[1]} r={3} fill={INK} />
+            <text x={f.labels[n][0]} y={f.labels[n][1]} textAnchor="middle" dominantBaseline="central" fontSize={15} fontStyle="italic" fontFamily="KaTeX_Math, 'Times New Roman', serif" fill={INK}>
               {n}
             </text>
           </g>
         ))}
       {f.texts.map((t, i) => (
-        <text key={i} x={t.at[0]} y={t.at[1]} textAnchor="middle" dominantBaseline="central" fontSize={13} fontFamily="KaTeX_Main, 'Times New Roman', serif" fill="#0f1121" fillOpacity={0.8}>
+        <text key={i} x={t.at[0]} y={t.at[1]} textAnchor="middle" dominantBaseline="central" fontSize={13} fontFamily="KaTeX_Main, 'Times New Roman', serif" fill={INK} fillOpacity={0.8}>
           {t.text}
         </text>
       ))}

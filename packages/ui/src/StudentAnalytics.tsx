@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
+import { type Formula, TOPIC_COLOR } from "@lemmory/core/content/types";
 import {
   type Student,
   byTopic,
@@ -17,14 +17,17 @@ export function StudentAnalytics({
   student,
   today,
   formulaHref,
+  formulaById,
 }: {
   student: Student;
   today: number;
   formulaHref: (id: string) => string;
+  /** The formulas this app has: the full bank, or the demo's slice. */
+  formulaById: Record<string, Formula>;
 }) {
   const m = summary(student, today);
   const log28 = recent(student.log, today, 28);
-  const topics = byTopic(log28).sort(
+  const topics = byTopic(log28, (id) => formulaById[id]?.topic).sort(
     (a, b) => (a.accuracy ?? 0) - (b.accuracy ?? 0),
   );
   const weak = weakest(student, today, 6);
@@ -66,7 +69,7 @@ export function StudentAnalytics({
               </li>
             )}
             {weak.map((w) => {
-              const f = FORMULA_BY_ID[w.formulaId];
+              const f = formulaById[w.formulaId];
               return (
                 <li key={w.formulaId}>
                   <Link
@@ -137,11 +140,11 @@ export function StudentAnalytics({
                 className="flex items-center gap-3 px-5 py-3 text-sm"
               >
                 <span className="font-semibold">
-                  {FORMULA_BY_ID[c.needed].name}
+                  {formulaById[c.needed].name}
                 </span>
                 <ArrowRight size={14} className="shrink-0 text-ink/30" />
                 <span className="text-ink/60">
-                  confused with {FORMULA_BY_ID[c.picked].name}
+                  confused with {formulaById[c.picked].name}
                 </span>
                 <span className="ml-auto shrink-0 text-xs font-bold text-ink/50">
                   {c.count}×

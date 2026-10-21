@@ -5,6 +5,7 @@ import { studentInfo } from "@lemmory/db/teacher";
 import { StudentAnalytics } from "@lemmory/ui/StudentAnalytics";
 import { getClass, requireTeacher } from "@/lib/session";
 import { ManageStudent } from "./ManageStudent";
+import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 
 export default async function StudentPage({ params }: PageProps<"/c/[classId]/students/[studentId]">) {
   const { classId, studentId } = await params;
@@ -25,7 +26,7 @@ export default async function StudentPage({ params }: PageProps<"/c/[classId]/st
           </p>
         </div>
       </div>
-      <StudentAnalytics student={s} today={today} formulaHref={(fid) => `/c/${classId}/formulas/${fid}`} />
+      <StudentAnalytics formulaById={FORMULA_BY_ID} student={s} today={today} formulaHref={(fid) => `/c/${classId}/formulas/${fid}`} />
       <ManageStudent classId={classId} studentId={studentId} name={s.name} />
     </div>
   );

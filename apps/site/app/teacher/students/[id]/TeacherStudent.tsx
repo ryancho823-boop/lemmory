@@ -4,8 +4,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
-import { StudentAnalytics } from "@/components/StudentAnalytics";
+import { StudentAnalytics } from "@lemmory/ui/StudentAnalytics";
 import { Skeleton } from "@lemmory/ui/ui";
+import { FORMULA_BY_ID } from "@/lib/bank";
 
 export function TeacherStudent({ id }: { id: string }) {
   const { ready, students, today } = useStore();
@@ -25,7 +26,7 @@ export function TeacherStudent({ id }: { id: string }) {
           </p>
         </div>
       </div>
-      <StudentAnalytics student={s} today={today} formulaHref={(fid) => `/teacher/formulas/${fid}`} />
+      <StudentAnalytics formulaById={FORMULA_BY_ID} student={s} today={today} formulaHref={(fid) => `/teacher/formulas/${fid}`} />
     </div>
   );
 }

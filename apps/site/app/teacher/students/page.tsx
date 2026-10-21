@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { TOPIC_COLOR } from "@/lib/bank";
+import { TOPIC_COLOR, topicOf } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { byTopic, recent, summary } from "@/lib/analytics";
+import { byTopic, recent, summary } from "@lemmory/core/analytics";
 import { PageHeader, Panel, Skeleton, cx, pct, relDay } from "@lemmory/ui/ui";
 
 export default function StudentsPage() {
@@ -13,7 +13,7 @@ export default function StudentsPage() {
   const rows = students
     .map((s) => {
       const m = summary(s, today);
-      const topics = byTopic(recent(s.log, today, 28)).filter((t) => t.n >= 3);
+      const topics = byTopic(recent(s.log, today, 28), topicOf).filter((t) => t.n >= 3);
       const weakTopic = topics.sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
       return { s, m, weakTopic };
     })

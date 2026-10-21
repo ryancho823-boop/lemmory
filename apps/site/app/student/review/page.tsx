@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
 import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { setupApply } from "@/lib/practice";
 import { useStore } from "@/lib/store";
-import { CARD_POINTS, streak, streakBonus } from "@/lib/analytics";
+import { CARD_POINTS, streak, streakBonus } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { Leaderboard } from "@/components/Leaderboard";
 import { RecallCard } from "@/components/review/RecallCard";

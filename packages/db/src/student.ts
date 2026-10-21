@@ -2,7 +2,6 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { type LeaderRow, leaderRows } from "@lemmory/core/analytics";
-import { contestLabel, dayInZone } from "@lemmory/core/days";
 import {
   type Outcome,
   type PickResult,
@@ -22,7 +21,7 @@ import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } fr
 import { isNew, newCard, review } from "@lemmory/core/srs";
 import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
-import { addAssignedCards, classToday, loadClass, loadRecords, settle } from "./records";
+import { addAssignedCards, classToday, loadClass, loadRecords, settle, studentToday } from "./records";
 import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
 
 export type Mode = "review" | "practice";
@@ -66,13 +65,6 @@ export async function classCovers(studentId: string) {
   return false;
 }
 
-/** Where "today" is for a student: their first class's time zone, or their own if they have no class. */
-async function zoneOf(studentId: string, mine: { timezone: string }[], q: Tx | typeof db = db) {
-  if (mine[0]) return mine[0].timezone;
-  const row = await q.select({ timezone: users.timezone }).from(users).where(eq(users.id, studentId)).get();
-  return row?.timezone ?? "UTC";
-}
-
 /** The student's classes, oldest first. */
 export async function studentClasses(studentId: string, q: Tx | typeof db = db) {
   return q
@@ -86,16 +78,17 @@ export async function studentClasses(studentId: string, q: Tx | typeof db = db) 
 /**
  * Everything the student app shows, with their classes settled through yesterday.
  * `selected` picks which class's leaderboard and contest to show (default: the first).
+ * The queue and "today" follow the student's own clock; the class's game and contest follow the class's.
  */
 export async function loadStudentView(user: { id: string; name: string; username: string | null }, selected?: string): Promise<StudentView> {
   const mine = await studentClasses(user.id);
   const current = mine.find((c) => c.id === selected) ?? mine[0];
   const view = current ? await loadClass(current.id) : null;
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
+  const today = await studentToday(user.id);
 
   if (!view) {
     // Not in a class: the individual plan (trial or paid) covers them.
-    const today = dayInZone(await zoneOf(user.id, mine));
     const record = (await loadRecords([user.id])).get(user.id)!;
     const session = await loadSession(user.id, today);
     return {
@@ -115,20 +108,20 @@ export async function loadStudentView(user: { id: string; name: string; username
     };
   }
 
-  const { klass, today, students } = view;
+  const { klass, students } = view;
   const teacher = await db.select({ name: users.name }).from(users).where(eq(users.id, klass.teacherId)).get();
   const me = students.find((s) => s.id === user.id)!;
   const session = await loadSession(user.id, today);
   const done = isDoneToday(me, today);
   return {
     me: user,
-    klass: { id: klass.id, name: klass.name, contest: contestLabel(klass.contestName, klass.contestDay, today), teacher: teacher?.name ?? "" },
+    klass: { id: klass.id, name: klass.name, contest: view.contest, teacher: teacher?.name ?? "" },
     classes: classList,
     today,
     record: { cards: me.cards, log: me.log, doneDays: me.doneDays, missed: me.missed },
     assigned: view.assignments.map((a) => a.formulaId),
-    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, today, user.id),
-    gameAge: today - klass.gameDay,
+    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, view.today, user.id),
+    gameAge: view.today - klass.gameDay,
     queue: done ? [] : buildQueue(me.cards, session, today),
     completedToday: session.completed.length,
     doneToday: done,
@@ -146,18 +139,14 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
   await q.insert(reviewSessions).values({ studentId, data }).onConflictDoUpdate({ target: reviewSessions.studentId, set: { data } });
 }
 
-/**
- * One student's state inside a transaction, settled through yesterday. A student has one
- * deck across all their classes; "today" follows their first class's time zone.
- */
+/** One student's state inside a transaction, settled through yesterday by their own clock. */
 async function context(q: Tx, studentId: string) {
   const mine = await studentClasses(studentId, q);
-  const today = dayInZone(await zoneOf(studentId, mine, q));
+  const today = await studentToday(studentId, q);
   const records = await loadRecords([studentId], q);
   await settle(
-    mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough })),
+    mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today })),
     records,
-    today,
     q,
   );
   const record = records.get(studentId)!;
@@ -292,7 +281,7 @@ async function issuedProblem(studentId: string, formulaId: string, problemId: st
   const problem = problemOf(f, problemId);
   if (!problem) throw new ReviewError("Unknown problem");
   if (mode === "review") {
-    const session = await loadSession(studentId, await todayFor(studentId));
+    const session = await loadSession(studentId, await studentToday(studentId));
     if (session.problems[formulaId] !== problemId) throw new ReviewError("That problem wasn't handed out today.");
   } else await assertPractice(studentId, formulaId);
   return problem;
@@ -336,10 +325,6 @@ export async function answerSolve(
   });
 }
 
-async function todayFor(studentId: string) {
-  return dayInZone(await zoneOf(studentId, await studentClasses(studentId)));
-}
-
 /** Mark today done when there's nothing left in the queue. */
 export async function finishIfEmpty(studentId: string) {
   await db.transaction(async (q) => {
@@ -351,7 +336,7 @@ export async function finishIfEmpty(studentId: string) {
 
 export async function addToDeck(studentId: string, formulaId: string) {
   formula(formulaId);
-  const today = await todayFor(studentId);
+  const today = await studentToday(studentId);
   const c = newCard(formulaId, "self", today);
   await db
     .insert(cards)

@@ -5,6 +5,7 @@ import { byTopic, recent, summary } from "@lemmory/core/analytics";
 import { PageHeader, Panel, cx, pct, relDay } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "../JoinCode";
+import { topicOf } from "@lemmory/core/formulas";
 
 export const metadata = { title: "Students · Lemmory for teachers" };
 
@@ -14,7 +15,7 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
   const rows = students
     .map((s) => {
       const m = summary(s, today);
-      const weakTopic = byTopic(recent(s.log, today, 28))
+      const weakTopic = byTopic(recent(s.log, today, 28), topicOf)
         .filter((t) => t.n >= 3)
         .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
       return { s, m, weakTopic };

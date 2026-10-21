@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Frame } from "@lemmory/ui/Shell";
 import { useStore } from "@/lib/store";
 import { YOU } from "@/lib/sim";
-import { streak } from "@/lib/analytics";
+import { streak } from "@lemmory/core/analytics";
 import { DEMO_MAX_DAYS } from "@/lib/demo";
 import { SIGNUP_URL } from "@/lib/links";
 import { cx } from "@lemmory/ui/ui";

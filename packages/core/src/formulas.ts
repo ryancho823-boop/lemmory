@@ -67,3 +67,4 @@ export const FORMULAS: Formula[] = ALL.map((f) => {
 });
 
 export const FORMULA_BY_ID: Record<string, Formula> = Object.fromEntries(FORMULAS.map((f) => [f.id, f]));
+export const topicOf = (id: string) => FORMULA_BY_ID[id]?.topic;

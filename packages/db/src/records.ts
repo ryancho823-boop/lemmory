@@ -15,6 +15,33 @@ type CardRow = typeof cards.$inferSelect;
 
 export const classToday = (c: Pick<ClassRow, "timezone">) => dayInZone(c.timezone);
 
+/**
+ * Each student's own clock: the time zone their browser reported (saved at sign-up and login),
+ * else their first class's, else UTC. A student has one deck across all their classes, so every
+ * page and every answer counts "today" by this one clock.
+ */
+export async function studentZones(studentIds: string[], q: Tx | typeof db = db): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!studentIds.length) return out;
+  const [own, joined] = await Promise.all([
+    q.select({ id: users.id, timezone: users.timezone }).from(users).where(inArray(users.id, studentIds)),
+    q
+      .select({ id: enrollments.studentId, timezone: classes.timezone })
+      .from(enrollments)
+      .innerJoin(classes, eq(classes.id, enrollments.classId))
+      .where(inArray(enrollments.studentId, studentIds))
+      .orderBy(enrollments.joinedDay, classes.createdAt),
+  ]);
+  for (const r of joined) if (!out.has(r.id)) out.set(r.id, r.timezone);
+  for (const r of own) if (r.timezone) out.set(r.id, r.timezone);
+  for (const id of studentIds) if (!out.has(id)) out.set(id, "UTC");
+  return out;
+}
+
+export async function studentToday(studentId: string, q: Tx | typeof db = db) {
+  return dayInZone((await studentZones([studentId], q)).get(studentId)!);
+}
+
 export function toCard(r: CardRow): Card {
   return { formulaId: r.formulaId, source: r.source, stage: r.stage, memory: r.memory, addedDay: r.addedDay };
 }
@@ -45,14 +72,14 @@ export async function loadRecords(studentIds: string[], q: Tx | typeof db = db):
   return out;
 }
 
-/** Record every finished past day for these students (before anything changes their cards). */
+/** Record every finished past day for these students (before anything changes their cards). `today` is each student's own. */
 export async function settle(
-  rows: { studentId: string; classId: string; settledThrough: number }[],
+  rows: { studentId: string; classId: string; settledThrough: number; today: number }[],
   records: Map<string, StudentRecord>,
-  today: number,
   q: Tx | typeof db = db,
 ) {
   for (const e of rows) {
+    const { today } = e;
     if (e.settledThrough >= today - 1) continue;
     const rec = records.get(e.studentId);
     if (!rec) continue;
@@ -95,8 +122,9 @@ export async function loadClass(classId: string): Promise<ClassView | null> {
       .from(assignments)
       .where(eq(assignments.classId, classId)),
   ]);
-  const records = await loadRecords(roster.map((r) => r.studentId));
-  await settle(roster, records, today);
+  const ids = roster.map((r) => r.studentId);
+  const [records, zones] = await Promise.all([loadRecords(ids), studentZones(ids)]);
+  await settle(roster.map((r) => ({ ...r, today: dayInZone(zones.get(r.studentId)!) })), records);
   return {
     klass,
     today,

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { type Competition, type Student, pointsBetween } from "./analytics";
+import { type Competition, type Student, pointsBetween } from "@lemmory/core/analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
 import { DEMO_MAX_DAYS } from "./demo";

@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { FORMULA_BY_ID } from "@/lib/bank";
+import { FORMULA_BY_ID, NOTES } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { accuracy } from "@/lib/analytics";
+import { accuracy } from "@lemmory/core/analytics";
 import { isMastered, isNew } from "@lemmory/core/srs";
-import { FormulaDetail } from "@/components/FormulaDetail";
+import { FormulaDetail } from "@lemmory/ui/FormulaDetail";
 import { DeckButton } from "@/components/DeckButton";
 import { Panel, StageTag, pct, relDay } from "@lemmory/ui/ui";
 
@@ -23,6 +23,7 @@ export function StudentFormula({ id }: { id: string }) {
       </Link>
       <FormulaDetail
         f={f}
+        note={NOTES[f.id]}
         actions={<DeckButton formulaId={id} size="md" />}
         aside={
           ready &&
