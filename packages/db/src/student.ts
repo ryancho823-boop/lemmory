@@ -21,7 +21,8 @@ import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } fr
 import { isNew, newCard, review } from "@lemmory/core/srs";
 import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
-import { addAssignedCards, classToday, loadClass, loadRecords, settle, studentToday } from "./records";
+import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, studentToday } from "./records";
+import { dayInZone } from "@lemmory/core/days";
 import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
 
 export type Mode = "review" | "practice";
@@ -54,15 +55,16 @@ export interface StudentView {
  * paid, or if any of their classes' teachers is. Otherwise everything but the plan page is locked.
  */
 export async function canStudentReview(studentId: string) {
-  const { state } = studentPlanState(await getStudentPlan(studentId));
-  return state === "trial" || state === "active" || (await classCovers(studentId));
+  const [plan, covered] = await Promise.all([getStudentPlan(studentId), classCovers(studentId)]);
+  const { state } = studentPlanState(plan);
+  return state === "trial" || state === "active" || covered;
 }
 
 /** Is any of the student's classes on a teacher's trial or paid plan? */
 export async function classCovers(studentId: string) {
   const mine = await studentClasses(studentId);
-  for (const teacherId of new Set(mine.map((c) => c.teacherId))) if (await teacherActive(teacherId)) return true;
-  return false;
+  const active = await Promise.all([...new Set(mine.map((c) => c.teacherId))].map((id) => teacherActive(id)));
+  return active.some(Boolean);
 }
 
 /** The student's classes, oldest first. */
@@ -128,8 +130,9 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
 /** One student's state inside a transaction, settled through yesterday by their own clock. */
 async function context(q: Tx, studentId: string) {
   const mine = await studentClasses(studentId, q);
-  const today = await studentToday(studentId, q);
-  const records = await loadRecords([studentId], null, q);
+  const own = await q.select({ timezone: users.timezone }).from(users).where(eq(users.id, studentId)).get();
+  const today = dayInZone(pickZone(own?.timezone, mine[0]?.timezone));
+  const records = await loadRecords([studentId], null, q, false);
   await settle(
     mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today })),
     records,
@@ -194,15 +197,22 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
     return { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
   }
   const { card: updated, promoted } = review(card, firstTry, today);
-  await q.insert(reviews).values({
-    studentId,
-    day: today,
-    formulaId,
-    stage: card.stage,
-    firstTry,
-    confusedWith: next.confusions[formulaId] ?? null,
-    extra: card.source === "self",
-  });
+  const inserted = await q
+    .insert(reviews)
+    .values({
+      studentId,
+      day: today,
+      formulaId,
+      stage: card.stage,
+      firstTry,
+      confusedWith: next.confusions[formulaId] ?? null,
+      extra: card.source === "self",
+    })
+    .onConflictDoNothing()
+    .returning({ id: reviews.id });
+  // Already finished today by another request sent at the same moment (a double click, a second
+  // tab): that one counts, this one changes nothing, so the card isn't scheduled or scored twice.
+  if (!inserted.length) return { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
   await q
     .update(cards)
     .set({ stage: updated.stage, memory: updated.memory })

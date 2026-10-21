@@ -1,4 +1,4 @@
-import { index, integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 import type { Memory, Stage } from "@lemmory/core/srs";
 import type { DaySession } from "@lemmory/core/session";
 
@@ -110,8 +110,14 @@ export const reviews = sqliteTable(
     /** A self-added card: extra practice, no class points. */
     extra: integer("extra", { mode: "boolean" }).notNull().default(false),
   },
-  // Covers the per-day points count (student, day, extra) as well as reading recent days.
-  (t) => [index("reviews_student_day").on(t.studentId, t.day, t.extra)],
+  (t) => [
+    // Covers the per-day points count (student, day, extra) as well as reading recent days.
+    index("reviews_student_day").on(t.studentId, t.day, t.extra),
+    // A card is finished once a day. Two answers sent at the same moment (a double click, two
+    // tabs) can both pass the "is it due" check, and this makes the second one a no-op instead of
+    // a duplicate row that would count its points twice.
+    uniqueIndex("reviews_one_per_card_day").on(t.studentId, t.day, t.formulaId),
+  ],
 );
 
 /** Each past day: did the student finish, and how many assigned cards were left. */

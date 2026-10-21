@@ -65,3 +65,18 @@ export async function deleteAccount(userId: string, password: string) {
   });
   return true;
 }
+
+/**
+ * Change a password: needs the current one, and signs the account out everywhere (the caller
+ * starts a fresh session for the device that asked). A lost or shared password stops working.
+ */
+export async function changePassword(userId: string, current: string, next: string) {
+  const user = await db.select({ hash: users.passwordHash }).from(users).where(eq(users.id, userId)).get();
+  if (!user || !(await verifyPassword(current, user.hash))) return false;
+  const passwordHash = await hashPassword(next);
+  await db.transaction(async (q) => {
+    await q.update(users).set({ passwordHash }).where(eq(users.id, userId));
+    await q.delete(sessions).where(eq(sessions.userId, userId));
+  });
+  return true;
+}

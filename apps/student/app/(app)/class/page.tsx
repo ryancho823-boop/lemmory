@@ -1,8 +1,9 @@
 import { PRICES, TRIAL_DAYS, getStudentPlan, studentPlanState } from "@lemmory/db/billing";
 import { classCovers } from "@lemmory/db/student";
+import { ChangePasswordForm } from "@lemmory/ui/ChangePasswordForm";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
 import { PageHeader, Panel } from "@lemmory/ui/ui";
-import { deleteMyAccount } from "../../actions";
+import { changeMyPassword, deleteMyAccount } from "../../actions";
 import { getView } from "@/lib/session";
 import { ClassList } from "./ClassList";
 import { JoinClassForm } from "./JoinClassForm";
@@ -50,6 +51,7 @@ export default async function ClassPage() {
       {inClass && <ClassList classes={v.classes} current={v.klass?.id ?? null} />}
       {covered ? joinPanel : planPanel}
       {covered ? planPanel : joinPanel}
+      <ChangePasswordForm action={changeMyPassword} />
       <ConfirmForm
         title="Delete your account"
         body="This deletes your account, your cards and all your progress, and takes you out of your classes. It can't be undone."

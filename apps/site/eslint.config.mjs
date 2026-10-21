@@ -14,7 +14,7 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
-            { group: ["@lemmory/core/formulas", "@lemmory/core/content/notes", "@lemmory/core/content/v2/*", "@lemmory/core/grading", "@lemmory/core/sim"], allowTypeImports: true, message: "Use the demo bank in lib/bank.ts. The full bank must not reach the public site." },
+            { group: ["@lemmory/core/formulas", "@lemmory/core/content/notes", "@lemmory/core/content/v2/*", "@lemmory/core/grading"], allowTypeImports: true, message: "Use the demo bank in lib/bank.ts. The full bank must not reach the public site." },
           ],
         },
       ],

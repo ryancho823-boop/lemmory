@@ -20,6 +20,9 @@ export const classToday = (c: Pick<ClassRow, "timezone">) => dayInZone(c.timezon
  * else their first class's, else UTC. A student has one deck across all their classes, so every
  * page and every answer counts "today" by this one clock.
  */
+/** The zone rule alone: the student's own saved zone, else their first class's, else UTC. */
+export const pickZone = (ownZone: string | null | undefined, firstClassZone: string | undefined) => ownZone || firstClassZone || "UTC";
+
 export async function studentZones(studentIds: string[], q: Tx | typeof db = db): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   if (!studentIds.length) return out;
@@ -32,9 +35,10 @@ export async function studentZones(studentIds: string[], q: Tx | typeof db = db)
       .where(inArray(enrollments.studentId, studentIds))
       .orderBy(enrollments.joinedDay, classes.createdAt),
   ]);
-  for (const r of joined) if (!out.has(r.id)) out.set(r.id, r.timezone);
-  for (const r of own) if (r.timezone) out.set(r.id, r.timezone);
-  for (const id of studentIds) if (!out.has(id)) out.set(id, "UTC");
+  const firstClass = new Map<string, string>();
+  for (const r of joined) if (!firstClass.has(r.id)) firstClass.set(r.id, r.timezone);
+  const ownZone = new Map(own.map((r) => [r.id, r.timezone]));
+  for (const id of studentIds) out.set(id, pickZone(ownZone.get(id), firstClass.get(id)));
   return out;
 }
 
@@ -61,7 +65,7 @@ function toEntry(r: ReviewRow): LogEntry {
  * per formula, one per day); the log grows with every answer, so it's only read as far back as
  * a page shows. Formulas no longer in the bank are skipped.
  */
-export async function loadRecords(studentIds: string[], logSince: number | null, q: Tx | typeof db = db): Promise<Map<string, StudentRecord>> {
+export async function loadRecords(studentIds: string[], logSince: number | null, q: Tx | typeof db = db, withPoints = true): Promise<Map<string, StudentRecord>> {
   const out = new Map<string, StudentRecord>(studentIds.map((id) => [id, { cards: {}, log: [], scored: {}, doneDays: [], missed: {} }]));
   if (!studentIds.length) return out;
   const [cardRows, reviewRows, scoredRows, dayRows] = await Promise.all([
@@ -71,11 +75,14 @@ export async function loadRecords(studentIds: string[], logSince: number | null,
       : q.select().from(reviews).where(and(inArray(reviews.studentId, studentIds), gte(reviews.day, logSince))).orderBy(reviews.id),
     // Points for all time, counted by the database: one row per student per day. Reviews of a
     // formula since removed from the bank still count, so points a student earned never disappear.
-    q
-      .select({ studentId: reviews.studentId, day: reviews.day, n: count() })
-      .from(reviews)
-      .where(and(inArray(reviews.studentId, studentIds), eq(reviews.extra, false)))
-      .groupBy(reviews.studentId, reviews.day),
+    // Answering a card doesn't need them, so that path skips the count.
+    withPoints
+      ? q
+          .select({ studentId: reviews.studentId, day: reviews.day, n: count() })
+          .from(reviews)
+          .where(and(inArray(reviews.studentId, studentIds), eq(reviews.extra, false)))
+          .groupBy(reviews.studentId, reviews.day)
+      : Promise.resolve([] as { studentId: string; day: number; n: number }[]),
     q.select().from(days).where(inArray(days.studentId, studentIds)),
   ]);
   for (const r of cardRows) if (FORMULA_BY_ID[r.formulaId]) out.get(r.studentId)!.cards[r.formulaId] = toCard(r);

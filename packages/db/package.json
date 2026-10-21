@@ -13,7 +13,8 @@
     "club:verify": "tsx scripts/verify-club.ts",
     "migrate:prod": "tsx --env-file=../../.env.turso scripts/migrate.ts",
     "club:verify:prod": "tsx --env-file=../../.env.turso scripts/verify-club.ts",
-    "reset:prod": "node --env-file=../../.env.turso scripts/reset-live.mjs --wipe"
+    "reset:prod": "node --env-file=../../.env.turso scripts/reset-live.mjs --wipe",
+    "test": "tsx --conditions=react-server --test test/*.test.ts"
   },
   "dependencies": {
     "@lemmory/core": "*",
