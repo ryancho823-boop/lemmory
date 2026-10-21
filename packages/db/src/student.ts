@@ -16,7 +16,7 @@ import {
   recallPrompt,
   wrongPicks,
 } from "@lemmory/core/grading";
-import type { StudentRecord } from "@lemmory/core/records";
+import { LOG_DAYS, type StudentRecord } from "@lemmory/core/records";
 import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } from "@lemmory/core/session";
 import { isNew, newCard, review } from "@lemmory/core/srs";
 import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
@@ -83,50 +83,36 @@ export async function studentClasses(studentId: string, q: Tx | typeof db = db) 
 export async function loadStudentView(user: { id: string; name: string; username: string | null }, selected?: string): Promise<StudentView> {
   const mine = await studentClasses(user.id);
   const current = mine.find((c) => c.id === selected) ?? mine[0];
-  const view = current ? await loadClass(current.id) : null;
+  // Classmates appear only on the leaderboard, so their review logs aren't loaded.
+  const view = current ? await loadClass(current.id, false) : null;
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
   const today = await studentToday(user.id);
-
-  if (!view) {
-    // Not in a class: the individual plan (trial or paid) covers them.
-    const record = (await loadRecords([user.id])).get(user.id)!;
-    const session = await loadSession(user.id, today);
-    return {
-      me: user,
-      klass: null,
-      classes: classList,
-      today,
-      record,
-      assigned: [],
-      leaderboard: [],
-      gameAge: 0,
-      queue: isDoneToday(record, today) ? [] : buildQueue(record.cards, session, today),
-      completedToday: session.completed.length,
-      doneToday: isDoneToday(record, today),
-      canReview: await canStudentReview(user.id),
-      nothingDue: nothingDue(record, today),
-    };
-  }
-
-  const { klass, students } = view;
-  const teacher = await db.select({ name: users.name }).from(users).where(eq(users.id, klass.teacherId)).get();
-  const me = students.find((s) => s.id === user.id)!;
+  // Loaded after the class, which settled this student's past days.
+  const record = (await loadRecords([user.id], today - LOG_DAYS)).get(user.id)!;
   const session = await loadSession(user.id, today);
-  const done = isDoneToday(me, today);
-  return {
+  const done = isDoneToday(record, today);
+  const base = {
     me: user,
-    klass: { id: klass.id, name: klass.name, contest: view.contest, teacher: teacher?.name ?? "" },
     classes: classList,
     today,
-    record: { cards: me.cards, log: me.log, doneDays: me.doneDays, missed: me.missed },
-    assigned: view.assignments.map((a) => a.formulaId),
-    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, view.today, user.id),
-    gameAge: view.today - klass.gameDay,
-    queue: done ? [] : buildQueue(me.cards, session, today),
+    record,
+    queue: done ? [] : buildQueue(record.cards, session, today),
     completedToday: session.completed.length,
     doneToday: done,
     canReview: await canStudentReview(user.id),
-    nothingDue: nothingDue(me, today),
+    nothingDue: nothingDue(record, today),
+  };
+  // Not in a class: the individual plan (trial or paid) covers them.
+  if (!view) return { ...base, klass: null, assigned: [], leaderboard: [], gameAge: 0 };
+
+  const { klass, students } = view;
+  const teacher = await db.select({ name: users.name }).from(users).where(eq(users.id, klass.teacherId)).get();
+  return {
+    ...base,
+    klass: { id: klass.id, name: klass.name, contest: view.contest, teacher: teacher?.name ?? "" },
+    assigned: view.assignments.map((a) => a.formulaId),
+    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, view.today, user.id),
+    gameAge: view.today - klass.gameDay,
   };
 }
 
@@ -143,7 +129,7 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
 async function context(q: Tx, studentId: string) {
   const mine = await studentClasses(studentId, q);
   const today = await studentToday(studentId, q);
-  const records = await loadRecords([studentId], q);
+  const records = await loadRecords([studentId], null, q);
   await settle(
     mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today })),
     records,

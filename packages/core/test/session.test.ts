@@ -10,7 +10,7 @@ const reviewed = (id: string, due: number, source: Card["source"] = "teacher"): 
   return { ...c, memory: { ...c.memory, last: DAY - 5, due } };
 };
 const deck = (...cards: Card[]) => Object.fromEntries(cards.map((c) => [c.formulaId, c]));
-const record = (cards: Record<string, Card>, extra: Partial<StudentRecord> = {}): StudentRecord => ({ cards, log: [], doneDays: [], missed: {}, ...extra });
+const record = (cards: Record<string, Card>, extra: Partial<StudentRecord> = {}): StudentRecord => ({ cards, log: [], scored: {}, doneDays: [], missed: {}, ...extra });
 
 test("due reviews come oldest first; cards not yet due wait", () => {
   const q = buildQueue(deck(reviewed("a", DAY), reviewed("b", DAY - 3), reviewed("c", DAY + 1)), emptySession(DAY), DAY);

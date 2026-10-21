@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { type Competition, type Student, pointsBetween } from "@lemmory/core/analytics";
+import { type Competition, type Student, pointsBetween, scoredByDay } from "@lemmory/core/analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
 import { DEMO_MAX_DAYS } from "./demo";
@@ -156,6 +156,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       isYou: true,
       cards: state.cards,
       log: state.log,
+      scored: scoredByDay(state.log),
       doneDays: nothingDue && !state.doneDays.includes(today) ? [...state.doneDays, today] : state.doneDays,
       missed: state.missed,
     }),

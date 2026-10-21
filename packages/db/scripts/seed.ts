@@ -97,12 +97,16 @@ async function main() {
   for (const id of ["you", "priya", "kevin"]) {
     const studentId = `student-${id}`;
     await db.insert(t.enrollments).values({ studentId, classId: clubId, joinedDay: today, settledThrough: today - 1 });
-    await db.insert(t.cards).values(
-      clubFormulas.map((formulaId) => {
-        const c = newCard(formulaId, "teacher", today);
-        return { studentId, formulaId, source: c.source, stage: c.stage, memory: c.memory, addedDay: today };
-      }),
-    );
+    // A formula already in their deck from the first class keeps its card (one deck per student).
+    await db
+      .insert(t.cards)
+      .values(
+        clubFormulas.map((formulaId) => {
+          const c = newCard(formulaId, "teacher", today);
+          return { studentId, formulaId, source: c.source, stage: c.stage, memory: c.memory, addedDay: today };
+        }),
+      )
+      .onConflictDoNothing();
   }
 
   console.log(`Seeded "Long-Term AMC 10 Course" (${timezone}) with ${CLASSMATES.length + 1} students.`);

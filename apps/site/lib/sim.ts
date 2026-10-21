@@ -5,6 +5,7 @@
 
 import { FORMULA_BY_ID, FORMULAS, type Level } from "./bank";
 import { type Card, isNew, newCard, retrievability, review } from "@lemmory/core/srs";
+import { scoredByDay } from "@lemmory/core/points";
 
 export const NEW_PER_DAY = 6;
 
@@ -37,6 +38,8 @@ export interface Profile {
 export interface StudentRecord {
   cards: Record<string, Card>;
   log: LogEntry[];
+  /** Cards that earn points, finished each day (see @lemmory/core/records). */
+  scored: Record<number, number>;
   doneDays: number[];
   /** Assigned cards left undone on each past day (0 when the review was finished). */
   missed: Record<number, number>;
@@ -168,5 +171,5 @@ export function simulate(
       cards[card.formulaId] = review(card, ok, day).card;
     }
   }
-  return { cards, log, doneDays, missed };
+  return { cards, log, scored: scoredByDay(log), doneDays, missed };
 }

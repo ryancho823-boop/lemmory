@@ -43,6 +43,13 @@
       "when": 1792555929688,
       "tag": "0005_student_timezone",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792562424051,
+      "tag": "0006_foreign_keys",
+      "breakpoints": true
     }
   ]
 }

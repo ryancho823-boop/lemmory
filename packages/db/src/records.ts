@@ -1,9 +1,9 @@
 // Loading students' review history and keeping their day-by-day record up to date.
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, count, eq, gte, inArray } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import type { Student } from "@lemmory/core/analytics";
-import type { LogEntry, StudentRecord } from "@lemmory/core/records";
+import { LOG_DAYS, type LogEntry, type StudentRecord } from "@lemmory/core/records";
 import { applyDays, settleDays } from "@lemmory/core/session";
 import { type Card, newCard } from "@lemmory/core/srs";
 import { contestLabel, dayInZone } from "@lemmory/core/days";
@@ -46,23 +46,41 @@ export function toCard(r: CardRow): Card {
   return { formulaId: r.formulaId, source: r.source, stage: r.stage, memory: r.memory, addedDay: r.addedDay };
 }
 
-/** Cards, review log and day history for each student. Formulas no longer in the bank are skipped. */
-export async function loadRecords(studentIds: string[], q: Tx | typeof db = db): Promise<Map<string, StudentRecord>> {
-  const out = new Map<string, StudentRecord>(studentIds.map((id) => [id, { cards: {}, log: [], doneDays: [], missed: {} }]));
+type ReviewRow = typeof reviews.$inferSelect;
+
+function toEntry(r: ReviewRow): LogEntry {
+  const e: LogEntry = { day: r.day, formulaId: r.formulaId, stage: r.stage, firstTry: r.firstTry };
+  if (r.confusedWith?.length) e.confusedWith = r.confusedWith.filter((id) => FORMULA_BY_ID[id]);
+  if (r.extra) e.extra = true;
+  return e;
+}
+
+/**
+ * Cards, day history and points for each student, plus the review log from `logSince` on
+ * (null: no log, for pages that only need points and streaks). Cards and days grow slowly (one
+ * per formula, one per day); the log grows with every answer, so it's only read as far back as
+ * a page shows. Formulas no longer in the bank are skipped.
+ */
+export async function loadRecords(studentIds: string[], logSince: number | null, q: Tx | typeof db = db): Promise<Map<string, StudentRecord>> {
+  const out = new Map<string, StudentRecord>(studentIds.map((id) => [id, { cards: {}, log: [], scored: {}, doneDays: [], missed: {} }]));
   if (!studentIds.length) return out;
-  const [cardRows, reviewRows, dayRows] = await Promise.all([
+  const [cardRows, reviewRows, scoredRows, dayRows] = await Promise.all([
     q.select().from(cards).where(inArray(cards.studentId, studentIds)),
-    q.select().from(reviews).where(inArray(reviews.studentId, studentIds)).orderBy(reviews.id),
+    logSince === null
+      ? Promise.resolve([] as ReviewRow[])
+      : q.select().from(reviews).where(and(inArray(reviews.studentId, studentIds), gte(reviews.day, logSince))).orderBy(reviews.id),
+    // Points for all time, counted by the database: one row per student per day. Reviews of a
+    // formula since removed from the bank still count, so points a student earned never disappear.
+    q
+      .select({ studentId: reviews.studentId, day: reviews.day, n: count() })
+      .from(reviews)
+      .where(and(inArray(reviews.studentId, studentIds), eq(reviews.extra, false)))
+      .groupBy(reviews.studentId, reviews.day),
     q.select().from(days).where(inArray(days.studentId, studentIds)),
   ]);
   for (const r of cardRows) if (FORMULA_BY_ID[r.formulaId]) out.get(r.studentId)!.cards[r.formulaId] = toCard(r);
-  for (const r of reviewRows) {
-    if (!FORMULA_BY_ID[r.formulaId]) continue;
-    const e: LogEntry = { day: r.day, formulaId: r.formulaId, stage: r.stage, firstTry: r.firstTry };
-    if (r.confusedWith?.length) e.confusedWith = r.confusedWith.filter((id) => FORMULA_BY_ID[id]);
-    if (r.extra) e.extra = true;
-    out.get(r.studentId)!.log.push(e);
-  }
+  for (const r of reviewRows) if (FORMULA_BY_ID[r.formulaId]) out.get(r.studentId)!.log.push(toEntry(r));
+  for (const r of scoredRows) out.get(r.studentId)!.scored[r.day] = r.n;
   for (const r of dayRows) {
     const rec = out.get(r.studentId)!;
     if (r.done) rec.doneDays.push(r.day);
@@ -105,8 +123,18 @@ export interface ClassView {
   students: Student[];
 }
 
-/** Everything about one class, with every student's record settled through yesterday. */
-export async function loadClass(classId: string): Promise<ClassView | null> {
+/** Every review a student has done of one formula (for that formula's page). */
+export async function formulaLog(studentId: string, formulaId: string) {
+  const rows = await db.select().from(reviews).where(and(eq(reviews.studentId, studentId), eq(reviews.formulaId, formulaId))).orderBy(reviews.id);
+  return rows.map(toEntry);
+}
+
+/**
+ * Everything about one class, with every student's record settled through yesterday.
+ * Logs cover the last LOG_DAYS days; `withLogs: false` skips them (a student's page shows
+ * classmates only on the leaderboard, which needs points and streaks, not their reviews).
+ */
+export async function loadClass(classId: string, withLogs = true): Promise<ClassView | null> {
   const klass = await db.select().from(classes).where(eq(classes.id, classId)).get();
   if (!klass) return null;
   const today = classToday(klass);
@@ -123,8 +151,9 @@ export async function loadClass(classId: string): Promise<ClassView | null> {
       .where(eq(assignments.classId, classId)),
   ]);
   const ids = roster.map((r) => r.studentId);
-  const [records, zones] = await Promise.all([loadRecords(ids), studentZones(ids)]);
-  await settle(roster.map((r) => ({ ...r, today: dayInZone(zones.get(r.studentId)!) })), records);
+  const [records, zones] = await Promise.all([loadRecords(ids, withLogs ? today - LOG_DAYS : null), studentZones(ids)]);
+  // One transaction, so two pages loading at once can't interleave their writes.
+  await db.transaction((q) => settle(roster.map((r) => ({ ...r, today: dayInZone(zones.get(r.studentId)!) })), records, q));
   return {
     klass,
     today,

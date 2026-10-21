@@ -4,6 +4,7 @@
 
 import { FORMULA_BY_ID, FORMULAS, type Level } from "./formulas";
 import { type Card, isNew, newCard, retrievability, review } from "./srs";
+import { scoredByDay } from "./points";
 import { type Assignment, type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
 
 export interface Profile {
@@ -128,5 +129,5 @@ export function simulate(
       cards[card.formulaId] = review(card, ok, day).card;
     }
   }
-  return { cards, log, doneDays, missed };
+  return { cards, log, scored: scoredByDay(log), doneDays, missed };
 }
