@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
+import { changePassword, checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
 import { isTimeZone } from "@lemmory/core/days";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
@@ -27,7 +27,7 @@ import {
 
 // Server actions are public endpoints: every one checks the session and its arguments.
 
-export type FormState = { error?: string; values?: Record<string, string> } | undefined;
+export type FormState = { error?: string; ok?: string; values?: Record<string, string> } | undefined;
 
 async function me() {
   const user = await currentUser("student");
@@ -161,6 +161,22 @@ export async function buyStudentPlan(_: FormState, fd: FormData): Promise<FormSt
   await checkoutStudent(await me(), values.billingName, values.billingEmail);
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+/** Change the signed-in user's password (the current one is needed); other devices are signed out. */
+export async function changeMyPassword(_: FormState, fd: FormData): Promise<FormState> {
+  const user = await currentUser("student");
+  if (!user) redirect("/login");
+  const key = `student:${user.username}`;
+  if (await isLimited("loginAccount", key)) return { error: LIMIT_MESSAGE.loginAccount };
+  const next = String(fd.get("next") ?? "");
+  if (next.length < PASSWORD_MIN || next.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
+  if (!(await changePassword(user.id, String(fd.get("current") ?? ""), next))) {
+    await noteAttempt("loginAccount", key);
+    return { error: "Your current password isn't right." };
+  }
+  await startSession(user.id, "student");
+  return { ok: "Password changed." };
 }
 
 /** Delete the student's account and everything in it, after checking their password. */

@@ -3,8 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import { FORMULAS } from "@lemmory/core/formulas";
 import { PRICES, TRIAL_DAYS, getPlan, monthlyCost, planState } from "@lemmory/db/billing";
 import { TopBar } from "@lemmory/ui/Shell";
+import { ChangePasswordForm } from "@lemmory/ui/ChangePasswordForm";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
-import { deleteMyAccount } from "../../actions";
+import { changeMyPassword, deleteMyAccount } from "../../actions";
 import { uniqueStudents } from "@lemmory/db/teacher";
 import { getClasses, requireTeacher } from "@/lib/session";
 import { LogoutButton } from "../LogoutButton";
@@ -61,7 +62,8 @@ export default async function PlanPage() {
           state={state}
           students={students}
         />
-        <div className="mt-12 max-w-2xl">
+        <div className="mt-12 max-w-2xl space-y-6">
+          <ChangePasswordForm action={changeMyPassword} />
           <ConfirmForm
             title="Delete your account"
             body="This deletes your account and your classes, with their rosters and assignments. Your students keep their own accounts and cards. It can't be undone."

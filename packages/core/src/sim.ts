@@ -2,10 +2,16 @@
 // Each one runs the real FSRS scheduler day by day; whether they answer correctly is
 // drawn from a seeded model (their skill x the formula's difficulty x FSRS's predicted recall).
 
-import { FORMULA_BY_ID, FORMULAS, type Level } from "./formulas";
+import type { Formula, Level } from "./content/types";
 import { type Card, isNew, newCard, retrievability, review } from "./srs";
 import { scoredByDay } from "./points";
 import { type Assignment, type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
+
+/** The formulas a simulation draws from: the full bank (seed script) or the demo's slice. */
+export interface Bank {
+  formulas: Formula[];
+  byId: Record<string, Formula>;
+}
 
 export interface Profile {
   id: string;
@@ -65,15 +71,15 @@ function rng(seed: number) {
 const clamp = (x: number, lo = 0.03, hi = 0.98) => Math.min(hi, Math.max(lo, x));
 
 const LEVEL_DIFFICULTY: Record<Level, number> = { "AMC 8": 0.02, "AMC 10": 0.1, "AMC 12": 0.18, AIME: 0.28, Calculus: 0.15 };
-export function difficulty(formulaId: string) {
-  const f = FORMULA_BY_ID[formulaId];
+export function difficulty(bank: Bank, formulaId: string) {
+  const f = bank.byId[formulaId];
   return LEVEL_DIFFICULTY[f.level] + ((hash(formulaId) % 100) / 100 - 0.5) * 0.14;
 }
 
 /** A plausible wrong pick: a look-alike formula. */
-function confusion(formulaId: string, r: () => number) {
-  const f = FORMULA_BY_ID[formulaId];
-  const pool = f.related.length ? f.related : FORMULAS.filter((x) => x.topic === f.topic && x.id !== f.id).map((x) => x.id);
+function confusion(bank: Bank, formulaId: string, r: () => number) {
+  const f = bank.byId[formulaId];
+  const pool = f.related.length ? f.related : bank.formulas.filter((x) => x.topic === f.topic && x.id !== f.id).map((x) => x.id);
   return pool[Math.floor(r() * pool.length)];
 }
 
@@ -85,6 +91,7 @@ export function simulate(
   profile: Profile,
   assignments: Assignment[],
   until: number,
+  bank: Bank,
   opts: { forceDays?: Set<number>; skipDays?: Set<number> } = {},
 ): StudentRecord {
   const r = rng(hash(profile.id));
@@ -116,7 +123,7 @@ export function simulate(
     const reviews = due.filter((c) => !isNew(c));
     const fresh = due.filter(isNew).slice(0, NEW_PER_DAY);
     for (const card of [...reviews, ...fresh]) {
-      const d = difficulty(card.formulaId);
+      const d = difficulty(bank, card.formulaId);
       const R = retrievability(card, day);
       let p: number;
       if (R === null) p = clamp(0.62 + 0.3 * profile.skill - d); // first time: learned in class
@@ -124,7 +131,7 @@ export function simulate(
       else p = clamp(R * (0.78 + 0.2 * profile.skill) - d * 0.9);
       const ok = r() < p;
       const entry: LogEntry = { day, formulaId: card.formulaId, stage: card.stage, firstTry: ok };
-      if (!ok && card.stage === "apply") entry.confusedWith = [confusion(card.formulaId, r)];
+      if (!ok && card.stage === "apply") entry.confusedWith = [confusion(bank, card.formulaId, r)];
       log.push(entry);
       cards[card.formulaId] = review(card, ok, day).card;
     }

@@ -22,7 +22,7 @@ Where to change common things:
 
 | To change | Edit |
 | --- | --- |
-| Prices or the pilot length | `packages/core/src/plans.ts` (the pricing page and billing both read it) |
+| Prices or the trial length | `packages/core/src/plans.ts` (the pricing page and billing both read it) |
 | The student and teacher site addresses | `packages/core/src/urls.ts` |
 | Colors and fonts | `packages/ui/src/theme.css` (all three sites) |
 | The main site's accent colors | `apps/site/lib/accents.ts` |
@@ -95,12 +95,12 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 
 | Plan | Price | Notes |
 | --- | --- | --- |
-| Free pilot | $0 for 14 days | Once per teacher; it can't be restarted |
+| Free trial | $0 for 14 days | Once per teacher; it can't be restarted |
 | Academy | $3 per student per month | A student in two of the teacher's classes counts once |
-| School math club | $3 per student, never over $20 a month per class | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the pilot |
+| School math club | $3 per student, never over $20 a month per class | Needs a school email; the cap applies once the club is confirmed (`npm run club:verify`). Until then it runs on the trial |
 | Individual student | $2 per month | For students not in a class |
 
-When a pilot ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.
+When a trial ends unpaid, the teacher is sent to the plan page and their students can't start reviews until a plan is picked. Nothing is lost. **Checkout is simulated:** no payment provider is connected, so nothing is charged.
 
 ## Deploying
 
@@ -110,7 +110,7 @@ See [DEPLOY.md](DEPLOY.md). Each site has a `/health` page (student and teacher)
 
 - Real payments in place of the simulated checkout
 - An admin page for approving school clubs (it's a command for now)
-- Rate limiting on login and sign-up; teacher password reset by email
+- Teacher password reset by email (a signed-in teacher can change their password; students can ask their teacher to reset theirs)
 - Academy accounts with several teachers
 - Teacher-made formulas and problems
 - A weekly email to teachers and a daily reminder to students

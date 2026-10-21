@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { Search } from "lucide-react";
+import { Lock, Search } from "lucide-react";
 import { LEVELS, LEVEL_LABEL, TOPICS, TOPIC_COLOR, type Level, type Topic } from "@lemmory/core/content/types";
 import type { BankEntry } from "@lemmory/core/bank";
 import { Tex } from "./Tex";
 import { LevelTag, Segmented, cx } from "./ui";
 import { type Scope, useBankFilters } from "./useBankFilters";
 
+/** A formula shown by name only, greyed out (the public demo's "in the full version" rows). */
+export type LockedEntry = Pick<BankEntry, "id" | "name" | "topic" | "level" | "tier">;
 
 interface Props {
   /** The bank, easiest first (from `bankEntries()` on the server). */
@@ -22,10 +24,14 @@ interface Props {
   assigned: string[];
   /** Formula ids in the student's deck. */
   deck?: string[];
+  /** Names-only rows for formulas that aren't included; shown when browsing everything. */
+  locked?: LockedEntry[];
+  /** A note above the filters (the demo's "3 of 187 formulas" link). */
+  banner?: React.ReactNode;
 }
 
 /** Topic sidebar + compact rows grouped by topic. Shared by the student bank and the teacher's assign page. */
-export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta, assigned: assignedIds, deck = [] }: Props) {
+export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta, assigned: assignedIds, deck = [], locked: LOCKED = [], banner }: Props) {
   const { q, setQ, topic, setTopic, level, setLevel, scope, setScope } = useBankFilters();
   const assigned = useMemo(() => new Set(assignedIds), [assignedIds]);
   const inDeck = useMemo(() => new Set(deck), [deck]);
@@ -41,7 +47,13 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
     (level === "All" || LEVELS.indexOf(f.level) <= LEVELS.indexOf(level)) &&
     (!needle || `${f.name} ${f.whenToUse} ${f.topic}`.toLowerCase().includes(needle));
   const visible = FORMULAS.filter((f) => matches(f) && (topic === "All" || f.topic === topic));
-  const groups = TOPICS.map((t) => ({ topic: t, items: visible.filter((f) => f.topic === t) })).filter((g) => g.items.length);
+  const lockedMatches = (f: LockedEntry) =>
+    scope === "all" &&
+    (level === "All" || LEVELS.indexOf(f.level) <= LEVELS.indexOf(level)) &&
+    (!needle || `${f.name} ${f.topic}`.toLowerCase().includes(needle));
+  const lockedVisible = LOCKED.filter((f) => lockedMatches(f) && (topic === "All" || f.topic === topic));
+  const count = (t?: Topic) => FORMULAS.filter((f) => matches(f) && (!t || f.topic === t)).length + LOCKED.filter((f) => lockedMatches(f) && (!t || f.topic === t)).length;
+  const groups = TOPICS.map((t) => ({ topic: t, items: visible.filter((f) => f.topic === t), locked: lockedVisible.filter((f) => f.topic === t) })).filter((g) => g.items.length || g.locked.length);
 
   const scopes =
     role === "student"
@@ -61,11 +73,11 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
       {/* Topic sidebar */}
       <aside className="lg:sticky lg:top-8 lg:self-start">
         <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1 lg:mx-0 lg:flex-col lg:overflow-visible">
-          <TopicLink active={topic === "All"} onClick={() => setTopic("All")} count={FORMULAS.filter(matches).length}>
+          <TopicLink active={topic === "All"} onClick={() => setTopic("All")} count={count()}>
             All topics
           </TopicLink>
           {TOPICS.map((t) => (
-            <TopicLink key={t} active={topic === t} onClick={() => setTopic(t)} color={TOPIC_COLOR[t]} count={FORMULAS.filter((f) => f.topic === t && matches(f)).length}>
+            <TopicLink key={t} active={topic === t} onClick={() => setTopic(t)} color={TOPIC_COLOR[t]} count={count(t)}>
               {t}
             </TopicLink>
           ))}
@@ -86,6 +98,7 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
       </aside>
 
       <div className="min-w-0">
+        {banner}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Segmented value={scope} onChange={setScope} options={scopes} />
           <label className="relative sm:ml-auto sm:w-64">
@@ -106,7 +119,7 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
             <h2 className="mb-2 flex items-center gap-2 text-sm font-bold">
               <span className="size-2.5 rounded-full" style={{ background: TOPIC_COLOR[g.topic] }} />
               {g.topic}
-              <span className="font-medium text-ink/40">{g.items.length}</span>
+              <span className="font-medium text-ink/40">{g.items.length + g.locked.length}</span>
             </h2>
             <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
               {g.items.map((f) => (
@@ -123,6 +136,18 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
                     </span>
                   </Link>
                   {action && <div className="shrink-0">{action(f)}</div>}
+                </li>
+              ))}
+              {g.locked.map((f) => (
+                <li key={f.id} className="flex items-center gap-4 bg-canvas/40 px-4 py-3" title="In the full version">
+                  <span className="flex min-w-0 flex-1 items-center gap-2 text-ink/40">
+                    <span className="truncate font-semibold">{f.name}</span>
+                    <LevelTag level={f.level} />
+                    <DifficultyMeter tier={f.tier} />
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-ink/35">
+                    <Lock size={13} /> Full version
+                  </span>
                 </li>
               ))}
             </ul>

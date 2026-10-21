@@ -6,7 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { FORMULAS } from "@lemmory/core/formulas";
 import { NOTES } from "@lemmory/core/content/notes";
-import { rankDifficulty } from "../lib/difficulty";
+import { rankDifficulty } from "@lemmory/core/difficulty";
 import { DEMO_IDS, DEMO_PROBLEMS_PER_FORMULA, type DemoBank } from "../lib/demo";
 
 const inDemo = new Set(DEMO_IDS);

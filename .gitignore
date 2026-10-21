@@ -25,5 +25,6 @@ apps/site/lib/generated/
 .DS_Store
 *.pem
 npm-debug.log*
+*.log
 .vercel
 .netlify

@@ -9,6 +9,7 @@
 //   Class join codes: AMCTEN (AMC 10 course), LINCLN (math club)
 
 import { dayInZone } from "@lemmory/core/days";
+import { FORMULAS, FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { CLASSMATES, YOU, seedAssignments, simulate } from "@lemmory/core/sim";
 import { newCard } from "@lemmory/core/srs";
 import { DATABASE_URL, db } from "../src/client";
@@ -68,7 +69,7 @@ async function main() {
 
     // Alex gets a 9-day streak going into today, like the demo.
     const forceDays = p === YOU ? new Set(Array.from({ length: 9 }, (_, i) => today - 1 - i)) : undefined;
-    const rec = simulate(p, assigned, today - 1, { forceDays });
+    const rec = simulate(p, assigned, today - 1, { formulas: FORMULAS, byId: FORMULA_BY_ID }, { forceDays });
     await db.insert(t.cards).values(
       Object.values(rec.cards).map((c) => ({ studentId, formulaId: c.formulaId, source: c.source, stage: c.stage, memory: c.memory, addedDay: c.addedDay })),
     );

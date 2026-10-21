@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { checkLogin, createTeacher, deleteAccount } from "@lemmory/db/accounts";
+import { changePassword, checkLogin, createTeacher, deleteAccount } from "@lemmory/db/accounts";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
@@ -80,6 +80,22 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   await noteAttempt("signup", ip, device);
   await startSession(id, "teacher");
   redirect("/plan");
+}
+
+/** Change the signed-in user's password (the current one is needed); other devices are signed out. */
+export async function changeMyPassword(_: FormState, fd: FormData): Promise<FormState> {
+  const user = await currentUser("teacher");
+  if (!user) redirect("/login");
+  const key = `teacher:${user.email}`;
+  if (await isLimited("loginAccount", key)) return { error: LIMIT_MESSAGE.loginAccount };
+  const next = String(fd.get("next") ?? "");
+  if (next.length < PASSWORD_MIN || next.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
+  if (!(await changePassword(user.id, String(fd.get("current") ?? ""), next))) {
+    await noteAttempt("loginAccount", key);
+    return { error: "Your current password isn't right." };
+  }
+  await startSession(user.id, "teacher");
+  return { ok: "Password changed." };
 }
 
 /** Delete the teacher's account and their classes, after checking their password. */
