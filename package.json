@@ -20,6 +20,7 @@
     "db:generate": "npm run generate -w @lemmory/db",
     "db:migrate": "npm run migrate -w @lemmory/db",
     "db:migrate:prod": "npm run migrate:prod -w @lemmory/db",
+    "db:reset:prod": "npm run reset:prod -w @lemmory/db",
     "db:seed": "npm run seed -w @lemmory/db",
     "club:verify": "npm run club:verify -w @lemmory/db --",
     "club:verify:prod": "npm run club:verify:prod -w @lemmory/db --",

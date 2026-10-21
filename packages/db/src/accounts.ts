@@ -1,8 +1,8 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "./client";
 import { hashPassword, newId, verifyPassword } from "./password";
-import { users } from "./schema";
+import { assignments, cards, classes, days, enrollments, plans, reviewSessions, reviews, sessions, studentPlans, users } from "./schema";
 
 // A real hash to compare against when the account doesn't exist, so a wrong username
 // takes as long as a wrong password.
@@ -41,13 +41,27 @@ export async function checkLogin(role: "teacher" | "student", login: string, pas
   return ok && user && user.role === role ? user.id : null;
 }
 
-/** Is there an account with this login (email for teachers, username for students)? */
-export async function accountExists(role: "teacher" | "student", login: string) {
-  const key = login.trim().toLowerCase();
-  const user = await db
-    .select({ role: users.role })
-    .from(users)
-    .where(role === "teacher" ? eq(users.email, key) : eq(users.username, key))
-    .get();
-  return user?.role === role;
+/**
+ * Delete an account and everything in it: a student's cards, reviews and progress; a teacher's
+ * classes (students in them keep their own accounts and decks). Asks for the password, so a
+ * borrowed laptop can't do it. Families and schools can ask for this under COPPA and FERPA.
+ */
+export async function deleteAccount(userId: string, password: string) {
+  const user = await db.select({ hash: users.passwordHash }).from(users).where(eq(users.id, userId)).get();
+  if (!user || !(await verifyPassword(password, user.hash))) return false;
+  await db.transaction(async (q) => {
+    // Foreign keys would cascade from the user row, but each table is named here so nothing is
+    // left even on a database that doesn't enforce them.
+    const owned = (await q.select({ id: classes.id }).from(classes).where(eq(classes.teacherId, userId))).map((c) => c.id);
+    if (owned.length) {
+      await q.delete(enrollments).where(inArray(enrollments.classId, owned));
+      await q.delete(assignments).where(inArray(assignments.classId, owned));
+      await q.delete(classes).where(inArray(classes.id, owned));
+    }
+    await q.delete(plans).where(eq(plans.teacherId, userId));
+    for (const t of [cards, reviews, days, reviewSessions, enrollments, studentPlans]) await q.delete(t).where(eq(t.studentId, userId));
+    await q.delete(sessions).where(eq(sessions.userId, userId));
+    await q.delete(users).where(eq(users.id, userId));
+  });
+  return true;
 }

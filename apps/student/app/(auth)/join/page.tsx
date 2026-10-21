@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { currentUser } from "@lemmory/db/auth";
 import { AuthFrame, RoleToggle } from "@lemmory/ui/Shell";
@@ -13,19 +12,15 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
   if (await currentUser("student")) redirect("/class");
   const params = await searchParams;
   const code = params.code;
-  const fromLogin = params.new === "1";
   // Students without a class sign up "on their own" and get the individual plan.
   const onOwn = params.own === "1";
-  const username = fromLogin ? ((await cookies()).get("lemmory_signup_username")?.value ?? "") : "";
   return (
     <AuthFrame
       title="Sign up"
       sub={
         onOwn
           ? `For studying on your own: free for ${TRIAL_DAYS} days, then $${PRICES.student.monthly} a month. No class code needed.`
-          : fromLogin
-            ? "No account with that username yet, so let's make one."
-            : undefined
+          : undefined
       }
       top={<RoleToggle current="student" teacherHref={`${teacherUrl}/signup`} studentHref="/join" />}
       foot={
@@ -48,7 +43,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
         </>
       }
     >
-      <JoinForm code={typeof code === "string" ? code : ""} username={username} onOwn={onOwn} />
+      <JoinForm code={typeof code === "string" ? code : ""} onOwn={onOwn} />
     </AuthFrame>
   );
 }

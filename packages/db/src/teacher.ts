@@ -179,3 +179,15 @@ export async function resetStudentPassword(teacherId: string, classId: string, s
     .where(eq(users.id, studentId));
   await db.delete(sessions).where(eq(sessions.userId, studentId));
 }
+
+/** Delete a class: its roster and assignments go with it. Students keep their accounts and decks. */
+export async function deleteClass(teacherId: string, classId: string, typedName: string) {
+  const klass = await owned(teacherId, classId);
+  if (typedName.trim().toLowerCase() !== klass.name.trim().toLowerCase()) return false;
+  await db.transaction(async (q) => {
+    await q.delete(enrollments).where(eq(enrollments.classId, classId));
+    await q.delete(assignments).where(eq(assignments.classId, classId));
+    await q.delete(classes).where(eq(classes.id, classId));
+  });
+  return true;
+}

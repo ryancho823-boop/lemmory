@@ -12,7 +12,8 @@
     "seed": "tsx scripts/seed.ts",
     "club:verify": "tsx scripts/verify-club.ts",
     "migrate:prod": "tsx --env-file=../../.env.turso scripts/migrate.ts",
-    "club:verify:prod": "tsx --env-file=../../.env.turso scripts/verify-club.ts"
+    "club:verify:prod": "tsx --env-file=../../.env.turso scripts/verify-club.ts",
+    "reset:prod": "node --env-file=../../.env.turso scripts/reset-live.mjs --wipe"
   },
   "dependencies": {
     "@lemmory/core": "*",

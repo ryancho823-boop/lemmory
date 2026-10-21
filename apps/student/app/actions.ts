@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { accountExists, checkLogin, createStudent, setTimezone } from "@lemmory/db/accounts";
+import { checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
 import { isTimeZone } from "@lemmory/core/days";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
@@ -26,9 +26,6 @@ import {
 } from "@lemmory/db/student";
 
 // Server actions are public endpoints: every one checks the session and its arguments.
-
-/** Carries the username from a failed login to the join form, without putting it in the URL. */
-const SIGNUP_HINT = "lemmory_signup_username";
 
 export type FormState = { error?: string; values?: Record<string, string> } | undefined;
 
@@ -75,12 +72,8 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   if (!id) {
     await noteAttempt("loginAccount", `student:${username}`);
     await noteAttempt("loginNetwork", ip);
-    // No account with that username: go join a class, with the username already filled in.
-    if (username && !(await accountExists("student", username))) {
-      (await cookies()).set(SIGNUP_HINT, username.toLowerCase(), { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
-      redirect("/join?new=1");
-    }
-    return { error: "That password isn't right for this username.", values: { username } };
+    // The same answer whether or not the username exists, so logging in can't be used to find out.
+    return { error: "That username and password don't match an account.", values: { username } };
   }
   const tz = zoneField(fd);
   if (tz) await setTimezone(id, tz);
@@ -168,6 +161,21 @@ export async function buyStudentPlan(_: FormState, fd: FormData): Promise<FormSt
   await checkoutStudent(await me(), values.billingName, values.billingEmail);
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+/** Delete the student's account and everything in it, after checking their password. */
+export async function deleteMyAccount(_: FormState, fd: FormData): Promise<FormState> {
+  const user = await currentUser("student");
+  if (!user) redirect("/login");
+  // Wrong passwords here count toward the same lock as logins.
+  const key = `student:${user.username}`;
+  if (await isLimited("loginAccount", key)) return { error: LIMIT_MESSAGE.loginAccount };
+  if (!(await deleteAccount(user.id, String(fd.get("confirm") ?? "")))) {
+    await noteAttempt("loginAccount", key);
+    return { error: "That password isn't right." };
+  }
+  await endSession("student");
+  redirect("/login?deleted=1");
 }
 
 export async function logout() {

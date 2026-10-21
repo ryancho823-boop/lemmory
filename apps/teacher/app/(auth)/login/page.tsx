@@ -7,13 +7,14 @@ import { LoginForm } from "./LoginForm";
 
 export const metadata = { title: "Teacher log in · Lemmory" };
 
-export default async function LoginPage() {
+export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  const deleted = (await searchParams).deleted === "1";
   if (await currentUser("teacher")) redirect("/");
   return (
     <AuthFrame
       tag="Teacher"
       title="Teacher log in"
-      sub="Log in with the email you signed up with."
+      sub={deleted ? "Your account and everything in it were deleted." : "Log in with the email you signed up with."}
       foot={
         <>
           <p>

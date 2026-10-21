@@ -1,5 +1,5 @@
 import { ComputeEngine } from "@cortex-js/compute-engine";
-import type { RecallBlank } from "./formulas";
+import type { RecallBlank } from "./content/types";
 
 let engine: ComputeEngine | null = null;
 const ce = () => (engine ??= new ComputeEngine());

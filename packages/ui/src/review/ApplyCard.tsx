@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Check } from "lucide-react";
-import type { ApplyPrompt, PickResult, SolveResult } from "@lemmory/core/grading";
+import type { ApplyPrompt, PickResult, SolveResult } from "@lemmory/core/check";
 import { MathInput } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, cx } from "../ui";

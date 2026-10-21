@@ -7,7 +7,7 @@ import { TimeZoneField } from "../TimeZoneField";
 import { signup } from "../../actions";
 
 /** `onOwn` drops the class code, for students on the individual plan. */
-export function JoinForm({ code, username, onOwn }: { code: string; username: string; onOwn?: boolean }) {
+export function JoinForm({ code, onOwn }: { code: string; onOwn?: boolean }) {
   const [state, action, pending] = useActionState(signup, undefined);
   const v = state?.values;
   return (
@@ -30,7 +30,7 @@ export function JoinForm({ code, username, onOwn }: { code: string; username: st
         <Field label="First name" name="firstName" required autoComplete="given-name" defaultValue={v?.firstName} />
         <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={v?.lastName} />
       </div>
-      <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username ?? username} />
+      <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username} />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={pending}>

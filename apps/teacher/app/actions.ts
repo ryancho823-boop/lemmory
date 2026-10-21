@@ -1,10 +1,9 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { accountExists, checkLogin, createTeacher } from "@lemmory/db/accounts";
+import { checkLogin, createTeacher, deleteAccount } from "@lemmory/db/accounts";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
@@ -13,6 +12,7 @@ import {
   type ClassSettings,
   assign,
   createClass,
+  deleteClass,
   newClassCode,
   newGame,
   removeStudent,
@@ -24,9 +24,6 @@ import {
 
 // Server actions are public endpoints: every one checks the session, and the db layer
 // checks that the class belongs to this teacher.
-
-/** Carries the email from a failed login to the sign-up form, without putting it in the URL. */
-const SIGNUP_HINT = "lemmory_signup_email";
 
 export type FormState = { error?: string; ok?: string; values?: Record<string, string> } | undefined;
 
@@ -62,12 +59,8 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   if (!id) {
     await noteAttempt("loginAccount", `teacher:${email}`);
     await noteAttempt("loginNetwork", ip);
-    // No account with that email: go make one, with the email already filled in.
-    if (email && !(await accountExists("teacher", email))) {
-      (await cookies()).set(SIGNUP_HINT, email, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 600 });
-      redirect("/signup?new=1");
-    }
-    return { error: "That password isn't right for this email.", values: { email } };
+    // The same answer whether or not the email has an account, so logging in can't be used to find out.
+    return { error: "That email and password don't match an account.", values: { email } };
   }
   await startSession(id, "teacher");
   redirect("/");
@@ -87,6 +80,29 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   await noteAttempt("signup", ip, device);
   await startSession(id, "teacher");
   redirect("/plan");
+}
+
+/** Delete the teacher's account and their classes, after checking their password. */
+export async function deleteMyAccount(_: FormState, fd: FormData): Promise<FormState> {
+  const user = await currentUser("teacher");
+  if (!user) redirect("/login");
+  // Wrong passwords here count toward the same lock as logins.
+  const key = `teacher:${user.email}`;
+  if (await isLimited("loginAccount", key)) return { error: LIMIT_MESSAGE.loginAccount };
+  if (!(await deleteAccount(user.id, String(fd.get("confirm") ?? "")))) {
+    await noteAttempt("loginAccount", key);
+    return { error: "That password isn't right." };
+  }
+  await endSession("teacher");
+  redirect("/login?deleted=1");
+}
+
+/** Delete a class after the teacher types its name. */
+export async function deleteClassAction(classId: string, _: FormState, fd: FormData): Promise<FormState> {
+  const id = await me();
+  if (!(await deleteClass(id, str(classId), String(fd.get("confirm") ?? "")))) return { error: "Type the class name exactly to delete it." };
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 export async function logout() {
