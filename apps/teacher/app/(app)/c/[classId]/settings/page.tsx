@@ -1,7 +1,8 @@
 import { isoDate } from "@lemmory/core/days";
 import { PageHeader, Panel } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
-import { updateClassAction } from "../../../../actions";
+import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
+import { deleteClassAction, updateClassAction } from "../../../../actions";
 import { ClassForm } from "../../../ClassForm";
 import { JoinCode } from "../JoinCode";
 import { NewCodeButton } from "./NewCodeButton";
@@ -34,6 +35,13 @@ export default async function Settings({ params }: PageProps<"/c/[classId]/setti
           <NewCodeButton classId={classId} />
         </div>
       </Panel>
+      <ConfirmForm
+        title="Delete this class"
+        body={<>The roster, assignments and leaderboard go away. Students keep their accounts and cards. Type <strong>{klass.name}</strong> to confirm.</>}
+        label="Class name"
+        submit="Delete class"
+        action={deleteClassAction.bind(null, classId)}
+      />
     </div>
   );
 }

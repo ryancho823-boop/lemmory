@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Check, X } from "lucide-react";
-import type { RecallPrompt, RecallResult } from "@lemmory/core/grading";
+import type { RecallPrompt, RecallResult } from "@lemmory/core/check";
 import { MathInput, type MathInputHandle } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, TopicTag } from "../ui";
@@ -15,9 +15,11 @@ interface Props {
   /** Grades on the server. May come back with a typo hint instead of a grade. */
   onCheck: (inputs: string[]) => Promise<RecallResult>;
   onDone: (correct: boolean) => void;
+  /** Off where the card sits mid-page (the homepage demo), so loading the page doesn't scroll to it. */
+  autoFocus?: boolean;
 }
 
-export function RecallCard({ prompt, onCheck, onDone }: Props) {
+export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props) {
   const [values, setValues] = useState<string[]>(() => prompt.blanks.map(() => ""));
   const [graded, setGraded] = useState<Graded | null>(null);
   // Boxes that look one letter off. The server allows one free retry per card to fix a slip.
@@ -73,7 +75,7 @@ export function RecallCard({ prompt, onCheck, onDone }: Props) {
                 ref={(h) => {
                   inputs.current[i] = h;
                 }}
-                autoFocus={i === 0}
+                autoFocus={autoFocus && i === 0}
                 disabled={!!results}
                 tools={!results && active === i}
                 onFocus={() => setActive(i)}

@@ -282,7 +282,7 @@ export async function answerPick(
   mode: Mode,
 ): Promise<{ result: PickResult; outcome: Outcome | null }> {
   const problem = await issuedProblem(studentId, formulaId, problemId, mode);
-  const result = checkPick(problem, picked);
+  const result = checkPick(problem, picked, FORMULA_BY_ID);
   if (result.right || mode === "practice") return { result, outcome: null };
   return db.transaction(async (q) => {
     const ctx = await context(q, studentId);
@@ -300,7 +300,7 @@ export async function answerSolve(
   mode: Mode,
 ): Promise<{ result: SolveResult; outcome: Outcome | null }> {
   const problem = await issuedProblem(studentId, formulaId, problemId, mode);
-  const pick = checkPick(problem, picked);
+  const pick = checkPick(problem, picked, FORMULA_BY_ID);
   const result = checkSolve(problem, input);
   if (mode === "practice") return { result, outcome: null };
   return db.transaction(async (q) => {

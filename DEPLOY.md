@@ -15,8 +15,19 @@ The sites already know these addresses (`packages/core/src/urls.ts`), so the lin
 
 Already set up. Your Turso values live in `.env.turso` on your Mac, which never goes to GitHub.
 
-- After changing `packages/db/src/schema.ts`: run `npm run db:generate`, commit the new migration, and run `npm run db:migrate:prod`.
+- After changing `packages/db/src/schema.ts`: run `npm run db:generate` and commit the new migration. Deploys apply it: the student and teacher sites' builds run every migration first (`packages/db/scripts/deploy.ts`), and if that fails the build fails, so the last working version stays live instead of one that can't log anyone in. You can still run `npm run db:migrate:prod` by hand; it's safe to repeat.
+- `/health` on the student or teacher site says whether the database is up to date (`"schema": "up to date"`).
 - Never run `npm run db:seed` for production. That's the fake sample class, for your computer only.
+
+## After each merge (while testing)
+
+Until real classes start, wipe the test accounts after each merge, once Vercel has finished deploying:
+
+```bash
+npm run db:reset:prod
+```
+
+It saves a backup in `data/backups`, then asks you to type the database's name before deleting every account and class. Stop doing this once real teachers and students are using Lemmory.
 
 ## A Vercel project per site
 
