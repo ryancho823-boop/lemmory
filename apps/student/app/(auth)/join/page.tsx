@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { currentUser } from "@lemmory/db/auth";
 import { AuthFrame, RoleToggle } from "@lemmory/ui/Shell";
-import { PRICES } from "@lemmory/db/billing";
+import { PRICES, TRIAL_DAYS } from "@lemmory/db/billing";
 import { teacherUrl } from "@/lib/links";
 import { JoinForm } from "./JoinForm";
 
@@ -22,7 +22,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
       title="Sign up"
       sub={
         onOwn
-          ? `For studying on your own: $${PRICES.student.monthly} a month, no class code needed.`
+          ? `For studying on your own: free for ${TRIAL_DAYS} days, then $${PRICES.student.monthly} a month. No class code needed.`
           : fromLogin
             ? "No account with that username yet, so let's make one."
             : undefined

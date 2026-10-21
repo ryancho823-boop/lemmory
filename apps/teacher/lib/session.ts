@@ -13,8 +13,8 @@ export const requireTeacher = cache(async () => {
 });
 
 /**
- * The signed-in teacher, if their plan lets them use Lemmory right now. New teachers and
- * teachers whose free pilot ended are sent to the plan page.
+ * The signed-in teacher, if their plan lets them use Lemmory right now. New teachers pick a
+ * plan to start their free trial; when the trial ends unpaid, everything but the plan page locks.
  */
 export const requirePlan = cache(async () => {
   const user = await requireTeacher();

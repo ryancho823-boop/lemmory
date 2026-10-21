@@ -16,6 +16,8 @@ export interface DaySession {
   typoOffered: string[];
   /** The application problem handed out for each card, so answers are checked against it. */
   problems: Record<string, string>;
+  /** Every problem shown for each card today, so a card that comes back gets a new one. */
+  shown?: Record<string, string[]>;
 }
 
 export const emptySession = (day: number): DaySession => ({
@@ -26,6 +28,7 @@ export const emptySession = (day: number): DaySession => ({
   newStarted: [],
   typoOffered: [],
   problems: {},
+  shown: {},
 });
 
 /** Today's remaining cards: unfinished retries, then due reviews with new cards mixed in. */
@@ -37,9 +40,10 @@ export function buildQueue(cards: Record<string, Card>, session: DaySession, tod
     .sort((a, b) => a.memory.due - b.memory.due)
     .map((c) => c.formulaId);
   const room = Math.max(0, NEW_PER_DAY - session.newStarted.length);
+  // Assigned homework is introduced first, so cards a student adds on their own can't push it back.
   const fresh = all
     .filter((c) => isNew(c) && !pending.includes(c.formulaId))
-    .sort((a, b) => a.addedDay - b.addedDay)
+    .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.addedDay - b.addedDay)
     .slice(0, room)
     .map((c) => c.formulaId);
   // Interleave new cards among reviews (mixed practice beats blocked practice).

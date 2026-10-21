@@ -82,7 +82,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     setup: "The height of the rectangle with the same area under the curve.",
     whenToUse: "\"Average value of $f$ on an interval.\"",
     recall: [{ lhs: "\\text{Average of } x^2 \\text{ on } [0, a] =", answer: "\\frac{a^2}{3}", vars: { a: [0.5, 3] } }],
-    related: ["integral-power", "averages"],
+    related: ["integral-power"],
     problems: [
       { id: "av1", text: "Find the average value of $x^3$ on $[0, 2]$.", answer: "2", solution: "$\\frac12\\cdot\\frac{16}{4} = 2$." },
       { id: "av2", text: "Find the average value of $\\sin x$ on $[0, \\pi]$.", answer: "\\frac{2}{\\pi}", solution: "$\\frac{2}{\\pi}$." },
@@ -96,7 +96,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     setup: "Differentiate the relationship with respect to time. For a circle with $v = \\frac{dr}{dt}$: $\\frac{dA}{dt} = 2\\pi r v$.",
     whenToUse: "Two quantities change together over time, like a growing circle or a sliding ladder.",
     recall: [{ lhs: "\\frac{dA}{dt} \\text{ for a circle} =", answer: "2\\pi rv", vars: { r: [1, 5], v: [1, 5] } }],
-    related: ["chain-rule", "circle-area"],
+    related: ["chain-rule"],
     problems: [
       { id: "rr1", text: "A circle's radius grows at $3$ cm/s. How fast is its area growing when $r = 10$?", answer: "60\\pi", solution: "$2\\pi\\cdot10\\cdot3$." },
       { id: "rr2", text: "A square's side grows at $2$ units/s. How fast is its area growing when the side is $5$?", answer: "20", solution: "$2s\\cdot\\frac{ds}{dt} = 20$." },
@@ -141,7 +141,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     setup: "Rotate $y = f(x)$ about the $x$-axis; each slice is a disk of radius $f(x)$.",
     whenToUse: "A solid made by spinning a curve around an axis.",
     recall: [{ lhs: "\\text{Rotate } y = \\sqrt{x},\\ 0 \\le x \\le a:\\ V =", answer: "\\frac{\\pi a^2}{2}", vars: { a: [0.5, 3] } }],
-    related: ["integral-power", "volumes"],
+    related: ["integral-power"],
     problems: [
       { id: "dm1", text: "Rotate $y = x$ for $0 \\le x \\le 3$ about the $x$-axis. Find the volume.", answer: "9\\pi", solution: "$\\pi\\int_0^3 x^2\\,dx = 9\\pi$ (a cone)." },
       { id: "dm2", text: "Rotate $y = x^2$ for $0 \\le x \\le 1$ about the $x$-axis. Find the volume.", answer: "\\frac{\\pi}{5}", solution: "$\\pi\\int_0^1 x^4\\,dx$." },

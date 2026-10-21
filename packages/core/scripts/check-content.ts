@@ -1,6 +1,8 @@
 import { FORMULAS, FORMULA_BY_ID } from "../src/formulas";
 import { gradeRecall, gradeNumber, findTypo } from "../src/grade";
 import { NOTES } from "../src/content/notes";
+import { FORMULA_FIGURES, PROBLEM_FIGURES } from "../src/content/v2/figures";
+import type { Figure } from "../src/content/types";
 import katex from "katex";
 let fail = 0;
 const ids = new Set<string>(), pids = new Set<string>();
@@ -16,7 +18,8 @@ for (const f of FORMULAS) {
     const onlyNames = /^[\s a-zA-Z]*$/.test(lhs);
     if (lhs.trim() && !onlyNames && gradeRecall(b, lhs)) { fail++; console.log("LHS PASSES", f.id, lhs); }
   }
-  if (f.problems.length < 2) { fail++; console.log("FEW PROBLEMS", f.id); }
+  // A worked example plus four to quiz, so a card that comes back the same day gets a fresh problem.
+  if (f.problems.length < 5) { fail++; console.log("FEW PROBLEMS", f.id); }
   for (const p of f.problems) {
     if (pids.has(p.id)) { fail++; console.log("DUP PROBLEM", p.id); } pids.add(p.id);
     for (const u of p.uses) if (!FORMULA_BY_ID[u]) { fail++; console.log("BAD USES", p.id, u); }
@@ -29,11 +32,11 @@ const cases: [string, number, string, boolean][] = [
   ["sfft", 0, "xy+ax+by+ab", false], ["telescoping", 0, "\\frac{1}{n(n+1)}", false], ["telescoping", 0, "\\frac1n-\\frac{1}{n+1}", true],
   ["change-of-base", 0, "\\frac{\\log a}{\\log b}", true], ["change-of-base", 0, "\\log_{b}a", false],
   ["double-angle", 0, "\\sin2x", false], ["double-angle", 1, "1-2\\sin^2x", true], ["double-angle", 1, "2\\cos^2x-1", true],
-  ["wilson", 0, "p-1", true], ["wilson", 0, "-1", true], ["special-angles", 0, "\\sin60^\\circ", false],
+  ["wilson", 0, "p-1", true], ["wilson", 0, "-1", true],
   ["legendre", 0, "\\left\\lfloor\\frac{n}{p}\\right\\rfloor+\\left\\lfloor\\frac{n}{p^2}\\right\\rfloor+\\left\\lfloor\\frac{n}{p^3}\\right\\rfloor", true],
-  ["perms-combs", 1, "\\binom{n}{r}", false], ["power-reduction", 0, "\\cos^2x", false], ["power-reduction", 0, "\\frac{1}{2}+\\frac{\\cos2x}{2}", true],
+ ["power-reduction", 0, "\\cos^2x", false], ["power-reduction", 0, "\\frac{1}{2}+\\frac{\\cos2x}{2}", true],
   ["common-derivatives", 0, "\\cos x", true], ["key-limits", 1, "e", true], ["exp-series", 0, "e^{x}", true],
-  ["product-rule", 0, "uq+vp", true], ["pythagorean-identity", 0, "\\sin^2x+\\cos^2x", false],
+  ["product-rule", 0, "uq+vp", true],
 ];
 for (const [id, i, s, exp] of cases) if (g(id, i, s) !== exp) { fail++; console.log("CASE", id, s, "expected", exp); }
 // One-letter slips get a typo hint; real mistakes and right answers don't.
@@ -57,5 +60,15 @@ for (const f of FORMULAS) {
     });
   }
 }
+// Diagrams: every point is a real number, every named segment exists, and attached ids are real.
+const badFigure = (f: Figure) =>
+  ![f.w, f.h, ...Object.values(f.pts).flat()].every(Number.isFinite) ||
+  [...f.lines.map((l) => l.split(":")[0]), ...f.shapes, ...f.rights].some((s) => s.split("-").some((n) => !f.pts[n]));
+for (const f of FORMULAS) {
+  if (f.figure && badFigure(f.figure)) { fail++; console.log("BAD FIGURE", f.id); }
+  for (const p of f.problems) if (p.figure && badFigure(p.figure)) { fail++; console.log("BAD FIGURE", p.id); }
+}
+for (const id of Object.keys(FORMULA_FIGURES)) if (!FORMULA_BY_ID[id]) { fail++; console.log("ORPHAN FIGURE", id); }
+for (const id of Object.keys(PROBLEM_FIGURES)) if (!pids.has(id)) { fail++; console.log("ORPHAN FIGURE", id); }
 for (const id of Object.keys(NOTES)) if (!FORMULA_BY_ID[id]) { fail++; console.log("ORPHAN NOTE", id); }
 console.log(FORMULAS.length, "formulas,", pids.size, "problems;", fail ? `${fail} failures` : "all checks pass");

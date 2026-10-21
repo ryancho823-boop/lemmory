@@ -1,9 +1,9 @@
 // The plans, for the pricing cards on "For users" and the Plan details page. The numbers come from packages/core/src/plans.ts,
 // which the apps' billing uses too, so the site and the apps always agree.
-import { PILOT_DAYS, PRICES } from "@lemmory/core/plans";
+import { TRIAL_DAYS, PRICES } from "@lemmory/core/plans";
 import { TOTAL_FORMULAS } from "@/lib/bank";
 
-export { PILOT_DAYS, PRICES };
+export { TRIAL_DAYS, PRICES };
 
 export interface Tier {
   id: "academy" | "club" | "student";
@@ -79,6 +79,7 @@ export const TIERS: Tier[] = [
     bestFor: "You're studying on your own, not in a class.",
     price: `$${student.monthly}`,
     per: "per month",
+    note: `The first ${TRIAL_DAYS} days are free`,
     intro: "For students preparing for contests on their own.",
     details: [
       {
@@ -91,7 +92,7 @@ export const TIERS: Tier[] = [
       },
       {
         title: "What you pay",
-        items: [`$${student.monthly} a month`, "Not needed if your teacher's plan already covers your class"],
+        items: [`Free for the first ${TRIAL_DAYS} days`, `Then $${student.monthly} a month`, "Not needed if your teacher's plan already covers your class"],
       },
     ],
   },
@@ -99,7 +100,7 @@ export const TIERS: Tier[] = [
 
 /** Rules for the teacher plans (academies and clubs), not the individual student plan. */
 export const TEACHER_PLAN_RULES = [
-  `Free for the first ${PILOT_DAYS} days.`,
-  "After that, choose a plan to keep going. Your classes and students' progress are saved.",
+  `Free for the first ${TRIAL_DAYS} days.`,
+  "After that, enter your academy's or school's details and pay to keep going. Your classes and students' progress are saved.",
   "Your students never pay.",
 ];

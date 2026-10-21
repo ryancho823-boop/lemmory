@@ -22,6 +22,34 @@
       "when": 1791869176546,
       "tag": "0002_multi_class_and_tiers",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792475237954,
+      "tag": "0003_trials",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792555724192,
+      "tag": "0004_attempts",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792555929688,
+      "tag": "0005_student_timezone",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792562424051,
+      "tag": "0006_foreign_keys",
+      "breakpoints": true
     }
   ]
 }

@@ -11,6 +11,7 @@ export function StudentShell({
   classes,
   streak,
   doneToday,
+  locked,
   children,
 }: {
   name: string;
@@ -18,6 +19,8 @@ export function StudentShell({
   classes: { id: string; name: string }[];
   streak: number;
   doneToday: boolean;
+  /** Nothing covers the student, so only Plan & classes opens. */
+  locked: boolean;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -53,7 +56,7 @@ export function StudentShell({
         { href: "/stats", label: "My stats" },
         { href: "/leaderboard", label: "Leaderboard" },
         { href: "/class", label: classes.length > 1 ? "My classes" : classes.length ? "My class" : "Plan & classes" },
-      ]}
+      ].filter((item) => !locked || item.href === "/class")}
       footer={
         <>
           <p className="truncate font-semibold" title={current?.name}>

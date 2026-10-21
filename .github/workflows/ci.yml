@@ -1,0 +1,25 @@
+# Runs on every pull request and every push to main: typecheck, lint, the formula bank check, and unit tests.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # The demo site reads a generated slice of the bank; build it before typechecking.
+      - run: npx tsx scripts/build-demo-bank.ts
+        working-directory: apps/site
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run check
+      - run: npm test

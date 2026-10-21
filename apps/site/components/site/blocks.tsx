@@ -51,7 +51,7 @@ export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a
           <p className="mt-4 text-ink/80">
             Ready for your own class?{" "}
             <a href={SIGNUP_URL} className="font-semibold text-ink underline underline-offset-2">
-              Start a free pilot
+              Start a free trial
             </a>
           </p>
         </div>

@@ -62,6 +62,34 @@ export interface RecallBlank {
   form?: "product" | "sum";
 }
 
+/** A point in a figure's drawing space. */
+export type Pt = [number, number];
+
+/**
+ * A diagram, ready to draw (built by `fig` in content/fig.ts from real coordinates).
+ * Coordinates are in a w × h box with y pointing down.
+ */
+export interface Figure {
+  w: number;
+  h: number;
+  /** Named points. Each gets a dot and a label unless listed in `hide`. */
+  pts: Record<string, Pt>;
+  /** Where each visible point's label goes. */
+  labels: Record<string, Pt>;
+  hide: string[];
+  /** Segments between named points: "A-B", optionally "A-B:blue", "A-B:rose" or "A-B:dashed". */
+  lines: string[];
+  /** Lightly shaded polygons through named points: "A-B-C". */
+  shapes: string[];
+  circles: { c: Pt; r: number; dashed?: boolean }[];
+  /** Short text such as a length or an angle. */
+  texts: { at: Pt; text: string }[];
+  /** Right-angle marks: "A-B-C" puts the mark at B. */
+  rights: string[];
+  /** Unlabeled dots, like lattice points. */
+  dots?: Pt[];
+}
+
 export interface Problem {
   id: string;
   /** Text with inline $...$ math. */
@@ -71,6 +99,8 @@ export interface Problem {
   /** Formula ids the problem needs. */
   uses: string[];
   solution: string;
+  /** A diagram for geometry problems. It must not give away the answer. */
+  figure?: Figure;
 }
 
 export interface Formula {
@@ -84,6 +114,8 @@ export interface Formula {
   recall: RecallBlank[];
   related: string[];
   problems: Problem[];
+  /** A diagram labeled with the same letters as the statement. */
+  figure?: Figure;
 }
 
 type Def = Omit<Formula, "topic" | "problems"> & {

@@ -2,6 +2,7 @@
   "name": "lemmory",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -15,6 +16,7 @@
     "lint": "npm run lint -w @lemmory/site && npm run lint -w @lemmory/student && npm run lint -w @lemmory/teacher",
     "typecheck": "tsc --noEmit -p apps/site && tsc --noEmit -p apps/student && tsc --noEmit -p apps/teacher",
     "check": "npm run check -w @lemmory/core",
+    "test": "npm run test -w @lemmory/core",
     "db:generate": "npm run generate -w @lemmory/db",
     "db:migrate": "npm run migrate -w @lemmory/db",
     "db:migrate:prod": "npm run migrate:prod -w @lemmory/db",

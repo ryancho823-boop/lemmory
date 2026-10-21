@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useStore } from "@/lib/store";
-import { competitionPoints, summary } from "@/lib/analytics";
+import { competitionPoints, summary } from "@lemmory/core/analytics";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Panel, Segmented, cx } from "@lemmory/ui/ui";
 

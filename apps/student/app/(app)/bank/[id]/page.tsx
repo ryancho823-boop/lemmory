@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
+import { NOTES } from "@lemmory/core/content/notes";
+import { formulaLog } from "@lemmory/db/records";
 import { accuracy } from "@lemmory/core/analytics";
 import { isMastered, isNew } from "@lemmory/core/srs";
 import { FormulaDetail } from "@lemmory/ui/FormulaDetail";
 import { Panel, StageTag, pct, relDay } from "@lemmory/ui/ui";
-import { getView } from "@/lib/session";
+import { getUnlockedView } from "@/lib/session";
 import { DeckButton } from "../../DeckButtons";
 
 export async function generateMetadata({ params }: PageProps<"/bank/[id]">) {
@@ -18,9 +20,10 @@ export default async function FormulaPage({ params }: PageProps<"/bank/[id]">) {
   const { id } = await params;
   const f = FORMULA_BY_ID[id];
   if (!f) notFound();
-  const v = await getView();
+  const v = await getUnlockedView();
   const card = v.record.cards[id];
-  const log = v.record.log.filter((l) => l.formulaId === id);
+  // All-time, unlike the page-wide log (which covers recent weeks).
+  const log = await formulaLog(v.me.id, id);
 
   return (
     <div>
@@ -29,6 +32,7 @@ export default async function FormulaPage({ params }: PageProps<"/bank/[id]">) {
       </Link>
       <FormulaDetail
         f={f}
+        note={NOTES[f.id]}
         actions={<DeckButton formulaId={id} inDeck={!!card} source={card?.source} size="md" />}
         aside={
           card ? (

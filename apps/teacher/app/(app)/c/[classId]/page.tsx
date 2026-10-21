@@ -6,6 +6,7 @@ import { BarList } from "@lemmory/ui/charts";
 import { Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
+import { topicOf } from "@lemmory/core/formulas";
 
 export default async function Overview({ params }: PageProps<"/c/[classId]">) {
   const { classId } = await params;
@@ -25,7 +26,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
     .map(({ s, m }) => {
       const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
       const away = m.lastActive === null ? null : today - m.lastActive;
-      const weak = byTopic(recent(s.log, today, 28))
+      const weak = byTopic(recent(s.log, today, 28), topicOf)
         .filter((t) => t.n >= 3)
         .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
       const behind = m.streak === 0;

@@ -10,6 +10,7 @@ import { findTypo, gradeRecall } from "@lemmory/core/grade";
 import { MathInput, type MathInputHandle } from "@lemmory/ui/MathInput";
 import { Rich, Tex } from "@lemmory/ui/Tex";
 import { Button, StageTag, TopicTag } from "@lemmory/ui/ui";
+import { Figure } from "@lemmory/ui/Figure";
 
 /** `autoFocus` is off where the card sits mid-page (the homepage), so loading the page doesn't scroll to it. */
 export function RecallCard({ formula, onDone, autoFocus = true }: { formula: Formula; onDone: (correct: boolean) => void; autoFocus?: boolean }) {
@@ -49,6 +50,7 @@ export function RecallCard({ formula, onDone, autoFocus = true }: { formula: For
       <p className="mt-1.5 text-ink/60">
         <Rich text={formula.setup} />
       </p>
+      {formula.figure && <Figure figure={formula.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
 
       <div className="mt-7 space-y-4">
         {formula.recall.map((b, i) => (

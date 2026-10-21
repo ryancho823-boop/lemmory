@@ -9,7 +9,7 @@ export const NUMBER_THEORY = defineTopic("Number Theory", [
     setup: "Write $n$ as a product of prime powers.",
     whenToUse: "Counting the factors of a number, or finding a number with a given number of factors.",
     recall: [{ lhs: "d(p^a q^b) =", answer: "(a+1)(b+1)", vars: { a: int(1, 6), b: int(1, 6) } }],
-    related: ["sum-divisors", "totient", "gcd-lcm"],
+    related: ["sum-divisors", "totient"],
     problems: [
       {
         id: "nd1",
@@ -46,37 +46,6 @@ export const NUMBER_THEORY = defineTopic("Number Theory", [
         text: "Find the sum of all positive divisors of $100$.",
         answer: "217",
         solution: "$(1+2+4)(1+5+25) = 7\\cdot31 = 217$.",
-      },
-    ],
-  },
-  {
-    id: "gcd-lcm",
-    name: "GCD × LCM",
-    level: "AMC 8",
-    statement: "\\gcd(a,b)\\cdot\\operatorname{lcm}(a,b) = ab",
-    setup: "For positive integers $a$ and $b$.",
-    whenToUse: "A problem gives two of: the numbers, their GCD, their LCM, and asks for the third.",
-    recall: [
-      {
-        lhs: "\\gcd(a,b)\\cdot\\operatorname{lcm}(a,b) =",
-        answer: "ab",
-        vars: { a: int(2, 30), b: int(2, 30) },
-        banned: ["\\gcd", "lcm"],
-      },
-    ],
-    related: ["num-divisors", "chicken-mcnugget"],
-    problems: [
-      {
-        id: "gl1",
-        text: "Two positive integers have GCD $6$ and LCM $72$. One of them is $18$. What is the other?",
-        answer: "24",
-        solution: "$\\frac{6\\cdot72}{18} = 24$.",
-      },
-      {
-        id: "gl2",
-        text: "Find $\\operatorname{lcm}(12, 18)$.",
-        answer: "36",
-        solution: "$\\gcd = 6$, so $\\operatorname{lcm} = \\frac{12\\cdot18}{6} = 36$.",
       },
     ],
   },
@@ -223,7 +192,7 @@ export const NUMBER_THEORY = defineTopic("Number Theory", [
       { lhs: "\\text{Largest unreachable} =", answer: "ab-a-b", vars: { a: int(2, 9), b: int(2, 9) } },
       { lhs: "\\text{Number unreachable} =", answer: "\\frac{(a-1)(b-1)}{2}", vars: { a: int(2, 9), b: int(2, 9) } },
     ],
-    related: ["sfft", "gcd-lcm"],
+    related: ["sfft"],
     problems: [
       {
         id: "cm1",
@@ -236,30 +205,6 @@ export const NUMBER_THEORY = defineTopic("Number Theory", [
         text: "With only $4$-point and $9$-point plays, how many positive scores are impossible to reach?",
         answer: "12",
         solution: "$\\frac{3\\cdot8}{2} = 12$.",
-      },
-    ],
-  },
-  {
-    id: "base-conversion",
-    name: "Base Expansion",
-    level: "AMC 8",
-    statement: "\\overline{d_k\\cdots d_1d_0}_b = d_kb^k + \\cdots + d_1b + d_0",
-    setup: "Each digit is multiplied by a power of the base.",
-    whenToUse: "Numbers written in a base other than $10$, or an unknown base.",
-    recall: [{ lhs: "\\overline{xyz}_n =", answer: "xn^2+yn+z", vars: { x: int(1, 9), y: int(0, 9), z: int(0, 9), n: int(2, 16) } }],
-    related: ["geometric-series"],
-    problems: [
-      {
-        id: "bc1",
-        text: "Convert $2012_3$ to base $10$.",
-        answer: "59",
-        solution: "$2\\cdot27 + 0\\cdot9 + 1\\cdot3 + 2 = 59$.",
-      },
-      {
-        id: "bc2",
-        text: "In what base $b$ does $121_b = 49$?",
-        answer: "6",
-        solution: "$b^2 + 2b + 1 = (b+1)^2 = 49$, so $b = 6$.",
       },
     ],
   },

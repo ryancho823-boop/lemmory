@@ -19,7 +19,7 @@ export const TRIG_3 = defineTopic("Trigonometry", [
         banned: ["\\frac{x}{2}", "x/2"],
       },
     ],
-    related: ["double-angle", "power-reduction", "special-angles"],
+    related: ["double-angle", "power-reduction"],
     problems: [
       { id: "x-ha1", text: "Find $\\cos^2 15^\\circ$.", answer: "\\frac{2+\\sqrt{3}}{4}", solution: "$\\frac{1 + \\cos 30^\\circ}{2} = \\frac{1 + \\frac{\\sqrt3}{2}}{2} = \\frac{2 + \\sqrt3}{4}$." },
       {

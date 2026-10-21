@@ -4,7 +4,7 @@
 // It uses the demo's own data (lib/), so the full formula bank and the database never reach the demo.
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowRight, Lock, Search } from "lucide-react";
 import {
   FORMULAS,
@@ -24,8 +24,7 @@ import {
 import { useStore } from "@/lib/store";
 import { Tex } from "@lemmory/ui/Tex";
 import { LevelTag, Segmented, cx } from "@lemmory/ui/ui";
-
-type Scope = "all" | "assigned" | "deck" | "unassigned";
+import { type Scope, useBankFilters } from "@lemmory/ui/useBankFilters";
 
 interface Props {
   role: "student" | "teacher";
@@ -38,10 +37,7 @@ interface Props {
 /** Topic sidebar + compact rows grouped by topic. Shared by the student bank and the teacher's assign page. */
 export function FormulaBrowser({ role, hrefFor, action, meta }: Props) {
   const { state } = useStore();
-  const [q, setQ] = useState("");
-  const [topic, setTopic] = useState<Topic | "All">(TOPICS[0]);
-  const [level, setLevel] = useState<Level | "All">("All");
-  const [scope, setScope] = useState<Scope>("all");
+  const { q, setQ, topic, setTopic, level, setLevel, scope, setScope } = useBankFilters();
   const assigned = useMemo(() => new Set(state.assignments.map((a) => a.formulaId)), [state.assignments]);
 
   const inScope = (f: Formula) =>

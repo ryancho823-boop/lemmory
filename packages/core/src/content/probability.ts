@@ -4,55 +4,6 @@ const prob: [number, number] = [0.1, 0.9];
 
 export const PROBABILITY = defineTopic("Probability", [
   {
-    id: "basic-probability",
-    name: "Equally Likely Outcomes",
-    level: "AMC 8",
-    statement: "P(E) = \\frac{\\#\\text{favorable}}{\\#\\text{total}}",
-    setup: "Only valid when every outcome is equally likely. Write $f$ for favorable outcomes and $n$ for total outcomes.",
-    whenToUse: "Dice, coins, cards, or random picks where you can count outcomes.",
-    recall: [{ lhs: "P(E) =", answer: "\\frac{f}{n}", vars: { f: [1, 5], n: [6, 20] } }],
-    related: ["complement", "perms-combs", "conditional-probability"],
-    problems: [
-      {
-        id: "bp1",
-        text: "Two fair dice are rolled. What is the probability that the sum is $7$?",
-        answer: "\\frac{1}{6}",
-        solution: "$6$ of the $36$ outcomes sum to $7$.",
-      },
-      {
-        id: "bp2",
-        text: "A bag has $4$ red and $6$ blue marbles. Two are drawn without replacement. What is the probability both are red?",
-        answer: "\\frac{2}{15}",
-        uses: ["basic-probability", "perms-combs"],
-        solution: "$\\binom42 / \\binom{10}{2} = \\frac{6}{45} = \\frac{2}{15}$.",
-      },
-    ],
-  },
-  {
-    id: "complement",
-    name: "Complementary Probability",
-    level: "AMC 8",
-    statement: "P(\\text{at least one}) = 1 - P(\\text{none})",
-    setup: "Write $q$ for the probability of none.",
-    whenToUse: "The words \"at least one\": counting the opposite is usually much easier.",
-    recall: [{ lhs: "P(\\text{at least one}) =", answer: "1-q", vars: { q: prob } }],
-    related: ["basic-probability", "pie", "binomial-probability"],
-    problems: [
-      {
-        id: "co1",
-        text: "Four fair coins are flipped. What is the probability of at least one head?",
-        answer: "\\frac{15}{16}",
-        solution: "$1 - \\left(\\frac12\\right)^4 = \\frac{15}{16}$.",
-      },
-      {
-        id: "co2",
-        text: "Three fair dice are rolled. What is the probability that at least one shows a $6$?",
-        answer: "\\frac{91}{216}",
-        solution: "$1 - \\left(\\frac56\\right)^3 = 1 - \\frac{125}{216} = \\frac{91}{216}$.",
-      },
-    ],
-  },
-  {
     id: "binomial-probability",
     name: "Binomial Probability",
     level: "AMC 10",
@@ -66,7 +17,7 @@ export const PROBABILITY = defineTopic("Probability", [
         vars: { n: int(4, 8), k: int(1, 3), p: prob },
       },
     ],
-    related: ["binomial-theorem", "complement", "expected-value"],
+    related: ["binomial-theorem", "expected-value"],
     problems: [
       {
         id: "bpr1",
@@ -117,7 +68,7 @@ export const PROBABILITY = defineTopic("Probability", [
     setup: "Write $x = P(A \\cap B)$ and $q = P(B)$. Knowing $B$ happened shrinks the sample space to $B$.",
     whenToUse: "\"Given that...\" or \"if we know...\": restrict to the outcomes where the condition holds.",
     recall: [{ lhs: "P(A\\mid B) =", answer: "\\frac{x}{q}", vars: { x: [0.05, 0.2], q: [0.3, 0.9] } }],
-    related: ["bayes", "basic-probability"],
+    related: ["bayes"],
     problems: [
       {
         id: "cnd1",

@@ -2,7 +2,6 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { type LeaderRow, leaderRows } from "@lemmory/core/analytics";
-import { contestLabel, dayInZone } from "@lemmory/core/days";
 import {
   type Outcome,
   type PickResult,
@@ -17,12 +16,12 @@ import {
   recallPrompt,
   wrongPicks,
 } from "@lemmory/core/grading";
-import type { StudentRecord } from "@lemmory/core/records";
+import { LOG_DAYS, type StudentRecord } from "@lemmory/core/records";
 import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } from "@lemmory/core/session";
 import { isNew, newCard, review } from "@lemmory/core/srs";
-import { getStudentPlan, teacherActive } from "./billing";
+import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
-import { addAssignedCards, classToday, loadClass, loadRecords, settle } from "./records";
+import { addAssignedCards, classToday, loadClass, loadRecords, settle, studentToday } from "./records";
 import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
 
 export type Mode = "review" | "practice";
@@ -46,16 +45,21 @@ export interface StudentView {
   completedToday: number;
   doneToday: boolean;
   nothingDue: boolean;
-  /** False when every class's free pilot has ended unpaid: the student can't start reviews. */
+  /** False when nothing covers the student (no trial or payment of their own, no active class): the app is locked. */
   canReview: boolean;
 }
 
 /**
- * Can this student do reviews? Yes if they pay for themselves (the individual plan), or if
- * any of their classes is on an active plan or pilot. Without a class they need the plan.
+ * Can this student use Lemmory? Yes if their own individual plan is on its free trial or
+ * paid, or if any of their classes' teachers is. Otherwise everything but the plan page is locked.
  */
 export async function canStudentReview(studentId: string) {
-  if (await getStudentPlan(studentId)) return true;
+  const { state } = studentPlanState(await getStudentPlan(studentId));
+  return state === "trial" || state === "active" || (await classCovers(studentId));
+}
+
+/** Is any of the student's classes on a teacher's trial or paid plan? */
+export async function classCovers(studentId: string) {
   const mine = await studentClasses(studentId);
   for (const teacherId of new Set(mine.map((c) => c.teacherId))) if (await teacherActive(teacherId)) return true;
   return false;
@@ -74,54 +78,41 @@ export async function studentClasses(studentId: string, q: Tx | typeof db = db) 
 /**
  * Everything the student app shows, with their classes settled through yesterday.
  * `selected` picks which class's leaderboard and contest to show (default: the first).
+ * The queue and "today" follow the student's own clock; the class's game and contest follow the class's.
  */
 export async function loadStudentView(user: { id: string; name: string; username: string | null }, selected?: string): Promise<StudentView> {
   const mine = await studentClasses(user.id);
   const current = mine.find((c) => c.id === selected) ?? mine[0];
-  const view = current ? await loadClass(current.id) : null;
+  // Classmates appear only on the leaderboard, so their review logs aren't loaded.
+  const view = current ? await loadClass(current.id, false) : null;
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
-
-  if (!view) {
-    // Not in a class: they can browse the bank, and review their own cards on the individual plan.
-    const today = dayInZone("UTC");
-    const record = (await loadRecords([user.id])).get(user.id)!;
-    const session = await loadSession(user.id, today);
-    return {
-      me: user,
-      klass: null,
-      classes: classList,
-      today,
-      record,
-      assigned: [],
-      leaderboard: [],
-      gameAge: 0,
-      queue: isDoneToday(record, today) ? [] : buildQueue(record.cards, session, today),
-      completedToday: session.completed.length,
-      doneToday: isDoneToday(record, today),
-      canReview: !!(await getStudentPlan(user.id)),
-      nothingDue: nothingDue(record, today),
-    };
-  }
-
-  const { klass, today, students } = view;
-  const teacher = await db.select({ name: users.name }).from(users).where(eq(users.id, klass.teacherId)).get();
-  const me = students.find((s) => s.id === user.id)!;
+  const today = await studentToday(user.id);
+  // Loaded after the class, which settled this student's past days.
+  const record = (await loadRecords([user.id], today - LOG_DAYS)).get(user.id)!;
   const session = await loadSession(user.id, today);
-  const done = isDoneToday(me, today);
-  return {
+  const done = isDoneToday(record, today);
+  const base = {
     me: user,
-    klass: { id: klass.id, name: klass.name, contest: contestLabel(klass.contestName, klass.contestDay, today), teacher: teacher?.name ?? "" },
     classes: classList,
     today,
-    record: { cards: me.cards, log: me.log, doneDays: me.doneDays, missed: me.missed },
-    assigned: view.assignments.map((a) => a.formulaId),
-    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, today, user.id),
-    gameAge: today - klass.gameDay,
-    queue: done ? [] : buildQueue(me.cards, session, today),
+    record,
+    queue: done ? [] : buildQueue(record.cards, session, today),
     completedToday: session.completed.length,
     doneToday: done,
     canReview: await canStudentReview(user.id),
-    nothingDue: nothingDue(me, today),
+    nothingDue: nothingDue(record, today),
+  };
+  // Not in a class: the individual plan (trial or paid) covers them.
+  if (!view) return { ...base, klass: null, assigned: [], leaderboard: [], gameAge: 0 };
+
+  const { klass, students } = view;
+  const teacher = await db.select({ name: users.name }).from(users).where(eq(users.id, klass.teacherId)).get();
+  return {
+    ...base,
+    klass: { id: klass.id, name: klass.name, contest: view.contest, teacher: teacher?.name ?? "" },
+    assigned: view.assignments.map((a) => a.formulaId),
+    leaderboard: leaderRows(students, { day: klass.gameDay, baseline: klass.gameBaseline }, view.today, user.id),
+    gameAge: view.today - klass.gameDay,
   };
 }
 
@@ -134,18 +125,14 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
   await q.insert(reviewSessions).values({ studentId, data }).onConflictDoUpdate({ target: reviewSessions.studentId, set: { data } });
 }
 
-/**
- * One student's state inside a transaction, settled through yesterday. A student has one
- * deck across all their classes; "today" follows their first class's time zone.
- */
+/** One student's state inside a transaction, settled through yesterday by their own clock. */
 async function context(q: Tx, studentId: string) {
   const mine = await studentClasses(studentId, q);
-  const today = dayInZone(mine[0]?.timezone ?? "UTC");
-  const records = await loadRecords([studentId], q);
+  const today = await studentToday(studentId, q);
+  const records = await loadRecords([studentId], null, q);
   await settle(
-    mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough })),
+    mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today })),
     records,
-    today,
     q,
   );
   const record = records.get(studentId)!;
@@ -162,20 +149,27 @@ function formula(id: string) {
 /** The card to show next. In review mode it must be one of today's cards. */
 export async function promptFor(studentId: string, formulaId: string, mode: Mode): Promise<Prompt> {
   const f = formula(formulaId);
-  if (mode === "review" && !(await canStudentReview(studentId)))
-    throw new ReviewError("Reviews need a plan. Your teacher's plan covers you in a class, or get the individual plan on My classes.");
+  if (!(await canStudentReview(studentId))) throw new ReviewError("Your free trial has ended. Go to Plan & classes to keep going.");
   return db.transaction(async (q) => {
     const { today, record, session } = await context(q, studentId);
     const card = record.cards[formulaId];
     if (!card) throw new ReviewError("That formula isn't in your deck.");
     if (mode === "review" && !buildQueue(record.cards, session, today).includes(formulaId)) throw new ReviewError("That card isn't due today.");
+    if (mode === "practice" && (isNew(card) || buildQueue(record.cards, session, today).includes(formulaId)))
+      throw new ReviewError("Do this card in today's review first.");
     if (card.stage === "recall") return recallPrompt(f);
     const deck = Object.keys(record.cards);
-    if (mode === "practice") return applyPrompt(f, undefined, deck);
+    if (mode === "practice") return applyPrompt(f, [], deck);
     const row = await q.select({ last: cards.lastProblemId }).from(cards).where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId))).get();
-    const prompt = applyPrompt(f, row?.last ?? undefined, deck);
+    // A card that comes back today (after a miss) gets a problem it hasn't shown yet, at random.
+    const shownToday = session.shown?.[formulaId] ?? [];
+    const prompt = applyPrompt(f, [...(row?.last ? [row.last] : []), ...shownToday], deck);
     await q.update(cards).set({ lastProblemId: prompt.problemId }).where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId)));
-    await saveSession(q, studentId, { ...session, problems: { ...session.problems, [formulaId]: prompt.problemId } });
+    await saveSession(q, studentId, {
+      ...session,
+      problems: { ...session.problems, [formulaId]: prompt.problemId },
+      shown: { ...session.shown, [formulaId]: [...shownToday, prompt.problemId] },
+    });
     return prompt;
   });
 }
@@ -228,6 +222,20 @@ function assertDue(ctx: Awaited<ReturnType<typeof context>>, formulaId: string) 
   if (!buildQueue(ctx.record.cards, ctx.session, ctx.today).includes(formulaId)) throw new ReviewError("That card isn't due today.");
 }
 
+/**
+ * Practice shows the right answer after each try and isn't recorded, so it only works on cards
+ * already in the deck and reviewed, and never on one still waiting in today's review. Otherwise a
+ * student could look up today's answers in practice first.
+ */
+async function assertPractice(studentId: string, formulaId: string) {
+  await db.transaction(async (q) => {
+    const ctx = await context(q, studentId);
+    const card = ctx.record.cards[formulaId];
+    if (!card || isNew(card)) throw new ReviewError("Practice cards you've already reviewed.");
+    if (buildQueue(ctx.record.cards, ctx.session, ctx.today).includes(formulaId)) throw new ReviewError("Do this card in today's review first.");
+  });
+}
+
 export async function answerRecall(
   studentId: string,
   formulaId: string,
@@ -237,7 +245,10 @@ export async function answerRecall(
   typoUsed = false,
 ): Promise<{ result: RecallResult; outcome: Outcome | null }> {
   const f = formula(formulaId);
-  if (mode === "practice") return { result: checkRecall(f, inputs, !typoUsed), outcome: null };
+  if (mode === "practice") {
+    await assertPractice(studentId, formulaId);
+    return { result: checkRecall(f, inputs, !typoUsed), outcome: null };
+  }
   return db.transaction(async (q) => {
     const ctx = await context(q, studentId);
     assertDue(ctx, formulaId);
@@ -256,9 +267,9 @@ async function issuedProblem(studentId: string, formulaId: string, problemId: st
   const problem = problemOf(f, problemId);
   if (!problem) throw new ReviewError("Unknown problem");
   if (mode === "review") {
-    const session = await loadSession(studentId, await todayFor(studentId));
+    const session = await loadSession(studentId, await studentToday(studentId));
     if (session.problems[formulaId] !== problemId) throw new ReviewError("That problem wasn't handed out today.");
-  }
+  } else await assertPractice(studentId, formulaId);
   return problem;
 }
 
@@ -300,10 +311,6 @@ export async function answerSolve(
   });
 }
 
-async function todayFor(studentId: string) {
-  return dayInZone((await studentClasses(studentId))[0]?.timezone ?? "UTC");
-}
-
 /** Mark today done when there's nothing left in the queue. */
 export async function finishIfEmpty(studentId: string) {
   await db.transaction(async (q) => {
@@ -315,7 +322,7 @@ export async function finishIfEmpty(studentId: string) {
 
 export async function addToDeck(studentId: string, formulaId: string) {
   formula(formulaId);
-  const today = await todayFor(studentId);
+  const today = await studentToday(studentId);
   const c = newCard(formulaId, "self", today);
   await db
     .insert(cards)

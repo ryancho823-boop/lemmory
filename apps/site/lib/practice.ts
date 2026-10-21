@@ -9,10 +9,21 @@ export function shuffle<T>(xs: T[]) {
   return a;
 }
 
-/** A fresh problem (not the last one shown) plus look-alike distractor formulas. */
-export function setupApply(formula: Formula, lastProblemId: string | undefined, deck: string[]) {
-  const pool = formula.problems.filter((p) => p.id !== lastProblemId);
-  const problem = shuffle(pool.length ? pool : formula.problems)[0];
+/**
+ * The problems a card can quiz. The first one is the worked example on the formula's page, with
+ * its answer, so it's left out whenever there are others.
+ */
+export const quizProblems = (formula: Formula) => (formula.problems.length > 1 ? formula.problems.slice(1) : formula.problems);
+
+/**
+ * A random problem not in `avoid` (the ones already shown today, and the last one shown before)
+ * plus look-alike distractor formulas. When every problem has been shown, any but the last will do.
+ */
+export function setupApply(formula: Formula, avoid: string[], deck: string[]) {
+  const all = quizProblems(formula);
+  const fresh = all.filter((p) => !avoid.includes(p.id));
+  const notLast = all.filter((p) => p.id !== avoid[avoid.length - 1]);
+  const problem = shuffle(fresh.length ? fresh : notLast.length ? notLast : all)[0];
   const opts = new Set(problem.uses);
   const candidates = [
     ...shuffle(problem.uses.flatMap((u) => FORMULA_BY_ID[u].related)),

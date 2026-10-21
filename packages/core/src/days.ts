@@ -1,5 +1,5 @@
-// A "day" is a calendar day number (days since 1970-01-01) in the class's time zone,
-// so "today" flips at local midnight for everyone in the class.
+// A "day" is a calendar day number (days since 1970-01-01) in a time zone, so "today" flips
+// at local midnight. A student counts days by their own clock, a class by its own.
 
 export const DAY_MS = 86_400_000;
 

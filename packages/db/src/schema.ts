@@ -7,6 +7,10 @@ const createdAt = () =>
     .notNull()
     .$defaultFn(() => new Date());
 
+// Every row belongs to a user (and some to a class). Deleting a user or class deletes their
+// rows with it ("cascade"), so nothing is left pointing at someone who's gone.
+const user = (name: string) => text(name).notNull().references(() => users.id, { onDelete: "cascade" });
+
 /** Teachers sign in with an email; students with a username (no email needed for under-13s). */
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -15,6 +19,8 @@ export const users = sqliteTable("users", {
   email: text("email").unique(),
   username: text("username").unique(),
   passwordHash: text("password_hash").notNull(),
+  /** Students on their own have no class time zone, so "today" uses their browser's (IANA name). */
+  timezone: text("timezone"),
   createdAt: createdAt(),
 });
 
@@ -23,7 +29,7 @@ export const sessions = sqliteTable(
   "sessions",
   {
     id: text("id").primaryKey(),
-    userId: text("user_id").notNull(),
+    userId: user("user_id"),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [index("sessions_user").on(t.userId)],
@@ -33,7 +39,7 @@ export const classes = sqliteTable(
   "classes",
   {
     id: text("id").primaryKey(),
-    teacherId: text("teacher_id").notNull(),
+    teacherId: user("teacher_id"),
     name: text("name").notNull(),
     contestName: text("contest_name"),
     /** Day number of the contest. */
@@ -55,8 +61,8 @@ export const classes = sqliteTable(
 export const enrollments = sqliteTable(
   "enrollments",
   {
-    studentId: text("student_id").notNull(),
-    classId: text("class_id").notNull(),
+    studentId: user("student_id"),
+    classId: text("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
     joinedDay: integer("joined_day").notNull(),
     /** Past days up to here have a row in `days`. */
     settledThrough: integer("settled_through").notNull(),
@@ -67,7 +73,7 @@ export const enrollments = sqliteTable(
 export const assignments = sqliteTable(
   "assignments",
   {
-    classId: text("class_id").notNull(),
+    classId: text("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
     formulaId: text("formula_id").notNull(),
     week: integer("week").notNull(),
     day: integer("day").notNull(),
@@ -78,7 +84,7 @@ export const assignments = sqliteTable(
 export const cards = sqliteTable(
   "cards",
   {
-    studentId: text("student_id").notNull(),
+    studentId: user("student_id"),
     formulaId: text("formula_id").notNull(),
     source: text("source", { enum: ["teacher", "self"] }).notNull(),
     stage: text("stage", { enum: ["recall", "apply"] }).$type<Stage>().notNull(),
@@ -95,7 +101,7 @@ export const reviews = sqliteTable(
   "reviews",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    studentId: text("student_id").notNull(),
+    studentId: user("student_id"),
     day: integer("day").notNull(),
     formulaId: text("formula_id").notNull(),
     stage: text("stage", { enum: ["recall", "apply"] }).$type<Stage>().notNull(),
@@ -104,14 +110,15 @@ export const reviews = sqliteTable(
     /** A self-added card: extra practice, no class points. */
     extra: integer("extra", { mode: "boolean" }).notNull().default(false),
   },
-  (t) => [index("reviews_student_day").on(t.studentId, t.day)],
+  // Covers the per-day points count (student, day, extra) as well as reading recent days.
+  (t) => [index("reviews_student_day").on(t.studentId, t.day, t.extra)],
 );
 
 /** Each past day: did the student finish, and how many assigned cards were left. */
 export const days = sqliteTable(
   "days",
   {
-    studentId: text("student_id").notNull(),
+    studentId: user("student_id"),
     day: integer("day").notNull(),
     done: integer("done", { mode: "boolean" }).notNull(),
     missed: integer("missed").notNull(),
@@ -121,30 +128,72 @@ export const days = sqliteTable(
 
 /** Today's in-progress review, so a reload picks up where the student left off. */
 export const reviewSessions = sqliteTable("review_sessions", {
-  studentId: text("student_id").primaryKey(),
+  studentId: text("student_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
   data: text("data", { mode: "json" }).$type<DaySession>().notNull(),
 });
 
 /**
- * A teacher's plan. Checkout is simulated for now (no payment provider yet), so
- * "paying" just records the choice. Swap in Stripe Checkout + a webhook later.
+ * A teacher's plan. Every teacher starts with a free trial of the plan they pick; after it
+ * ends they must enter their academy or school's details and pay. Checkout is simulated for
+ * now (no payment provider yet), so "paying" just records it. Swap in Stripe later.
  */
 export const plans = sqliteTable("plans", {
-  teacherId: text("teacher_id").primaryKey(),
+  teacherId: text("teacher_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  /** "pilot" is the old trial with no plan picked; new teachers pick academy or club. */
   kind: text("kind", { enum: ["pilot", "academy", "club"] }).notNull(),
   /** Academy or school name. */
   orgName: text("org_name"),
-  /** Clubs sign up with a school address; the club price applies once it's verified. */
+  /** City and state of the academy or school. */
+  orgLocation: text("org_location"),
+  /** Who gets the bills, for academies. */
+  billingName: text("billing_name"),
+  billingEmail: text("billing_email"),
+  /** Clubs give a school address; the club price applies once it's verified. */
   schoolEmail: text("school_email"),
   clubStatus: text("club_status", { enum: ["pending", "verified", "rejected"] }),
-  /** When a free pilot runs out. */
+  /** When the free trial runs out. Kept after paying, so a trial can't be restarted. */
   pilotEndsAt: integer("pilot_ends_at", { mode: "timestamp_ms" }),
   /** Set by the (simulated) checkout. */
   paidAt: integer("paid_at", { mode: "timestamp_ms" }),
 });
 
-/** Individual students who pay for themselves ($2/month). Also simulated for now. */
+/** Students on their own ($2/month): a free trial, then a (simulated) payment. */
 export const studentPlans = sqliteTable("student_plans", {
-  studentId: text("student_id").primaryKey(),
-  paidAt: integer("paid_at", { mode: "timestamp_ms" }).notNull(),
+  studentId: text("student_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  trialEndsAt: integer("trial_ends_at", { mode: "timestamp_ms" }),
+  paidAt: integer("paid_at", { mode: "timestamp_ms" }),
+  /** A parent or guardian, for the receipt. */
+  billingName: text("billing_name"),
+  billingEmail: text("billing_email"),
 });
+
+/**
+ * Where each free trial came from, so one person can't keep starting new ones. Values are
+ * SHA-256 hashes: a normalized email, a browser cookie id, or an IP address.
+ */
+export const trialClaims = sqliteTable(
+  "trial_claims",
+  {
+    id: text("id").primaryKey(),
+    role: text("role", { enum: ["teacher", "student"] }).notNull(),
+    kind: text("kind", { enum: ["email", "device", "ip"] }).notNull(),
+    hash: text("hash").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("trial_claims_hash").on(t.kind, t.hash)],
+);
+
+/**
+ * Recent attempts at things worth slowing down: failed logins, wrong class codes, new accounts.
+ * `key` is a SHA-256 hash of what was tried (an account, an IP address or a browser), never the raw value.
+ */
+export const attempts = sqliteTable(
+  "attempts",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("attempts_key").on(t.key, t.createdAt)],
+);
+

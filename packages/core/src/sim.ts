@@ -4,6 +4,7 @@
 
 import { FORMULA_BY_ID, FORMULAS, type Level } from "./formulas";
 import { type Card, isNew, newCard, retrievability, review } from "./srs";
+import { scoredByDay } from "./points";
 import { type Assignment, type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
 
 export interface Profile {
@@ -34,10 +35,10 @@ export const CLASSMATES: Profile[] = [
 
 /** A four-week AMC 10 course. Week w is assigned on day start + 7(w - 1). */
 export const SEED_WEEKS: string[][] = [
-  ["quadratic-formula", "vieta-quadratic", "arithmetic-series", "geometric-series"],
-  ["pythagorean", "heron", "inscribed-angle", "power-of-a-point", "special-angles"],
-  ["num-divisors", "gcd-lcm", "legendre", "chicken-mcnugget"],
-  ["perms-combs", "stars-and-bars", "pie", "complement"],
+  ["amgm", "vieta-quadratic", "arithmetic-series", "geometric-series"],
+  ["stewart", "heron", "inscribed-angle", "power-of-a-point", "double-angle"],
+  ["num-divisors", "fermat", "legendre", "chicken-mcnugget"],
+  ["binomial-theorem", "stars-and-bars", "pie", "conditional-probability"],
 ];
 export const SEED_LENGTH = 21; // days of history before "today"
 
@@ -128,5 +129,5 @@ export function simulate(
       cards[card.formulaId] = review(card, ok, day).card;
     }
   }
-  return { cards, log, doneDays, missed };
+  return { cards, log, scored: scoredByDay(log), doneDays, missed };
 }

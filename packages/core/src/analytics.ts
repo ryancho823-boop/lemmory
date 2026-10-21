@@ -1,4 +1,4 @@
-import { FORMULA_BY_ID, TOPICS, type Topic } from "./formulas";
+import { TOPICS, type Topic } from "./content/types";
 import type { LogEntry, StudentRecord } from "./records";
 import { pointsBetween, streak } from "./points";
 import { type Card, isMastered, retrievability } from "./srs";
@@ -44,9 +44,10 @@ export function summary(s: Student, today: number) {
   };
 }
 
-export function byTopic(log: LogEntry[]) {
+/** Accuracy per topic. `topicOf` looks formulas up in whichever bank the app has (the demo only has a slice). */
+export function byTopic(log: LogEntry[], topicOf: (formulaId: string) => Topic | undefined) {
   return TOPICS.map((topic) => {
-    const l = log.filter((x) => FORMULA_BY_ID[x.formulaId]?.topic === topic);
+    const l = log.filter((x) => topicOf(x.formulaId) === topic);
     return { topic, n: l.length, accuracy: accuracy(l) };
   }).filter((t) => t.n > 0);
 }
@@ -169,8 +170,6 @@ export function classFormulaHealth(students: Student[], formulaIds: string[], to
     })
     .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1));
 }
-
-export const topicOf = (id: string): Topic => FORMULA_BY_ID[id].topic;
 
 // ── daily consistency ──
 

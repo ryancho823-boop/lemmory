@@ -144,7 +144,7 @@ export async function newGame(teacherId: string, classId: string) {
   const klass = await owned(teacherId, classId);
   const today = classToday(klass);
   const ids = await roster(classId);
-  const records = await loadRecords(ids);
+  const records = await loadRecords(ids, null);
   // Points already earned today don't count toward the new game.
   const baseline = Object.fromEntries(ids.map((id) => [id, pointsBetween(records.get(id)!, today, today)]));
   await db.update(classes).set({ gameDay: today, gameBaseline: baseline }).where(eq(classes.id, classId));

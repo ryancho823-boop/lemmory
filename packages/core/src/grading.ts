@@ -1,7 +1,7 @@
 // Server-side card checking. The browser only ever gets the prompt; answers come back
 // after the attempt is graded and recorded, so they can't be read ahead of time.
 
-import { FORMULA_BY_ID, type Formula, type Problem, type Topic } from "./formulas";
+import { FORMULA_BY_ID, type Figure, type Formula, type Problem, type Topic } from "./formulas";
 import { findTypo, gradeNumber, gradeRecall } from "./grade";
 import { setupApply } from "./practice";
 
@@ -12,6 +12,7 @@ export interface RecallPrompt {
   topic: Topic;
   setup: string;
   blanks: { lhs: string }[];
+  figure?: Figure;
 }
 
 export interface ApplyPrompt {
@@ -22,6 +23,7 @@ export interface ApplyPrompt {
   /** How many formulas the problem needs. */
   needs: number;
   options: { id: string; name: string }[];
+  figure?: Figure;
 }
 
 export type Prompt = RecallPrompt | ApplyPrompt;
@@ -54,12 +56,12 @@ export interface Outcome {
 }
 
 export function recallPrompt(f: Formula): RecallPrompt {
-  return { kind: "recall", formulaId: f.id, name: f.name, topic: f.topic, setup: f.setup, blanks: f.recall.map((b) => ({ lhs: b.lhs })) };
+  return { kind: "recall", formulaId: f.id, name: f.name, topic: f.topic, setup: f.setup, blanks: f.recall.map((b) => ({ lhs: b.lhs })), figure: f.figure };
 }
 
 /** A fresh problem (not `lastProblemId`) with look-alike distractors from the student's deck and topic. */
-export function applyPrompt(f: Formula, lastProblemId: string | undefined, deck: string[]): ApplyPrompt {
-  const { problem, options } = setupApply(f, lastProblemId, deck);
+export function applyPrompt(f: Formula, avoid: string[], deck: string[]): ApplyPrompt {
+  const { problem, options } = setupApply(f, avoid, deck);
   return {
     kind: "apply",
     formulaId: f.id,
@@ -67,6 +69,7 @@ export function applyPrompt(f: Formula, lastProblemId: string | undefined, deck:
     text: problem.text,
     needs: problem.uses.length,
     options: options.map((id) => ({ id, name: FORMULA_BY_ID[id].name })),
+    figure: problem.figure,
   };
 }
 

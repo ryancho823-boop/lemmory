@@ -1,11 +1,11 @@
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
 import { Button, Panel } from "@lemmory/ui/ui";
-import { getView } from "@/lib/session";
+import { getUnlockedView } from "@/lib/session";
 
 export const metadata = { title: "Leaderboard · Lemmory" };
 
 export default async function LeaderboardPage() {
-  const v = await getView();
+  const v = await getUnlockedView();
   return (
     <div className="mx-auto max-w-2xl">
       {v.klass ? (

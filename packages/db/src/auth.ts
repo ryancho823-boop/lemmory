@@ -1,11 +1,12 @@
 import "server-only";
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { randomBytes } from "node:crypto";
 import { and, eq, lt } from "drizzle-orm";
 import { db } from "./client";
 import { sessions, users } from "./schema";
 import { sha256 } from "./password";
+import type { TrialSource } from "./billing";
 
 export type Role = "teacher" | "student";
 
@@ -50,3 +51,29 @@ export const currentUser = cache(async (role: Role) => {
 });
 
 export type SessionUser = NonNullable<Awaited<ReturnType<typeof currentUser>>>;
+
+/** A random id for this browser, kept for two years: one free trial per browser, and limits on guessing. */
+const DEVICE_COOKIE = "lemmory_device";
+
+/**
+ * Who is making this request: this browser's id (set now if it has none) and the IP address,
+ * when the host provides one. Call it from a server action, which is allowed to set cookies.
+ */
+export async function requester(): Promise<{ device: string; ip?: string }> {
+  const jar = await cookies();
+  let device = jar.get(DEVICE_COOKIE)?.value;
+  if (!device) {
+    device = randomBytes(18).toString("base64url");
+    jar.set(DEVICE_COOKIE, device, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 2 * 365 * 86_400 });
+  }
+  const h = await headers();
+  // The host (Vercel) sets these; locally there is none, and a loopback address isn't a real network.
+  const ip = (h.get("x-real-ip") ?? h.get("x-forwarded-for")?.split(",")[0])?.trim();
+  const local = !ip || ip === "::1" || ip.startsWith("127.") || ip === "::ffff:127.0.0.1";
+  return { device, ip: local ? undefined : ip };
+}
+
+/** Who is starting a free trial: the requester, plus the email if there is one. */
+export async function trialSource(email?: string): Promise<TrialSource> {
+  return { email, ...(await requester()) };
+}

@@ -3,12 +3,14 @@
 import { useActionState } from "react";
 import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
+import { TimeZoneField } from "../TimeZoneField";
 import { login } from "../../actions";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
   return (
     <form action={action} className="space-y-4">
+      <TimeZoneField />
       <Field label="Username" name="username" autoComplete="username" autoCapitalize="none" required defaultValue={state?.values?.username} />
       <Field label="Password" name="password" type="password" autoComplete="current-password" required />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}

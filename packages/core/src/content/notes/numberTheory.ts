@@ -13,12 +13,6 @@ export const NUMBER_THEORY_NOTES: Notes = {
     proof:
       "Expanding $(1 + p + \\cdots + p^a)(1 + q + \\cdots + q^b)$ produces each term $p^iq^j$ exactly once, and those are exactly the divisors of $p^aq^b$. Each factor is a geometric series equal to $\\frac{p^{a+1} - 1}{p - 1}$.",
   },
-  "gcd-lcm": {
-    explain:
-      "The GCD and LCM of two numbers multiply to the product of the numbers. Given any three of $a$, $b$, $\\gcd$, $\\operatorname{lcm}$, you can find the fourth.",
-    proof:
-      "For each prime, the GCD takes the smaller exponent from $a$ and $b$ and the LCM takes the larger. The smaller plus the larger is the sum of the two exponents, which is that prime's exponent in $ab$.",
-  },
   totient: {
     explain:
       "$\\varphi(n)$ counts the numbers from $1$ to $n$ sharing no factor with $n$. Start with $n$ and, for each distinct prime $p$ dividing $n$, keep the fraction $1 - \\frac1p$ that isn't a multiple of $p$.",
@@ -55,37 +49,11 @@ export const NUMBER_THEORY_NOTES: Notes = {
     proof:
       "Sketch: for each remainder mod $a$, the smallest reachable amount is a multiple of $b$, namely $b \\cdot k$ for $k = 0, \\dots, a - 1$. The largest of these is $(a-1)b$, so the largest unreachable amount is $(a-1)b - a = ab - a - b$. Counting the gaps below each $bk$ gives $\\frac{(a-1)(b-1)}{2}$.",
   },
-  "base-conversion": {
-    explain:
-      "In base $b$, each digit is worth a power of $b$: ones, then $b$s, then $b^2$s. To convert to base $10$, multiply each digit by its place value and add. An unknown base becomes an equation to solve.",
-    proof: "This is the definition of positional notation: the digit $d_k$ in position $k$ (counting from $0$ on the right) stands for $d_k \\cdot b^k$.",
-  },
-  "digit-sum-mod-9": {
-    explain:
-      "A number and the sum of its digits leave the same remainder when divided by $9$ (and by $3$). That gives the divisibility tests and makes missing-digit problems quick.",
-    proof: "$10 \\equiv 1 \\pmod 9$, so $10^k \\equiv 1$ for every $k$. A number $\\sum d_k10^k$ is therefore $\\equiv \\sum d_k$, the digit sum.",
-  },
-  "division-algorithm": {
-    explain:
-      "Dividing $a$ by $b$ gives a quotient and a remainder smaller than $b$. Remainders behave well under arithmetic: the remainder of a sum or product depends only on the remainders of the pieces.",
-    proof:
-      "Let $q$ be the largest integer with $bq \\le a$. Then $r = a - bq$ satisfies $0 \\le r$, and $r < b$ because otherwise $q + 1$ would also work.",
-  },
-  "count-multiples": {
-    explain:
-      "From $1$ to $n$, every $k$th number is a multiple of $k$, so there are $\\lfloor n/k \\rfloor$ of them. For a range $a$ to $b$, subtract the count up to $a - 1$ from the count up to $b$.",
-    proof: "The multiples of $k$ up to $n$ are $k, 2k, \\dots, mk$ where $mk \\le n < (m+1)k$, so $m = \\lfloor n/k \\rfloor$.",
-  },
   crt: {
     explain:
       "If the moduli share no factors, any combination of remainders happens for exactly one number in each block of $mn$ consecutive integers. To find it, list numbers with the right remainder for the larger modulus and check the others.",
     proof:
       "The map from $x \\bmod mn$ to the pair $(x \\bmod m, x \\bmod n)$ is one-to-one: if two numbers give the same pair, their difference is divisible by $m$ and $n$, hence by $mn$. Both sides have $mn$ possibilities, so every pair occurs exactly once.",
-  },
-  "number-of-digits": {
-    explain:
-      "A number has $k$ digits when it's between $10^{k-1}$ and $10^k$, so the digit count is $\\lfloor\\log_{10} n\\rfloor + 1$. For products of powers, pair up $2$s and $5$s into $10$s and count what's left.",
-    proof: "If $10^{k-1} \\le n < 10^k$, then $k - 1 \\le \\log_{10} n < k$, so $\\lfloor\\log_{10} n\\rfloor = k - 1$.",
   },
   bezout: {
     explain:

@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
+import { FORMULA_BY_ID, TOPIC_COLOR, topicOf } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
-import { byTopic, classFormulaHealth, recent, summary } from "@/lib/analytics";
-import { BarList } from "@/components/charts";
+import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
+import { BarList } from "@lemmory/ui/charts";
 import { Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function TeacherOverview() {
@@ -22,7 +22,7 @@ export default function TeacherOverview() {
     .map(({ s, m }) => {
       const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
       const away = m.lastActive === null ? null : today - m.lastActive;
-      const weak = byTopic(recent(s.log, today, 28))
+      const weak = byTopic(recent(s.log, today, 28), topicOf)
         .filter((t) => t.n >= 3)
         .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
       const behind = m.streak === 0;

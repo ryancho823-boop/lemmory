@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CONTEST, contestLabel, YOU } from "@/lib/sim";
-import { streak, streakBonus, weakest } from "@/lib/analytics";
+import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";

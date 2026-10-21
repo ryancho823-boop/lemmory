@@ -7,7 +7,7 @@ import type { Tier } from "@/lib/pricing";
 
 /**
  * One button per plan; the chosen plan's details show below. The URL's #academy, #club or #student picks one.
- * `teacherRules` (the pilot, students never paying) show on the teacher plans only.
+ * `teacherRules` (the free trial, students never paying) show on the teacher plans only.
  */
 export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules: string[] }) {
   const [active, setActive] = useState(tiers[0].id);
@@ -81,7 +81,7 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
           href={t.id === "student" ? INDIVIDUAL_SIGNUP_URL : SIGNUP_URL}
           className="mt-8 inline-flex h-11 items-center rounded-lg bg-ink px-5 font-semibold text-white hover:bg-ink/85"
         >
-          {t.id === "student" ? "Sign up as a student" : "Start a free pilot"}
+          {t.id === "student" ? "Sign up as a student" : "Start a free trial"}
         </a>
       </div>
     </div>

@@ -2,48 +2,6 @@ import { defineTopic, int } from "../types";
 
 export const COMBINATORICS_2 = defineTopic("Combinatorics", [
   {
-    id: "multiplication-principle",
-    name: "Multiplication Principle",
-    level: "AMC 8",
-    statement: "\\text{total} = n_1 \\times n_2 \\times \\cdots",
-    setup: "Independent choices made in sequence multiply.",
-    whenToUse: "Outfits, license plates, codes: one choice after another.",
-    recall: [{ lhs: "\\text{Ways for } m \\text{ then } n \\text{ choices} =", answer: "mn", vars: { m: int(2, 9), n: int(2, 9) } }],
-    related: ["perms-combs", "subsets"],
-    problems: [
-      { id: "mul1", text: "How many license plates have $3$ letters followed by $3$ digits?", answer: "17576000", solution: "$26^3\\cdot10^3$." },
-      { id: "mul2", text: "You own $4$ shirts, $3$ pants, and $2$ pairs of shoes. How many outfits?", answer: "24", solution: "$4\\cdot3\\cdot2$." },
-    ],
-  },
-  {
-    id: "subsets",
-    name: "Counting Subsets",
-    level: "AMC 8",
-    statement: "\\#\\text{subsets of an } n\\text{-element set} = 2^n",
-    setup: "Each element is either in or out.",
-    whenToUse: "Counting subsets, or yes/no choices for each item.",
-    recall: [{ lhs: "\\#\\text{subsets} =", answer: "2^n", vars: { n: int(1, 10) } }],
-    related: ["multiplication-principle", "binomial-theorem"],
-    problems: [
-      { id: "sub1", text: "How many subsets of $\\{1, 2, \\dots, 10\\}$ contain the number $1$?", answer: "512", solution: "The other $9$ elements are free: $2^9$." },
-      { id: "sub2", text: "How many nonempty subsets does a $6$-element set have?", answer: "63", solution: "$2^6 - 1$." },
-    ],
-  },
-  {
-    id: "complementary-counting",
-    name: "Complementary Counting",
-    level: "AMC 8",
-    statement: "\\#\\text{good} = \\#\\text{total} - \\#\\text{bad}",
-    setup: "Write $T$ for the total and $B$ for the outcomes you don't want.",
-    whenToUse: "\"At least one\" counting: the opposite is usually simpler.",
-    recall: [{ lhs: "\\#\\text{good} =", answer: "T-B", vars: { T: [50, 100], B: [1, 40] } }],
-    related: ["complement", "pie"],
-    problems: [
-      { id: "cc1", text: "How many four-digit numbers contain at least one digit $7$?", answer: "3168", solution: "$9000 - 8\\cdot9\\cdot9\\cdot9 = 3168$." },
-      { id: "cc2", text: "How many subsets of $\\{1, \\dots, 8\\}$ have at least $2$ elements?", answer: "247", solution: "$256 - 1 - 8$." },
-    ],
-  },
-  {
     id: "distinct-distribution",
     name: "Distinct Objects into Boxes",
     level: "AMC 10",
@@ -51,7 +9,7 @@ export const COMBINATORICS_2 = defineTopic("Combinatorics", [
     setup: "Each object independently picks a box. Compare stars and bars, where objects are identical.",
     whenToUse: "Distinct things (people, letters) each choosing one of several options.",
     recall: [{ lhs: "\\text{Ways} =", answer: "k^n", vars: { k: int(2, 6), n: int(2, 6) } }],
-    related: ["stars-and-bars", "multiplication-principle"],
+    related: ["stars-and-bars"],
     problems: [
       { id: "dd1", text: "In how many ways can $5$ different letters be put into $3$ mailboxes?", answer: "243", solution: "$3^5$." },
       { id: "dd2", text: "Each of $4$ students joins one of $3$ clubs. How many ways?", answer: "81", solution: "$3^4$." },
@@ -65,27 +23,10 @@ export const COMBINATORICS_2 = defineTopic("Combinatorics", [
     setup: "Ways to choose $k$ items from a row of $n$ with no two next to each other.",
     whenToUse: "Seats with gaps, subsets with no consecutive numbers.",
     recall: [{ lhs: "\\text{Ways} =", answer: "\\binom{n-k+1}{k}", vars: { n: int(8, 12), k: int(2, 4) } }],
-    related: ["stars-and-bars", "perms-combs"],
+    related: ["stars-and-bars"],
     problems: [
       { id: "na1", text: "In how many ways can you choose $3$ seats from a row of $8$ so that no two chosen seats are adjacent?", answer: "20", solution: "$\\binom{6}{3}$." },
       { id: "na2", text: "How many $4$-element subsets of $\\{1, \\dots, 10\\}$ contain no two consecutive numbers?", answer: "35", solution: "$\\binom{7}{4}$." },
-    ],
-  },
-  {
-    id: "handshakes",
-    name: "Handshakes & Diagonals",
-    level: "AMC 8",
-    statement: "\\binom{n}{2} = \\frac{n(n-1)}{2}, \\qquad \\text{diagonals} = \\frac{n(n-3)}{2}",
-    setup: "Pairs among $n$ people; diagonals of an $n$-gon.",
-    whenToUse: "Every pair interacts once: handshakes, round-robin games, polygon diagonals.",
-    recall: [
-      { lhs: "\\text{Handshakes} =", answer: "\\frac{n(n-1)}{2}", vars: { n: int(3, 20) } },
-      { lhs: "\\text{Diagonals of an } n\\text{-gon} =", answer: "\\frac{n(n-3)}{2}", vars: { n: int(4, 20) } },
-    ],
-    related: ["perms-combs", "polygon-angles"],
-    problems: [
-      { id: "hs21", text: "How many diagonals does a $12$-sided polygon have?", answer: "54", solution: "$\\frac{12\\cdot9}{2}$." },
-      { id: "hs22", text: "In a round-robin tournament with $10$ teams, each pair plays once. How many games?", answer: "45", solution: "$\\binom{10}{2}$." },
     ],
   },
   {
@@ -96,7 +37,7 @@ export const COMBINATORICS_2 = defineTopic("Combinatorics", [
     setup: "An $m \\times n$ grid of squares has $m + 1$ and $n + 1$ grid lines. A rectangle picks two of each.",
     whenToUse: "Counting rectangles (of any size) in a grid.",
     recall: [{ lhs: "\\#\\text{rectangles} =", answer: "\\binom{m+1}{2}\\binom{n+1}{2}", vars: { m: int(2, 8), n: int(2, 8) } }],
-    related: ["power-sums", "perms-combs"],
+    related: ["power-sums"],
     problems: [
       { id: "gr1", text: "How many rectangles are on an $8 \\times 8$ chessboard?", answer: "1296", solution: "$\\binom92^2 = 36^2$." },
       { id: "gr2", text: "How many rectangles are in a $3 \\times 4$ grid of unit squares?", answer: "60", solution: "$\\binom42\\binom52 = 6\\cdot10$." },

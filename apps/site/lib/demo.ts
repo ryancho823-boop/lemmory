@@ -9,38 +9,38 @@ import type { Notes } from "@lemmory/core/content/notes/types";
  */
 export const DEMO_IDS = [
   // Algebra
-  "quadratic-formula",
+  "amgm",
   "vieta-quadratic",
   "arithmetic-series",
   "geometric-series",
   "sfft",
   // Geometry
-  "pythagorean",
+  "stewart",
   "heron",
   "inscribed-angle",
   "power-of-a-point",
   // Trigonometry
-  "special-angles",
+  "double-angle",
   "law-of-cosines",
   "area-sine",
   // Number theory
   "num-divisors",
-  "gcd-lcm",
+  "fermat",
   "legendre",
   "chicken-mcnugget",
   // Combinatorics
-  "perms-combs",
+  "binomial-theorem",
   "stars-and-bars",
   "pie",
   // Probability
-  "complement",
+  "conditional-probability",
   "expected-value",
   // Calculus
   "power-rule",
 ];
 
 /** Application-mode problems per formula in the demo. */
-export const DEMO_PROBLEMS_PER_FORMULA = 2;
+export const DEMO_PROBLEMS_PER_FORMULA = 5;
 
 /** How many days "Skip to tomorrow" can go past the real date. */
 export const DEMO_MAX_DAYS = 30;

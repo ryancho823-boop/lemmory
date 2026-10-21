@@ -1,10 +1,11 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { type Competition, type Student, pointsBetween } from "./analytics";
+import { type Competition, type Student, pointsBetween, scoredByDay } from "@lemmory/core/analytics";
 import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
 import { DEMO_MAX_DAYS } from "./demo";
+import { FORMULA_BY_ID } from "./bank";
 
 // Demo persistence: the demo student's data lives in localStorage; classmates are
 // re-simulated from the assignments. Swap for an API + database for real classes.
@@ -93,8 +94,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const t = realToday();
     try {
       const raw = localStorage.getItem(KEY);
+      const saved: State | null = raw ? JSON.parse(raw) : null;
+      // A save that mentions a formula no longer in the bank starts over instead of crashing.
+      const known = saved && saved.assignments.every((a) => FORMULA_BY_ID[a.formulaId]) && Object.keys(saved.cards).every((id) => FORMULA_BY_ID[id]);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from storage after mount
-      setState(raw ? JSON.parse(raw) : seed(t));
+      setState(known ? saved : seed(t));
     } catch {
       setState(seed(t));
     }
@@ -152,6 +156,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       isYou: true,
       cards: state.cards,
       log: state.log,
+      scored: scoredByDay(state.log),
       doneDays: nothingDue && !state.doneDays.includes(today) ? [...state.doneDays, today] : state.doneDays,
       missed: state.missed,
     }),
@@ -167,9 +172,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .sort((a, b) => a.memory.due - b.memory.due)
       .map((c) => c.formulaId);
     const room = Math.max(0, NEW_PER_DAY - session.newStarted.length);
+    // Assigned homework first, so cards added on your own can't push it back.
     const fresh = cards
       .filter((c) => isNew(c) && !pending.includes(c.formulaId))
-      .sort((a, b) => a.addedDay - b.addedDay)
+      .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.addedDay - b.addedDay)
       .slice(0, room)
       .map((c) => c.formulaId);
     // Interleave new cards among reviews (mixed practice beats blocked practice).

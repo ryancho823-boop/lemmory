@@ -6,6 +6,7 @@ import type { RecallPrompt, RecallResult } from "@lemmory/core/grading";
 import { MathInput, type MathInputHandle } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, TopicTag } from "../ui";
+import { Figure } from "../Figure";
 
 type Graded = Extract<RecallResult, { status: "graded" }>;
 
@@ -59,6 +60,7 @@ export function RecallCard({ prompt, onCheck, onDone }: Props) {
       <p className="mt-1.5 text-ink/60">
         <Rich text={prompt.setup} />
       </p>
+      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
 
       <div className="mt-7 space-y-4">
         {prompt.blanks.map((b, i) => (

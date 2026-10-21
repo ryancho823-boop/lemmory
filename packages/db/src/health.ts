@@ -15,15 +15,9 @@ function describe(raw: string | undefined) {
 export async function databaseHealth() {
   const { cleanEnv, DATABASE_AUTH_TOKEN: token } = await import("./client");
   const url = cleanEnv(process.env.DATABASE_URL);
-  let host = "";
-  try {
-    host = url ? new URL(url).host : "";
-  } catch {
-    host = "not a valid address";
-  }
+  // No host name or account count: this page is public, and neither helps fix a setup.
   const report = {
     DATABASE_URL: describe(process.env.DATABASE_URL),
-    database_host: host || "-",
     url_starts_with: url ? url.split("://")[0] + "://" : "-",
     DATABASE_AUTH_TOKEN: describe(process.env.DATABASE_AUTH_TOKEN),
     // Turso tokens are three dot-separated parts, a few hundred characters long.
@@ -32,8 +26,8 @@ export async function databaseHealth() {
   };
   try {
     const { db } = await import("./client");
-    const rows = await db.all<{ n: number }>(sql`select count(*) as n from users`);
-    report.database = `connected (${rows[0]?.n ?? 0} accounts)`;
+    await db.all(sql`select 1 from users limit 1`);
+    report.database = "connected";
   } catch (e) {
     const err = e as Error & { cause?: Error };
     report.database = `ERROR: ${(err.cause?.message ?? err.message).slice(0, 300)}`;

@@ -6,82 +6,6 @@ const noTrig = ["\\sin", "\\cos", "\\tan", "^\\circ", "\\degree"];
 
 export const TRIG = defineTopic("Trigonometry", [
   {
-    id: "special-angles",
-    name: "Special Angle Values",
-    level: "AMC 10",
-    statement: "\\sin 30^\\circ = \\tfrac12,\\ \\ \\sin 45^\\circ = \\tfrac{\\sqrt2}{2},\\ \\ \\sin 60^\\circ = \\tfrac{\\sqrt3}{2}",
-    setup: "From the $30$-$60$-$90$ triangle (sides $1 : \\sqrt3 : 2$) and the $45$-$45$-$90$ triangle (sides $1 : 1 : \\sqrt2$).",
-    whenToUse: "Angles of $30^\\circ$, $45^\\circ$, or $60^\\circ$ show up, including in equilateral triangles and squares.",
-    recall: [
-      { lhs: "\\sin 60^\\circ =", answer: "\\frac{\\sqrt3}{2}", vars: {}, banned: noTrig },
-      { lhs: "\\cos 45^\\circ =", answer: "\\frac{\\sqrt2}{2}", vars: {}, banned: noTrig },
-      { lhs: "\\tan 30^\\circ =", answer: "\\frac{\\sqrt3}{3}", vars: {}, banned: noTrig },
-    ],
-    related: ["pythagorean-identity", "law-of-sines"],
-    problems: [
-      {
-        id: "sa1",
-        text: "A ramp $12$ meters long makes a $30^\\circ$ angle with the ground. How many meters high does it rise?",
-        answer: "6",
-        solution: "$12\\sin 30^\\circ = 6$.",
-      },
-      {
-        id: "sa2",
-        text: "In right triangle $ABC$ with right angle at $C$, $\\angle A = 60^\\circ$ and $AC = 5$. Find $BC$.",
-        answer: "5\\sqrt{3}",
-        solution: "$BC = AC\\tan 60^\\circ = 5\\sqrt3$.",
-      },
-    ],
-  },
-  {
-    id: "radians",
-    name: "Radian Conversion",
-    level: "AMC 12",
-    statement: "\\theta_{\\text{rad}} = \\frac{\\pi}{180}\\cdot\\theta_{\\text{deg}}, \\qquad L = r\\theta",
-    setup: "$\\pi$ radians $= 180^\\circ$. In radians, arc length is just $r\\theta$.",
-    whenToUse: "Angles given in radians, or arc length and rotation problems.",
-    recall: [{ lhs: "d^\\circ \\text{ in radians} =", answer: "\\frac{\\pi d}{180}", vars: { d: [10, 350] }, banned: ["\\circ", "\\degree"] }],
-    related: ["arcs-sectors", "special-angles"],
-    problems: [
-      {
-        id: "rd1",
-        text: "Convert $135^\\circ$ to radians.",
-        answer: "\\frac{3\\pi}{4}",
-        solution: "$135\\cdot\\frac{\\pi}{180} = \\frac{3\\pi}{4}$.",
-      },
-      {
-        id: "rd2",
-        text: "A wheel of radius $2$ turns through $1.5$ radians. How far does a point on its rim travel?",
-        answer: "3",
-        solution: "$L = r\\theta = 2 \\cdot 1.5 = 3$.",
-      },
-    ],
-  },
-  {
-    id: "pythagorean-identity",
-    name: "Pythagorean Identity",
-    level: "AMC 10",
-    statement: "\\sin^2 x + \\cos^2 x = 1",
-    setup: "Dividing by $\\cos^2 x$ gives $\\tan^2 x + 1 = \\sec^2 x$.",
-    whenToUse: "You know one of $\\sin x$ or $\\cos x$ and need the other, or need $\\sin x \\cos x$ from $\\sin x + \\cos x$.",
-    recall: [{ lhs: "\\sin^2 x + \\cos^2 x =", answer: "1", vars: {} }],
-    related: ["double-angle", "special-angles"],
-    problems: [
-      {
-        id: "pid1",
-        text: "$\\sin x = \\frac35$ and $x$ is in the second quadrant. Find $\\cos x$.",
-        answer: "-\\frac{4}{5}",
-        solution: "$\\cos^2 x = 1 - \\frac{9}{25}$, and cosine is negative in quadrant II.",
-      },
-      {
-        id: "pid2",
-        text: "$\\sin x + \\cos x = \\frac12$. Find $\\sin x \\cos x$.",
-        answer: "-\\frac{3}{8}",
-        solution: "Squaring: $1 + 2\\sin x\\cos x = \\frac14$, so $\\sin x\\cos x = -\\frac38$.",
-      },
-    ],
-  },
-  {
     id: "double-angle",
     name: "Double Angle Formulas",
     level: "AMC 12",
@@ -92,7 +16,7 @@ export const TRIG = defineTopic("Trigonometry", [
       { lhs: "\\sin 2x =", answer: "2\\sin x\\cos x", vars: { x: angle }, banned: noDouble },
       { lhs: "\\cos 2x =", answer: "\\cos^2x-\\sin^2x", vars: { x: angle }, banned: noDouble },
     ],
-    related: ["angle-addition", "power-reduction", "pythagorean-identity"],
+    related: ["angle-addition", "power-reduction"],
     problems: [
       {
         id: "da1",
@@ -119,7 +43,7 @@ export const TRIG = defineTopic("Trigonometry", [
       { lhs: "\\sin(a+b) =", answer: "\\sin a\\cos b+\\cos a\\sin b", vars: { a: angle, b: angle }, banned: ["a+b", "b+a"] },
       { lhs: "\\cos(a+b) =", answer: "\\cos a\\cos b-\\sin a\\sin b", vars: { a: angle, b: angle }, banned: ["a+b", "b+a"] },
     ],
-    related: ["tan-addition", "double-angle", "special-angles"],
+    related: ["tan-addition", "double-angle"],
     problems: [
       {
         id: "aa1",
@@ -170,7 +94,7 @@ export const TRIG = defineTopic("Trigonometry", [
       { lhs: "\\cos^2 x =", answer: "\\frac{1+\\cos 2x}{2}", vars: { x: angle }, banned: ["\\cos^", "\\sin^"] },
       { lhs: "\\sin^2 x =", answer: "\\frac{1-\\cos 2x}{2}", vars: { x: angle }, banned: ["\\cos^", "\\sin^"] },
     ],
-    related: ["double-angle", "pythagorean-identity"],
+    related: ["double-angle"],
     problems: [
       {
         id: "prr1",
@@ -194,7 +118,7 @@ export const TRIG = defineTopic("Trigonometry", [
     setup: "Two sides $a, b$ and the included angle $C$.",
     whenToUse: "You know two sides and the angle between them.",
     recall: [{ lhs: "K =", answer: "\\frac{1}{2}ab\\sin C", vars: { a: pos, b: pos, C: angle } }],
-    related: ["heron", "law-of-cosines", "equilateral-area"],
+    related: ["heron", "law-of-cosines"],
     problems: [
       {
         id: "ar1",
@@ -218,7 +142,7 @@ export const TRIG = defineTopic("Trigonometry", [
     setup: "Angle $C$ is opposite side $c$.",
     whenToUse: "You know two sides and the included angle (find the third side), or all three sides (find an angle).",
     recall: [{ lhs: "c^2 =", answer: "a^2+b^2-2ab\\cos C", vars: { a: pos, b: pos, C: angle } }],
-    related: ["law-of-sines", "stewart", "pythagorean"],
+    related: ["law-of-sines", "stewart"],
     problems: [
       {
         id: "lc1",

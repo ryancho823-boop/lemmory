@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, BarChart3, BookOpen, GraduationCap, Layers, Play, Trophy, UserRound, Users } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
+import { CLASSMATES } from "@/lib/sim";
 
 const SIDES = [
   {
@@ -22,7 +23,7 @@ const SIDES = [
     href: "/teacher",
     icon: GraduationCap,
     title: "Teacher view",
-    who: "Ms. Chen, 13 students",
+    who: `Ms. Chen, ${CLASSMATES.length + 1} students`,
     body: "Assign formulas, see what the class is forgetting, and drill into any formula or student.",
     features: [
       { icon: BookOpen, text: "One-click assign from the bank" },

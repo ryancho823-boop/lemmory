@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Frame } from "@lemmory/ui/Shell";
 import { useStore } from "@/lib/store";
 import { YOU } from "@/lib/sim";
-import { streak } from "@/lib/analytics";
+import { streak } from "@lemmory/core/analytics";
 import { DEMO_MAX_DAYS } from "@/lib/demo";
 import { SIGNUP_URL } from "@/lib/links";
 import { cx } from "@lemmory/ui/ui";
@@ -116,7 +116,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
               <p className="mt-2 text-ink/60">
                 The demo runs {DEMO_MAX_DAYS} days ahead.{" "}
                 <a href={SIGNUP_URL} className="font-semibold text-ink underline">
-                  Start a pilot
+                  Start a free trial
                 </a>{" "}
                 to use it with a real class.
               </p>
