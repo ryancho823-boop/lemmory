@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import { type LeaderRow, leaderRows } from "@lemmory/core/analytics";
 import {
@@ -23,7 +23,7 @@ import { getStudentPlan, studentPlanState, teacherActive } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, studentToday } from "./records";
 import { dayInZone } from "@lemmory/core/days";
-import { assignments, cards, classes, days, enrollments, reviewSessions, reviews, users } from "./schema";
+import { assignments, cards, classes, dailyScores, days, enrollments, reviewSessions, reviews, users } from "./schema";
 
 export type Mode = "review" | "practice";
 
@@ -213,6 +213,12 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
   // Already finished today by another request sent at the same moment (a double click, a second
   // tab): that one counts, this one changes nothing, so the card isn't scheduled or scored twice.
   if (!inserted.length) return { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
+  // Points come from these daily totals, so keep them in step with the log (self-added cards earn none).
+  if (card.source !== "self")
+    await q
+      .insert(dailyScores)
+      .values({ studentId, day: today, n: 1 })
+      .onConflictDoUpdate({ target: [dailyScores.studentId, dailyScores.day], set: { n: sql`${dailyScores.n} + 1` } });
   await q
     .update(cards)
     .set({ stage: updated.stage, memory: updated.memory })

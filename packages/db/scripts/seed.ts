@@ -36,7 +36,7 @@ function nextContest() {
 
 async function main() {
   // Start clean.
-  for (const table of [t.trialClaims, t.studentPlans, t.plans, t.reviewSessions, t.days, t.reviews, t.cards, t.assignments, t.enrollments, t.classes, t.sessions, t.users])
+  for (const table of [t.trialClaims, t.studentPlans, t.plans, t.reviewSessions, t.dailyScores, t.days, t.reviews, t.cards, t.assignments, t.enrollments, t.classes, t.sessions, t.users])
     await db.delete(table);
 
   const hash = await hashPassword(PASSWORD);
@@ -77,6 +77,8 @@ async function main() {
       await db.insert(t.reviews).values(
         rec.log.map((l) => ({ studentId, day: l.day, formulaId: l.formulaId, stage: l.stage, firstTry: l.firstTry, confusedWith: l.confusedWith ?? null, extra: !!l.extra })),
       );
+    const scoreRows = Object.entries(rec.scored).map(([d, n]) => ({ studentId, day: Number(d), n }));
+    if (scoreRows.length) await db.insert(t.dailyScores).values(scoreRows);
     const dayRows = Object.entries(rec.missed).map(([d, missed]) => ({ studentId, day: Number(d), done: rec.doneDays.includes(Number(d)), missed }));
     if (dayRows.length) await db.insert(t.days).values(dayRows);
   }

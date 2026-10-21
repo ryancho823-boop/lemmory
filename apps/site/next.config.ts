@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "@lemmory/core/headers";
 
 const nextConfig: NextConfig = {
+  headers: async () => [{ source: "/:path*", headers: securityHeaders() }],
   /* config options here */
   cacheComponents: true,
   // The page used to be "For academies".

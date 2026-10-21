@@ -53,3 +53,23 @@ export async function noteAttempt(kind: LimitKind, ...ids: (string | undefined)[
   // Nothing is limited for longer than a day, so older rows are never needed.
   await db.delete(attempts).where(lt(attempts.createdAt, new Date(Date.now() - 86_400_000)));
 }
+
+// ── a quick in-memory pace limit, for things that happen many times a minute ──
+
+const recent = new Map<string, number[]>();
+
+/**
+ * True if `key` has been used more than `max` times in the last minute. Kept in this server
+ * instance's memory, because a database write on every answer would cost more than the answers
+ * do. Another instance has its own count, so it blunts a script rather than stopping it; the
+ * real protection is that every answer is cheap (see MAX_ANSWER_LENGTH in core/grade.ts).
+ * 120 a minute is several times faster than anyone can type.
+ */
+export function tooFast(key: string, max = 120, now = Date.now()) {
+  const since = now - 60_000;
+  const times = (recent.get(key) ?? []).filter((t) => t > since);
+  times.push(now);
+  recent.set(key, times);
+  if (recent.size > 5000) for (const [k, v] of recent) if (v[v.length - 1] <= since) recent.delete(k);
+  return times.length > max;
+}

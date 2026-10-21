@@ -1,18 +1,29 @@
 import "server-only";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "./client";
-import { hashPassword, newId, verifyPassword } from "./password";
-import { assignments, cards, classes, days, enrollments, plans, reviewSessions, reviews, sessions, studentPlans, users } from "./schema";
+import { hashPassword, needsRehash, newId, verifyPassword } from "./password";
+import { assignments, cards, classes, dailyScores, days, enrollments, plans, reviewSessions, reviews, sessions, studentPlans, users } from "./schema";
 
 // A real hash to compare against when the account doesn't exist, so a wrong username
 // takes as long as a wrong password.
 const DUMMY = hashPassword("not-a-real-password");
 
+/** Did this insert fail because the email or username is already taken (the database's unique rule)? */
+function isTaken(e: unknown) {
+  return /UNIQUE constraint failed/i.test(`${(e as Error)?.message} ${((e as Error)?.cause as Error | undefined)?.message}`);
+}
+
 export async function createTeacher(name: string, email: string, password: string) {
   const normalized = email.trim().toLowerCase();
   if (await db.select({ id: users.id }).from(users).where(eq(users.email, normalized)).get()) return null;
   const id = newId();
-  await db.insert(users).values({ id, role: "teacher", name, email: normalized, passwordHash: await hashPassword(password) });
+  try {
+    await db.insert(users).values({ id, role: "teacher", name, email: normalized, passwordHash: await hashPassword(password) });
+  } catch (e) {
+    // Two sign-ups for the same email at the same moment: the second one is "taken", not an error.
+    if (isTaken(e)) return null;
+    throw e;
+  }
   return id;
 }
 
@@ -20,7 +31,12 @@ export async function createStudent(name: string, username: string, password: st
   const normalized = username.trim().toLowerCase();
   if (await db.select({ id: users.id }).from(users).where(eq(users.username, normalized)).get()) return null;
   const id = newId();
-  await db.insert(users).values({ id, role: "student", name, username: normalized, passwordHash: await hashPassword(password), timezone });
+  try {
+    await db.insert(users).values({ id, role: "student", name, username: normalized, passwordHash: await hashPassword(password), timezone });
+  } catch (e) {
+    if (isTaken(e)) return null;
+    throw e;
+  }
   return id;
 }
 
@@ -38,7 +54,10 @@ export async function checkLogin(role: "teacher" | "student", login: string, pas
     .where(role === "teacher" ? eq(users.email, key) : eq(users.username, key))
     .get();
   const ok = await verifyPassword(password, user?.hash ?? (await DUMMY));
-  return ok && user && user.role === role ? user.id : null;
+  if (!(ok && user && user.role === role)) return null;
+  // An account made with weaker hashing settings is upgraded now that we have the password.
+  if (needsRehash(user.hash)) await db.update(users).set({ passwordHash: await hashPassword(password) }).where(eq(users.id, user.id));
+  return user.id;
 }
 
 /**
@@ -59,7 +78,7 @@ export async function deleteAccount(userId: string, password: string) {
       await q.delete(classes).where(inArray(classes.id, owned));
     }
     await q.delete(plans).where(eq(plans.teacherId, userId));
-    for (const t of [cards, reviews, days, reviewSessions, enrollments, studentPlans]) await q.delete(t).where(eq(t.studentId, userId));
+    for (const t of [cards, reviews, dailyScores, days, reviewSessions, enrollments, studentPlans]) await q.delete(t).where(eq(t.studentId, userId));
     await q.delete(sessions).where(eq(sessions.userId, userId));
     await q.delete(users).where(eq(users.id, userId));
   });

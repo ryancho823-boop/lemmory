@@ -1,6 +1,6 @@
 // Loading students' review history and keeping their day-by-day record up to date.
 
-import { and, count, eq, gte, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import type { Student } from "@lemmory/core/analytics";
 import { LOG_DAYS, type LogEntry, type StudentRecord } from "@lemmory/core/records";
@@ -8,7 +8,7 @@ import { applyDays, settleDays } from "@lemmory/core/session";
 import { type Card, newCard } from "@lemmory/core/srs";
 import { contestLabel, dayInZone } from "@lemmory/core/days";
 import { db, type Tx } from "./client";
-import { assignments, cards, classes, days, enrollments, reviews, users } from "./schema";
+import { assignments, cards, classes, dailyScores, days, enrollments, reviews, users } from "./schema";
 
 export type ClassRow = typeof classes.$inferSelect;
 type CardRow = typeof cards.$inferSelect;
@@ -73,15 +73,11 @@ export async function loadRecords(studentIds: string[], logSince: number | null,
     logSince === null
       ? Promise.resolve([] as ReviewRow[])
       : q.select().from(reviews).where(and(inArray(reviews.studentId, studentIds), gte(reviews.day, logSince))).orderBy(reviews.id),
-    // Points for all time, counted by the database: one row per student per day. Reviews of a
-    // formula since removed from the bank still count, so points a student earned never disappear.
-    // Answering a card doesn't need them, so that path skips the count.
+    // Points for all time: one small row per student per day, kept up to date as reviews come in
+    // (the review log itself isn't read). Reviews of a formula since removed from the bank still
+    // count, so points a student earned never disappear. Answering a card doesn't need them.
     withPoints
-      ? q
-          .select({ studentId: reviews.studentId, day: reviews.day, n: count() })
-          .from(reviews)
-          .where(and(inArray(reviews.studentId, studentIds), eq(reviews.extra, false)))
-          .groupBy(reviews.studentId, reviews.day)
+      ? q.select().from(dailyScores).where(inArray(dailyScores.studentId, studentIds))
       : Promise.resolve([] as { studentId: string; day: number; n: number }[]),
     q.select().from(days).where(inArray(days.studentId, studentIds)),
   ]);
