@@ -120,6 +120,21 @@ export const reviews = sqliteTable(
   ],
 );
 
+/**
+ * Points-earning cards finished each day (not self-added ones, which are extra practice).
+ * Kept up to date as reviews come in, so a leaderboard reads one small row per student per day
+ * instead of counting the whole review log.
+ */
+export const dailyScores = sqliteTable(
+  "daily_scores",
+  {
+    studentId: user("student_id"),
+    day: integer("day").notNull(),
+    n: integer("n").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.studentId, t.day] })],
+);
+
 /** Each past day: did the student finish, and how many assigned cards were left. */
 export const days = sqliteTable(
   "days",

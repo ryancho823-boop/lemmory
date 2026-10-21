@@ -4,7 +4,7 @@
 export const TRIAL_DAYS = 14;
 
 /** New free trials allowed from one network (IP address) in `days`, so one person can't keep starting them. */
-export const TRIALS_PER_NETWORK = { count: 3, days: 30 };
+export const TRIALS_PER_NETWORK = { count: 10, days: 30 };
 
 export const PRICES = {
   /** Academies pay per student, counting a student in two of their classes once. */

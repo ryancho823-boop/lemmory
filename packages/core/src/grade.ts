@@ -70,8 +70,18 @@ function sameValue(blank: RecallBlank, answer: string, input: string) {
   return checked >= TRIALS;
 }
 
+/**
+ * The longest answer that's graded. The longest formula in the bank is 113 characters, so a
+ * longer answer is never right. Grading and the typo search cost more the longer the input
+ * (a 500-character answer took 9 seconds), so anything longer is refused before any work is done.
+ */
+export const MAX_ANSWER_LENGTH = 200;
+/** The typo search tries every one-letter edit, so it only runs on answers up to this long. */
+export const MAX_TYPO_LENGTH = 120;
+
 /** Is the typed expression equivalent to the blank's answer? Checked numerically at random points. */
 export function gradeRecall(blank: RecallBlank, input: string): boolean {
+  if (input.length > MAX_ANSWER_LENGTH) return false;
   return scoped(() => {
     // Declared variables read `a(b+c)` as multiplication instead of a function call.
     for (const v of Object.keys(blank.vars)) ce().declare(v, "real");
@@ -104,6 +114,7 @@ function recall(blank: RecallBlank, input: string): boolean {
 
 /** Is the typed number equal to the problem's answer? Accepts any form, e.g. 9.25 or 37/4. */
 export function gradeNumber(answer: string, input: string): boolean {
+  if (input.length > MAX_ANSWER_LENGTH) return false;
   return scoped(() => number(answer, input));
 }
 
@@ -163,6 +174,7 @@ function oneLetterEdits(latex: string, vars: string[]) {
  * typing `b` for `a` or a stray extra letter. Returns the corrected LaTeX, or null.
  */
 export function findTypo(blank: RecallBlank, input: string): string | null {
+  if (input.length > MAX_TYPO_LENGTH) return null;
   return scoped(() => {
     for (const v of Object.keys(blank.vars)) ce().declare(v, "real");
     const clean = normalize(input);

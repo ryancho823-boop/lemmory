@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { changePassword, checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
 import { isTimeZone } from "@lemmory/core/days";
+import { MAX_ANSWER_LENGTH } from "@lemmory/core/grade";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
-import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
+import { LIMIT_MESSAGE, isLimited, noteAttempt, tooFast } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
 import { checkoutStudent, startStudentTrial } from "@lemmory/db/billing";
 import {
@@ -42,14 +43,24 @@ async function unlocked() {
   return id;
 }
 
+/** Like unlocked(), and also slows down a script that sends answers faster than anyone can type. */
+async function answeringId() {
+  const id = await unlocked();
+  if (tooFast(`answers:${id}`)) throw new ReviewError("You're going too fast. Wait a moment and try again.");
+  return id;
+}
+
 const str = (v: unknown, max = 200): string => {
   if (typeof v !== "string" || v.length > max) throw new ReviewError("Bad request");
   return v;
 };
-const strs = (v: unknown, maxItems = 8): string[] => {
+const strs = (v: unknown, maxLength: number, maxItems = 8): string[] => {
   if (!Array.isArray(v) || v.length > maxItems) throw new ReviewError("Bad request");
-  return v.map((x) => str(x, 500));
+  return v.map((x) => str(x, maxLength));
 };
+/** Typed answers (formulas and numbers) and the ids of picked formulas, each with a sensible length cap. */
+const answers = (v: unknown) => strs(v, MAX_ANSWER_LENGTH);
+const ids = (v: unknown) => strs(v, 80);
 const mode = (v: unknown): Mode => {
   if (v !== "review" && v !== "practice") throw new ReviewError("Bad request");
   return v;
@@ -206,19 +217,19 @@ export async function getPrompt(formulaId: unknown, m: unknown) {
 }
 
 export async function checkRecall(formulaId: unknown, inputs: unknown, m: unknown, typoUsed: unknown) {
-  const r = await answerRecall(await unlocked(), str(formulaId), strs(inputs), mode(m), typoUsed === true);
+  const r = await answerRecall(await answeringId(), str(formulaId), answers(inputs), mode(m), typoUsed === true);
   if (r.outcome?.finished) refresh();
   return r;
 }
 
 export async function checkPick(formulaId: unknown, problemId: unknown, picked: unknown, m: unknown) {
-  const r = await answerPick(await unlocked(), str(formulaId), str(problemId), strs(picked), mode(m));
+  const r = await answerPick(await answeringId(), str(formulaId), str(problemId), ids(picked), mode(m));
   if (r.outcome?.finished) refresh();
   return r;
 }
 
 export async function checkSolve(formulaId: unknown, problemId: unknown, picked: unknown, input: unknown, m: unknown) {
-  const r = await answerSolve(await unlocked(), str(formulaId), str(problemId), strs(picked), str(input, 500), mode(m));
+  const r = await answerSolve(await answeringId(), str(formulaId), str(problemId), ids(picked), str(input, MAX_ANSWER_LENGTH), mode(m));
   if (r.outcome?.finished) refresh();
   return r;
 }

@@ -20,6 +20,7 @@ const { assign, createClass, deleteClass, newGame, unassign } = await import("..
 const student = await import("../src/student");
 const { loadClass } = await import("../src/records");
 const { CARD_POINTS, pointsBetween } = await import("@lemmory/core/points");
+const { dayInZone } = await import("@lemmory/core/days");
 const { FORMULA_BY_ID } = await import("@lemmory/core/formulas");
 
 const f = FORMULA_BY_ID["heron"];
@@ -58,6 +59,12 @@ test("answering a recall card right finishes the day and earns points", async ()
   const me = v.leaderboard.find((r) => r.you)!;
   assert.ok(me.total >= CARD_POINTS, "points include the card");
   assert.equal(me.streak, 1);
+});
+
+test("the day's points total follows the review log", async () => {
+  const today = dayInZone("UTC");
+  const scores = await db.select().from(schema.dailyScores).where(eq(schema.dailyScores.studentId, quinn));
+  assert.deepEqual(scores.map((r) => [r.day, r.n]), [[today, 1]]);
 });
 
 test("the same card can't be finished twice in a day", async () => {
@@ -120,6 +127,44 @@ test("changing a password needs the current one, and signs the account out every
   assert.ok(await changePassword(riley, "brand-new-pass", "correct-horse"));
 });
 
+test("missed days are filled in once, with the homework left undone", async () => {
+  const today = dayInZone("UTC");
+  const sam = (await createStudent("Sam Test", "sam", "correct-horse", "UTC"))!;
+  await student.joinClass(sam, classId);
+  // Sam has been in the class for 5 days and hasn't opened the app since day today-4.
+  await db.update(schema.enrollments).set({ joinedDay: today - 5, settledThrough: today - 4 }).where(eq(schema.enrollments.studentId, sam));
+  await db.update(schema.cards).set({ addedDay: today - 5 }).where(eq(schema.cards.studentId, sam));
+  await db.$client.execute({ sql: "update cards set memory = json_set(memory, '$.due', ?) where student_id = ?", args: [today - 4, sam] });
+  const v = await view(sam, "Sam");
+  const rows = await db.select().from(schema.days).where(eq(schema.days.studentId, sam));
+  assert.deepEqual(rows.map((r) => r.day).sort(), [today - 3, today - 2, today - 1]);
+  assert.ok(rows.every((r) => !r.done && r.missed >= 1), "each missed day counts the homework left undone");
+  assert.equal(v.record.missed[today - 1], rows.find((r) => r.day === today - 1)!.missed);
+  const [enr] = await db.select().from(schema.enrollments).where(eq(schema.enrollments.studentId, sam));
+  assert.equal(enr.settledThrough, today - 1);
+  await view(sam, "Sam");
+  assert.equal((await db.select().from(schema.days).where(eq(schema.days.studentId, sam))).length, 3, "loading again adds nothing");
+});
+
+test("a miss from before midnight doesn't carry into the new day", async () => {
+  const today = dayInZone("UTC");
+  const sam = (await db.select().from(schema.users).where(eq(schema.users.username, "sam")).get())!.id;
+  // Last night Sam got heron wrong and left it unfinished: that's yesterday's session.
+  await db.insert(schema.reviewSessions).values({
+    studentId: sam,
+    data: { day: today - 1, attempts: { heron: false }, confusions: {}, completed: [], newStarted: ["heron"], typoOffered: [], problems: {}, shown: {} },
+  }).onConflictDoUpdate({ target: schema.reviewSessions.studentId, set: { data: { day: today - 1, attempts: { heron: false }, confusions: {}, completed: [], newStarted: ["heron"], typoOffered: [], problems: {}, shown: {} } } });
+  const v = await view(sam, "Sam");
+  assert.equal(v.completedToday, 0);
+  assert.ok(v.queue.includes("heron"));
+  await student.promptFor(sam, "heron", "review");
+  const { outcome } = await student.answerRecall(sam, "heron", answers, "review");
+  assert.ok(outcome?.finished);
+  const [row] = await db.select().from(schema.reviews).where(eq(schema.reviews.studentId, sam));
+  assert.equal(row.day, today);
+  assert.equal(row.firstTry, true, "today's first try is right, whatever happened last night");
+});
+
 test("deleting a student needs the password and removes everything they own", async () => {
   assert.equal(await deleteAccount(quinn, "wrong-password"), false);
   assert.equal(await deleteAccount(quinn, "correct-horse"), true);
@@ -144,4 +189,24 @@ test("deleting a teacher removes their classes and plan", async () => {
   assert.equal(await deleteAccount(teacherId, "correct-horse"), true);
   assert.equal((await db.select().from(schema.classes).where(eq(schema.classes.id, c2))).length, 0);
   assert.equal((await db.select().from(schema.plans).where(eq(schema.plans.teacherId, teacherId))).length, 0);
+});
+
+test("passwords hashed with older, weaker settings still work and are upgraded on login", async () => {
+  const { scryptSync, randomBytes } = await import("node:crypto");
+  const salt = randomBytes(16);
+  const key = scryptSync("old-password-1", salt, 64, { N: 16384, r: 8, p: 1 });
+  const legacy = `scrypt$${salt.toString("base64url")}$${key.toString("base64url")}`;
+  const id = (await createStudent("Old Hash", "oldhash", "placeholder-1", "UTC"))!;
+  await db.update(schema.users).set({ passwordHash: legacy }).where(eq(schema.users.id, id));
+  assert.equal(await checkLogin("student", "oldhash", "wrong-password"), null);
+  assert.equal(await checkLogin("student", "oldhash", "old-password-1"), id);
+  const [row] = await db.select().from(schema.users).where(eq(schema.users.id, id));
+  assert.notEqual(row.passwordHash, legacy);
+  assert.match(row.passwordHash, /^scrypt\$65536,8,2\$/);
+  assert.equal(await checkLogin("student", "oldhash", "old-password-1"), id, "and still works after the upgrade");
+});
+
+test("two sign-ups for one username at the same moment: one wins, the other is told it's taken", async () => {
+  const results = await Promise.all([createStudent("Twin One", "twin", "correct-horse", "UTC"), createStudent("Twin Two", "twin", "correct-horse", "UTC")]);
+  assert.equal(results.filter(Boolean).length, 1);
 });
