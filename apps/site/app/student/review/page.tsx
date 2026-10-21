@@ -27,7 +27,7 @@ export default function ReviewPage() {
 
   const prepare = (id: string) => {
     if (state.cards[id]?.stage !== "apply") return null;
-    const a = setupApply(FORMULA_BY_ID[id], state.lastProblem[id], Object.keys(state.cards));
+    const a = setupApply(FORMULA_BY_ID[id], state.lastProblem[id] ? [state.lastProblem[id]] : [], Object.keys(state.cards));
     setLastProblem(id, a.problem.id);
     return a;
   };

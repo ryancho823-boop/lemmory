@@ -60,8 +60,8 @@ export function recallPrompt(f: Formula): RecallPrompt {
 }
 
 /** A fresh problem (not `lastProblemId`) with look-alike distractors from the student's deck and topic. */
-export function applyPrompt(f: Formula, lastProblemId: string | undefined, deck: string[]): ApplyPrompt {
-  const { problem, options } = setupApply(f, lastProblemId, deck);
+export function applyPrompt(f: Formula, avoid: string[], deck: string[]): ApplyPrompt {
+  const { problem, options } = setupApply(f, avoid, deck);
   return {
     kind: "apply",
     formulaId: f.id,

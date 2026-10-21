@@ -184,11 +184,17 @@ export async function promptFor(studentId: string, formulaId: string, mode: Mode
       throw new ReviewError("Do this card in today's review first.");
     if (card.stage === "recall") return recallPrompt(f);
     const deck = Object.keys(record.cards);
-    if (mode === "practice") return applyPrompt(f, undefined, deck);
+    if (mode === "practice") return applyPrompt(f, [], deck);
     const row = await q.select({ last: cards.lastProblemId }).from(cards).where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId))).get();
-    const prompt = applyPrompt(f, row?.last ?? undefined, deck);
+    // A card that comes back today (after a miss) gets a problem it hasn't shown yet, at random.
+    const shownToday = session.shown?.[formulaId] ?? [];
+    const prompt = applyPrompt(f, [...(row?.last ? [row.last] : []), ...shownToday], deck);
     await q.update(cards).set({ lastProblemId: prompt.problemId }).where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId)));
-    await saveSession(q, studentId, { ...session, problems: { ...session.problems, [formulaId]: prompt.problemId } });
+    await saveSession(q, studentId, {
+      ...session,
+      problems: { ...session.problems, [formulaId]: prompt.problemId },
+      shown: { ...session.shown, [formulaId]: [...shownToday, prompt.problemId] },
+    });
     return prompt;
   });
 }

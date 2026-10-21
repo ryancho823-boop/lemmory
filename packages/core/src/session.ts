@@ -16,6 +16,8 @@ export interface DaySession {
   typoOffered: string[];
   /** The application problem handed out for each card, so answers are checked against it. */
   problems: Record<string, string>;
+  /** Every problem shown for each card today, so a card that comes back gets a new one. */
+  shown?: Record<string, string[]>;
 }
 
 export const emptySession = (day: number): DaySession => ({
@@ -26,6 +28,7 @@ export const emptySession = (day: number): DaySession => ({
   newStarted: [],
   typoOffered: [],
   problems: {},
+  shown: {},
 });
 
 /** Today's remaining cards: unfinished retries, then due reviews with new cards mixed in. */

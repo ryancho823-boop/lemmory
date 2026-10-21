@@ -33,7 +33,7 @@ export default function PracticePage() {
   const deckIds = Object.keys(state.cards);
 
   const prep = (id: string) =>
-    state.cards[id]?.stage === "apply" ? setupApply(FORMULA_BY_ID[id], undefined, deckIds) : null;
+    state.cards[id]?.stage === "apply" ? setupApply(FORMULA_BY_ID[id], [], deckIds) : null;
 
   const start = () => {
     const queue = shuffle(chosen.map((c) => c.formulaId));

@@ -40,7 +40,7 @@ export const DEMO_IDS = [
 ];
 
 /** Application-mode problems per formula in the demo. */
-export const DEMO_PROBLEMS_PER_FORMULA = 2;
+export const DEMO_PROBLEMS_PER_FORMULA = 5;
 
 /** How many days "Skip to tomorrow" can go past the real date. */
 export const DEMO_MAX_DAYS = 30;

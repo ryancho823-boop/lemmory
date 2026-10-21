@@ -24,6 +24,7 @@ import { TRIG_V2 } from "./content/v2/trig";
 import { GEOMETRY_V2 } from "./content/v2/geometry";
 import { GEOMETRY_V2B } from "./content/v2/geometry2";
 import { FORMULA_FIGURES, PROBLEM_FIGURES } from "./content/v2/figures";
+import { MORE_PROBLEMS } from "./content/v2/problems";
 import type { Formula } from "./content/types";
 
 export * from "./content/types";
@@ -55,10 +56,13 @@ const ALL: Formula[] = [
   ...CALCULUS_2,
 ];
 
-// Attach the diagrams drawn for formulas that predate diagrams.
+// Add the extra application problems (content/v2/problems) and attach the diagrams drawn for
+// formulas that predate diagrams.
 export const FORMULAS: Formula[] = ALL.map((f) => {
   const figure = f.figure ?? FORMULA_FIGURES[f.id];
-  const problems = f.problems.map((p) => (p.figure || !PROBLEM_FIGURES[p.id] ? p : { ...p, figure: PROBLEM_FIGURES[p.id] }));
+  const problems = [...f.problems, ...(MORE_PROBLEMS[f.id] ?? []).map((p) => ({ ...p, uses: [f.id] }))].map((p) =>
+    p.figure || !PROBLEM_FIGURES[p.id] ? p : { ...p, figure: PROBLEM_FIGURES[p.id] },
+  );
   return figure ? { ...f, figure, problems } : { ...f, problems };
 });
 
