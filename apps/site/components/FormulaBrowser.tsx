@@ -41,7 +41,7 @@ export function FormulaBrowser(props: Props) {
       deck={deck}
       locked={LOCKED_ENTRIES}
       banner={
-        <Link href="/users#pricing" className="mb-4 flex items-center gap-3 rounded-2xl border border-lemon/60 bg-lemon-soft px-4 py-3 text-sm hover:border-lemon-deep/50">
+        <Link href="/pricing#pricing" className="mb-4 flex items-center gap-3 rounded-2xl border border-lemon/60 bg-lemon-soft px-4 py-3 text-sm hover:border-lemon-deep/50">
           <Lock size={16} className="shrink-0 text-lemon-deep" />
           <span className="min-w-0 flex-1 text-ink/75">
             <b className="text-ink">The demo includes {FORMULAS.length} of {TOTAL_FORMULAS} formulas.</b> The rest come with every plan.

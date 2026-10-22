@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
 import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
-import { BarList } from "@lemmory/ui/charts";
+import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
 import { Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
@@ -20,6 +20,8 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
     assignments.map((a) => a.formulaId),
     today,
   ).filter((h) => h.n > 0);
+  // Formulas are compared with this class's own average, not a fixed cutoff.
+  const typical = average(health.map((h) => h.accuracy));
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
   const attention = sums
     .filter((x) => x.m.streak === 0 || (x.m.accuracy ?? 1) < 0.6)
@@ -70,7 +72,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
         <Panel>
           <PanelHeader
             title="What the class is forgetting"
-            info="Right on first try, last 14 days. Reteach the red ones."
+            info={`Right on the first try, last 14 days. Red means well below this class's average${typical === null ? "" : ` (${pct(typical)})`}: reteach those.`}
             action={
               <Link href={`${base}/formulas`} className="text-sm font-semibold text-ink/50 hover:text-ink">
                 All
@@ -84,7 +86,8 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
               </p>
             ) : (
               <BarList
-                tone="status"
+                flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
+                unit="right"
                 rows={health.slice(0, 8).map((h) => ({
                   key: h.formulaId,
                   label: (

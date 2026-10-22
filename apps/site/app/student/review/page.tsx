@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CheckCircle2, GraduationCap } from "lucide-react";
 import { BANK, FORMULA_BY_ID, type Problem } from "@/lib/bank";
 import { setupApply } from "@lemmory/core/practice";
 import { useStore } from "@/lib/store";
 import { CARD_POINTS, streak, streakBonus } from "@lemmory/core/analytics";
-import { isNew } from "@lemmory/core/srs";
 import { Leaderboard } from "@/components/Leaderboard";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
@@ -37,6 +36,15 @@ export default function ReviewPage() {
     if (!queue.length) return finishSession();
     setActive({ queue, total: queue.length, attempt: 0, apply: prepare(queue[0]), firstTries: {}, toast: null });
   };
+
+  // Home already says how many cards are due, so the review opens on the first card (once).
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!ready || doneToday || opened.current) return;
+    opened.current = true;
+    start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once the saved demo state has loaded
+  }, [ready, doneToday]);
 
   const done = (correct: boolean, confusedWith?: string[]) => {
     if (!active) return;
@@ -94,28 +102,8 @@ export default function ReviewPage() {
     );
   }
 
-  // ── Start ──
-  if (!active) {
-    const queue = buildQueue();
-    const fresh = queue.filter((id) => isNew(state.cards[id])).length;
-    const apply = queue.filter((id) => state.cards[id].stage === "apply" && !isNew(state.cards[id])).length;
-    return (
-      <Panel className="mx-auto max-w-xl px-6 py-12 text-center">
-        <p className="flex items-center justify-center gap-1 text-sm font-semibold text-ink/45">
-          Daily review
-        </p>
-        <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{queue.length} {queue.length === 1 ? "card" : "cards"}</h1>
-        <div className="mt-4 flex justify-center gap-4 text-[15px] text-ink/80">
-          <Chip n={queue.length - fresh - apply} label="recall" />
-          <Chip n={apply} label="application" />
-          <Chip n={fresh} label="new" />
-        </div>
-        <Button variant="lemon" size="lg" className="mt-8 w-full max-w-xs" onClick={start}>
-          {queue.length ? "Start" : "Nothing due, mark done"} <ArrowRight size={18} />
-        </Button>
-      </Panel>
-    );
-  }
+  // The first card is being set up.
+  if (!active) return <Skeleton className="mx-auto h-96 max-w-3xl" />;
 
   // ── In session ──
   const id = active.queue[0];
@@ -139,14 +127,6 @@ export default function ReviewPage() {
         )}
       </Panel>
     </div>
-  );
-}
-
-function Chip({ n, label }: { n: number; label: string }) {
-  return (
-    <span>
-      <b>{n}</b> {label}
-    </span>
   );
 }
 

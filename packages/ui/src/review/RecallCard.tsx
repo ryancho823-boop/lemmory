@@ -109,7 +109,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
           ) : (
             <>
               <span className="block overflow-x-auto py-1">
-                <Tex math={graded.statement} />
+                <Tex math={`\\displaystyle ${graded.statement}`} />
               </span>
             </>
           )}
@@ -134,13 +134,14 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
 
 export function Feedback({ right, title, children }: { right: boolean; title: string; children: React.ReactNode }) {
   return (
-    <div role="status" className={`rise mt-6 flex gap-3 rounded-2xl p-4 text-sm leading-relaxed ${right ? "bg-good/8" : "bg-bad/6"}`}>
+    // Full-size text: right after an answer is when the formula and solution are worth reading.
+    <div role="status" className={`rise mt-6 flex gap-3 rounded-lg p-5 text-[17px] leading-relaxed ${right ? "bg-good/8" : "bg-bad/6"}`}>
       <span className={`grid size-6 shrink-0 place-items-center rounded-full text-white ${right ? "bg-good" : "bg-bad"}`}>
         {right ? <Check size={14} strokeWidth={3} /> : <X size={14} strokeWidth={3} />}
       </span>
       <div className="min-w-0">
         <p className="font-bold">{title}</p>
-        <div className="text-ink/75">{children}</div>
+        <div className="mt-1 space-y-2">{children}</div>
       </div>
     </div>
   );

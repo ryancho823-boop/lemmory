@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
 import type { LeaderRow } from "@lemmory/core/analytics";
 import type { Prompt } from "@lemmory/core/grading";
@@ -46,7 +46,10 @@ export function ReviewSession({
   leaderboard: LeaderRow[];
   gameAge: number;
 }) {
-  const [active, setActive] = useState<Active | null>(null);
+  // Home already says how many cards are due, so the review opens on the first card.
+  const [active, setActive] = useState<Active | null>(() =>
+    initial.length && !doneToday ? { queue: initial, total: initial.length, attempt: 0, prompt: null, firstTries: {}, toast: null } : null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   // Set when a card graduates; shown once the student moves on.
@@ -58,11 +61,14 @@ export function ReviewSession({
       () => setError("Couldn't load the next card. Reload the page to pick up where you left off."),
     );
 
-  const begin = () => {
-    if (!initial.length) return start(() => markDone());
-    setActive({ queue: initial, total: initial.length, attempt: 0, prompt: null, firstTries: {}, toast: null });
-    load(initial[0]);
-  };
+  // Once, even when React runs effects twice in development: each load hands out a problem.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (opened.current || !active || active.prompt || active.attempt) return;
+    opened.current = true;
+    load(active.queue[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only for the first card
+  }, []);
 
   const done = (correct: boolean) => {
     if (!active) return;
@@ -111,23 +117,13 @@ export function ReviewSession({
     );
   }
 
-  // ── Start ──
+  // ── Nothing in the queue, but the day isn't marked done yet ──
   if (!active) {
-    const fresh = initial.filter((id) => cards[id]?.isNew).length;
-    const apply = initial.filter((id) => cards[id]?.stage === "apply" && !cards[id]?.isNew).length;
     return (
       <Panel className="mx-auto max-w-xl px-6 py-12 text-center">
-        <p className="flex items-center justify-center gap-1 text-sm font-semibold text-ink/45">
-          Daily review
-        </p>
-        <h1 className="mt-1 text-5xl font-extrabold tracking-tight">{initial.length} {initial.length === 1 ? "card" : "cards"}</h1>
-        <div className="mt-4 flex justify-center gap-4 text-[15px] text-ink/80">
-          <Chip n={initial.length - fresh - apply} label="recall" />
-          <Chip n={apply} label="application" />
-          <Chip n={fresh} label="new" />
-        </div>
-        <Button variant="lemon" size="lg" className="mt-8 w-full max-w-xs" onClick={begin} disabled={pending}>
-          {initial.length ? "Start" : "Nothing due, mark done"} <ArrowRight size={18} />
+        <h1 className="text-3xl font-extrabold tracking-tight">No cards left today</h1>
+        <Button variant="lemon" size="lg" className="mt-8 w-full max-w-xs" onClick={() => start(() => markDone())} disabled={pending}>
+          Mark today done <ArrowRight size={18} />
         </Button>
       </Panel>
     );
@@ -163,14 +159,6 @@ export function ReviewSession({
         <Skeleton className="mt-4 h-80" />
       )}
     </div>
-  );
-}
-
-function Chip({ n, label }: { n: number; label: string }) {
-  return (
-    <span>
-      <b>{n}</b> {label}
-    </span>
   );
 }
 

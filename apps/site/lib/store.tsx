@@ -2,8 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { type Competition, type Student, pointsBetween, scoredByDay } from "@lemmory/core/analytics";
-import { type Assignment, CLASSMATES, type LogEntry, NEW_PER_DAY, YOU, seedAssignments, simulate } from "./sim";
-import { type Card, isNew, newCard, realToday, review } from "@lemmory/core/srs";
+import { type Assignment, CLASSMATES, type LogEntry, YOU, seedAssignments, simulate } from "./sim";
+import { type Card, isNew, newCard, realToday } from "@lemmory/core/srs";
+import { type QueueSession, buildQueue as coreBuildQueue, recordAttempt as recordCore } from "@lemmory/core/session";
 import { DEMO_MAX_DAYS } from "./demo";
 import { FORMULA_BY_ID } from "./bank";
 
@@ -12,14 +13,8 @@ import { FORMULA_BY_ID } from "./bank";
 
 const KEY = "lemmory:v4";
 
-interface Session {
-  day: number;
-  /** First-try result for each card attempted today. */
-  attempts: Record<string, boolean>;
-  confusions: Record<string, string[]>;
-  completed: string[];
-  newStarted: string[];
-}
+/** The demo keeps only the session fields the queue needs (no server-side problem tracking). */
+type Session = QueueSession;
 
 interface State {
   dayOffset: number;
@@ -164,53 +159,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
   const students = useMemo(() => [...classmates, you], [classmates, you]);
 
-  const buildQueue = useCallback(() => {
-    const cards = Object.values(state.cards);
-    const pending = Object.keys(session.attempts).filter((id) => !session.completed.includes(id) && state.cards[id]);
-    const due = cards
-      .filter((c) => !isNew(c) && c.memory.due <= today && !pending.includes(c.formulaId))
-      .sort((a, b) => a.memory.due - b.memory.due)
-      .map((c) => c.formulaId);
-    const room = Math.max(0, NEW_PER_DAY - session.newStarted.length);
-    // Assigned homework first, so cards added on your own can't push it back.
-    const fresh = cards
-      .filter((c) => isNew(c) && !pending.includes(c.formulaId))
-      .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.addedDay - b.addedDay)
-      .slice(0, room)
-      .map((c) => c.formulaId);
-    // Interleave new cards among reviews (mixed practice beats blocked practice).
-    const out = [...pending, ...due];
-    fresh.forEach((id, i) => out.splice(Math.min(out.length, 1 + i * 3), 0, id));
-    return out;
-  }, [state.cards, session, today]);
+  // The same queue and attempt rules as the app (packages/core/src/session.ts).
+  const buildQueue = useCallback(() => coreBuildQueue(state.cards, session, today), [state.cards, session, today]);
 
   const recordAttempt = useCallback(
     (formulaId: string, correct: boolean, confusedWith?: string[]) => {
       const card = state.cards[formulaId];
-      const first = formulaId in session.attempts ? session.attempts[formulaId] : correct;
-      const promoted = !!card && correct && review(card, first, today).promoted;
+      const promoted = !!card && !!recordCore(session, card, correct, today, confusedWith).done?.promoted;
       update((s, t) => {
-        const ses = s.session;
         const c = s.cards[formulaId];
         if (!c) return s;
-        const isFirst = !(formulaId in ses.attempts);
-        const firstTry = isFirst ? correct : ses.attempts[formulaId];
-        const next: Session = {
-          ...ses,
-          attempts: { ...ses.attempts, [formulaId]: firstTry },
-          confusions: isFirst && confusedWith?.length ? { ...ses.confusions, [formulaId]: confusedWith } : ses.confusions,
-          newStarted: isNew(c) && !ses.newStarted.includes(formulaId) ? [...ses.newStarted, formulaId] : ses.newStarted,
-        };
-        if (!correct) return { ...s, session: next };
-        const entry: LogEntry = { day: t, formulaId, stage: c.stage, firstTry };
-        if (c.source === "self") entry.extra = true;
-        if (next.confusions[formulaId]) entry.confusedWith = next.confusions[formulaId];
-        return {
-          ...s,
-          cards: { ...s.cards, [formulaId]: review(c, firstTry, t).card },
-          log: [...s.log, entry],
-          session: { ...next, completed: [...next.completed, formulaId] },
-        };
+        const { session: next, done } = recordCore(s.session, c, correct, t, confusedWith);
+        if (!done) return { ...s, session: next };
+        return { ...s, cards: { ...s.cards, [formulaId]: done.card }, log: [...s.log, done.entry], session: next };
       });
       return { promoted };
     },

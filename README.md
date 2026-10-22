@@ -13,7 +13,7 @@ One repo, three websites. The student and teacher sites share one database.
 Shared code lives in `packages/`:
 
 ```
-packages/core   Formula bank (187 formulas, 378 problems), FSRS scheduling, grading, analytics. No React, no database.
+packages/core   Formula bank (310 formulas, 1,550 problems; `npm run check` prints the current counts), FSRS scheduling, grading, analytics. No React, no database.
 packages/ui     React components, theme and the app icon, shared by all three sites
 packages/db     Database schema, migrations, accounts and sessions, plans, and every read and write the sites make
 ```
@@ -53,7 +53,7 @@ Other commands:
 - **Log in.** The main site's only button is **Log in** (`/login`), which asks "teacher or student?" and opens that site's login page: "Teacher log in" (email) or "Student log in" (username). Each has a **New? Sign up** link.
 - **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, first and last name, username, password. The switch links between the two sites.
 - **Students on their own.** `/join?own=1` (linked as "No class code? Sign up on your own", and from the pricing pages) skips the class code. They land on **Plan & classes** to get the individual plan; without a class or that plan they can browse the bank but not review.
-- **No account yet.** Logging in with an email or username that doesn't exist goes to sign-up with it filled in (carried in a short-lived cookie, not the URL).
+- **Wrong details.** A wrong password and an unknown username or email get the same message ("That username and password don't match an account."), so logging in can't be used to find out who has an account. Sign-up does say when a teacher email or student username is taken: it has to, and sign-ups are rate-limited.
 - Already-logged-in visitors skip the login page. Sessions last 30 days.
 
 Locally the sites link to each other on localhost. Online they use the addresses in `packages/core/src/urls.ts`, which `NEXT_PUBLIC_TEACHER_URL` / `NEXT_PUBLIC_STUDENT_URL` override.

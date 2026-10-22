@@ -84,7 +84,9 @@ export default function StudentHome() {
                       {f.name}
                     </span>
                     <Meter value={w.retention} className="hidden w-20 xl:block" />
-                    <span className="w-10 text-right tabular-nums">{pct(w.retention)}</span>
+                    <span className="shrink-0 text-right tabular-nums">
+                      {pct(w.retention)} <span className="text-ink/70">retained</span>
+                    </span>
                   </Link>
                 </li>
               );

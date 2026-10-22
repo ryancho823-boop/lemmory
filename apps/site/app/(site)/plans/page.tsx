@@ -10,7 +10,7 @@ export default function PlanDetails() {
     <div>
       <section className="bg-lemon">
         <Container className="pb-14 pt-14 sm:pt-20">
-          <Link href="/users" className="text-sm font-semibold underline underline-offset-2">
+          <Link href="/pricing" className="text-sm font-semibold underline underline-offset-2">
             Back to plans and pricing
           </Link>
           <div className="mt-6">

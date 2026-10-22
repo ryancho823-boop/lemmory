@@ -17,8 +17,8 @@ import {
   wrongPicks,
 } from "@lemmory/core/grading";
 import { LOG_DAYS, type StudentRecord } from "@lemmory/core/records";
-import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue } from "@lemmory/core/session";
-import { isNew, newCard, review } from "@lemmory/core/srs";
+import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue, recordAttempt } from "@lemmory/core/session";
+import { isNew, newCard } from "@lemmory/core/srs";
 import { getStudentPlan, isOpen, planState, studentPlanState } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday } from "./records";
@@ -198,36 +198,28 @@ export async function promptFor(studentId: string, formulaId: string, mode: Mode
 async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof context>>, formulaId: string, correct: boolean, confusedWith?: string[]): Promise<Outcome> {
   const { today, record: rec, session: ses } = ctx;
   const card = rec.cards[formulaId];
-  const isFirst = !(formulaId in ses.attempts);
-  const firstTry = isFirst ? correct : ses.attempts[formulaId];
-  const next: DaySession = {
-    ...ses,
-    attempts: { ...ses.attempts, [formulaId]: firstTry },
-    confusions: isFirst && confusedWith?.length ? { ...ses.confusions, [formulaId]: confusedWith } : ses.confusions,
-    newStarted: isNew(card) && !ses.newStarted.includes(formulaId) ? [...ses.newStarted, formulaId] : ses.newStarted,
-  };
-  if (!correct) {
-    await saveSession(q, studentId, next);
+  const { session: done, done: result } = recordAttempt(ses, card, correct, today, confusedWith);
+  if (!result) {
+    await saveSession(q, studentId, done);
     return { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
   }
-  const { card: updated, promoted } = review(card, firstTry, today);
+  const { card: updated, promoted, entry } = result;
   const inserted = await q
     .insert(reviews)
     .values({
       studentId,
       day: today,
       formulaId,
-      stage: card.stage,
-      firstTry,
-      confusedWith: next.confusions[formulaId] ?? null,
-      extra: card.source === "self",
+      stage: entry.stage,
+      firstTry: entry.firstTry,
+      confusedWith: entry.confusedWith ?? null,
+      extra: !!entry.extra,
     })
     .onConflictDoNothing()
     .returning({ id: reviews.id });
   // Already finished today by another request sent at the same moment (a double click, a second
   // tab): that one counts, this one changes nothing, so the card isn't scheduled or scored twice.
   if (!inserted.length) return { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
-  const done: DaySession = { ...next, completed: [...next.completed, formulaId] };
   const finished = buildQueue({ ...rec.cards, [formulaId]: updated }, done, today).length === 0;
   // Sent together: one trip to the database.
   await Promise.all([

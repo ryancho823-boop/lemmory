@@ -78,8 +78,8 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
                 {pick && needed && <Check size={16} strokeWidth={3} className="text-good" />}
               </span>
               {pick?.statements[o.id] && (needed || on) && (
-                <span className="mt-1 block overflow-x-auto text-[13px] text-ink/70">
-                  <Tex math={pick.statements[o.id]} />
+                <span className="mt-2 block overflow-x-auto py-0.5 text-[17px]">
+                  <Tex math={`\\displaystyle ${pick.statements[o.id]}`} />
                 </span>
               )}
             </button>
@@ -91,11 +91,8 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
           {pending ? "Checking…" : "Check"}
         </Button>
       ) : (
-        <p className={cx("rise mt-3 text-sm", pick.right ? "text-good" : "text-bad")}>
-          <b>{pick.right ? "Right tool." : "Not quite."}</b>{" "}
-          <span className="text-ink/60">
-            <Rich text={pick.whenToUse} />
-          </span>
+        <p className="rise mt-4 text-[17px] leading-relaxed">
+          <b className={pick.right ? "text-good" : "text-bad"}>{pick.right ? "Right tool." : "Not quite."}</b> <Rich text={pick.whenToUse} />
         </p>
       )}
 
@@ -130,7 +127,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
                 </span>
               )}
               <span className="block">
-                <Rich text={solve.solution} />
+                <Rich text={solve.solution} display />
               </span>
             </Feedback>
           )}

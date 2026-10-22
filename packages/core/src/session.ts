@@ -2,8 +2,8 @@
 // Only the first attempt each day is reported to the scheduler; misses come back
 // until the student gets them right.
 
-import { NEW_PER_DAY, type StudentRecord } from "./records";
-import { type Card, isNew } from "./srs";
+import { type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
+import { type Card, isNew, review } from "./srs";
 
 export interface DaySession {
   day: number;
@@ -32,7 +32,10 @@ export const emptySession = (day: number): DaySession => ({
 });
 
 /** Today's remaining cards: unfinished retries, then due reviews with new cards mixed in. */
-export function buildQueue(cards: Record<string, Card>, session: DaySession, today: number) {
+/** The parts of a day's session that decide the queue and record attempts (the demo keeps only these). */
+export type QueueSession = Pick<DaySession, "day" | "attempts" | "confusions" | "completed" | "newStarted">;
+
+export function buildQueue(cards: Record<string, Card>, session: QueueSession, today: number) {
   const all = Object.values(cards);
   const pending = Object.keys(session.attempts).filter((id) => !session.completed.includes(id) && cards[id]);
   const due = all
@@ -50,6 +53,29 @@ export function buildQueue(cards: Record<string, Card>, session: DaySession, tod
   const out = [...pending, ...due];
   fresh.forEach((id, i) => out.splice(Math.min(out.length, 1 + i * 3), 0, id));
   return out;
+}
+
+/**
+ * One attempt at a card, used by the app (db/student.ts) and the demo alike. Only the first
+ * attempt each day goes to the scheduler; a miss stays in today's queue until it's right.
+ * `done` is set once the card is right: its rescheduled state and the review-log entry.
+ */
+export function recordAttempt<S extends QueueSession>(session: S, card: Card, correct: boolean, today: number, confusedWith?: string[]) {
+  const id = card.formulaId;
+  const isFirst = !(id in session.attempts);
+  const firstTry = isFirst ? correct : session.attempts[id];
+  const next: S = {
+    ...session,
+    attempts: { ...session.attempts, [id]: firstTry },
+    confusions: isFirst && confusedWith?.length ? { ...session.confusions, [id]: confusedWith } : session.confusions,
+    newStarted: isNew(card) && !session.newStarted.includes(id) ? [...session.newStarted, id] : session.newStarted,
+  };
+  if (!correct) return { session: next, done: null };
+  const { card: updated, promoted } = review(card, firstTry, today);
+  const entry: LogEntry = { day: today, formulaId: id, stage: card.stage, firstTry };
+  if (next.confusions[id]) entry.confusedWith = next.confusions[id];
+  if (card.source === "self") entry.extra = true;
+  return { session: { ...next, completed: [...next.completed, id] }, done: { card: updated, promoted, entry } };
 }
 
 /** Nothing was scheduled today at all (not "everything is already finished"). */
