@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check, Minus, X } from "lucide-react";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
 import { TIER_ACCENT, TRIAL_DAYS, TIERS } from "@/lib/pricing";
@@ -71,7 +72,7 @@ export default function ForUsers() {
                 <tr>
                   <th className="px-5 py-3 font-semibold" />
                   {COMPARE.columns.map((c, i) => (
-                    <th key={c} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-bold" : "px-4 py-3 font-semibold text-ink/70"}>
+                    <th key={c} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-bold" : "px-4 py-3 font-semibold"}>
                       {c}
                     </th>
                   ))}
@@ -80,10 +81,10 @@ export default function ForUsers() {
               <tbody className="divide-y divide-line">
                 {COMPARE.rows.map((r) => (
                   <tr key={r.label}>
-                    <td className="px-5 py-3">{r.label}</td>
+                    <td className="px-5 py-3 font-semibold">{r.label}</td>
                     {r.cells.map((c, i) => (
-                      <td key={i} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-semibold" : "px-4 py-3 text-ink/70"}>
-                        {c}
+                      <td key={i} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-semibold" : "px-4 py-3"}>
+                        <Cell text={c} />
                       </td>
                     ))}
                   </tr>
@@ -94,5 +95,24 @@ export default function ForUsers() {
         </Container>
       </section>
     </div>
+  );
+}
+
+/** A comparison cell: a green check for yes, an amber dash for partly, a gray cross for no. */
+function Cell({ text }: { text: string }) {
+  const icon = /^Yes\b/.test(text) ? (
+    <Check size={16} strokeWidth={3} className="text-good" />
+  ) : text === "Partly" ? (
+    <Minus size={16} strokeWidth={3} className="text-warn" />
+  ) : text === "No" ? (
+    <X size={16} strokeWidth={3} className="text-ink/35" />
+  ) : null;
+  return icon ? (
+    <span className="flex items-start gap-1.5">
+      <span className="mt-[0.2em] shrink-0">{icon}</span>
+      {text}
+    </span>
+  ) : (
+    text
   );
 }
