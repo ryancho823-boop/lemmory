@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, GraduationCap } from "lucide-react";
-import { FORMULA_BY_ID, type Problem } from "@/lib/bank";
-import { setupApply } from "@/lib/practice";
+import { BANK, FORMULA_BY_ID, type Problem } from "@/lib/bank";
+import { setupApply } from "@lemmory/core/practice";
 import { useStore } from "@/lib/store";
 import { CARD_POINTS, streak, streakBonus } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
@@ -27,7 +27,7 @@ export default function ReviewPage() {
 
   const prepare = (id: string) => {
     if (state.cards[id]?.stage !== "apply") return null;
-    const a = setupApply(FORMULA_BY_ID[id], state.lastProblem[id] ? [state.lastProblem[id]] : [], Object.keys(state.cards));
+    const a = setupApply(BANK, FORMULA_BY_ID[id], state.lastProblem[id] ? [state.lastProblem[id]] : [], Object.keys(state.cards));
     setLastProblem(id, a.problem.id);
     return a;
   };

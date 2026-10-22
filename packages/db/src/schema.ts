@@ -215,6 +215,7 @@ export const attempts = sqliteTable(
     key: text("key").notNull(),
     createdAt: createdAt(),
   },
-  (t) => [index("attempts_key").on(t.key, t.createdAt)],
+  // The second index is for clearing out old rows, which goes by time alone.
+  (t) => [index("attempts_key").on(t.key, t.createdAt), index("attempts_created").on(t.createdAt)],
 );
 

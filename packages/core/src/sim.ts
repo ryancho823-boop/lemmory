@@ -2,16 +2,13 @@
 // Each one runs the real FSRS scheduler day by day; whether they answer correctly is
 // drawn from a seeded model (their skill x the formula's difficulty x FSRS's predicted recall).
 
-import type { Formula, Level } from "./content/types";
+import type { Bank, Formula, Level } from "./content/types";
+
+export type { Bank };
 import { type Card, isNew, newCard, retrievability, review } from "./srs";
 import { scoredByDay } from "./points";
 import { type Assignment, type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
 
-/** The formulas a simulation draws from: the full bank (seed script) or the demo's slice. */
-export interface Bank {
-  formulas: Formula[];
-  byId: Record<string, Formula>;
-}
 
 export interface Profile {
   id: string;

@@ -64,6 +64,13 @@
       "when": 1792626617575,
       "tag": "0008_daily_scores",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1792652944765,
+      "tag": "0009_attempts_created",
+      "breakpoints": true
     }
   ]
 }

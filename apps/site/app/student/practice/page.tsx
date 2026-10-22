@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Zap } from "lucide-react";
-import { FORMULA_BY_ID, TOPICS, TOPIC_COLOR, type Problem, type Topic } from "@/lib/bank";
+import { BANK, FORMULA_BY_ID, TOPICS, TOPIC_COLOR, type Problem, type Topic } from "@/lib/bank";
 import { useStore } from "@/lib/store";
-import { setupApply, shuffle } from "@/lib/practice";
+import { setupApply, shuffle } from "@lemmory/core/practice";
 import { isNew } from "@lemmory/core/srs";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
@@ -33,7 +33,7 @@ export default function PracticePage() {
   const deckIds = Object.keys(state.cards);
 
   const prep = (id: string) =>
-    state.cards[id]?.stage === "apply" ? setupApply(FORMULA_BY_ID[id], [], deckIds) : null;
+    state.cards[id]?.stage === "apply" ? setupApply(BANK, FORMULA_BY_ID[id], [], deckIds) : null;
 
   const start = () => {
     const queue = shuffle(chosen.map((c) => c.formulaId));
