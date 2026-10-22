@@ -1,15 +1,13 @@
 // The demo's simulated class: the real simulator (packages/core/src/sim.ts) run on the demo's
 // slice of the bank, plus the demo class's name and contest.
 
-import { type Bank, simulate as run } from "@lemmory/core/sim";
+import { simulate as run } from "@lemmory/core/sim";
 import type { Assignment, StudentRecord } from "@lemmory/core/records";
-import { FORMULAS, FORMULA_BY_ID } from "./bank";
+import { BANK } from "./bank";
 
 export { CLASSMATES, YOU, seedAssignments } from "@lemmory/core/sim";
 export { NEW_PER_DAY } from "@lemmory/core/records";
 export type { Assignment, LogEntry, StudentRecord } from "@lemmory/core/records";
-
-const BANK: Bank = { formulas: FORMULAS, byId: FORMULA_BY_ID };
 
 export const simulate = (
   profile: Parameters<typeof run>[0],

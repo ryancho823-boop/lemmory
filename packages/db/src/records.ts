@@ -118,6 +118,16 @@ export async function settle(
   }
 }
 
+/**
+ * settle(), in a transaction so two pages loading at once can't interleave their writes, but only
+ * when someone has past days to fill in. A transaction holds the database's one write lock, so
+ * opening one on every page load would make a whole class's loads wait in line.
+ */
+export async function settleIfBehind(rows: Parameters<typeof settle>[0], records: Map<string, StudentRecord>) {
+  const behind = rows.filter((e) => e.settledThrough < e.today - 1 && records.has(e.studentId));
+  if (behind.length) await db.transaction((q) => settle(behind, records, q));
+}
+
 export interface ClassView {
   klass: ClassRow;
   today: number;
@@ -155,8 +165,7 @@ export async function loadClass(classId: string, withLogs = true): Promise<Class
   ]);
   const ids = roster.map((r) => r.studentId);
   const [records, zones] = await Promise.all([loadRecords(ids, withLogs ? today - LOG_DAYS : null), studentZones(ids)]);
-  // One transaction, so two pages loading at once can't interleave their writes.
-  await db.transaction((q) => settle(roster.map((r) => ({ ...r, today: dayInZone(zones.get(r.studentId)!) })), records, q));
+  await settleIfBehind(roster.map((r) => ({ ...r, today: dayInZone(zones.get(r.studentId)!) })), records);
   return {
     klass,
     today,

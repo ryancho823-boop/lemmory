@@ -3,10 +3,11 @@
 // that's missing its tables or columns. (A migration that wasn't run once made every login and
 // sign-up fail.) If it fails, the build fails and the last working release stays live.
 //
-// It only acts on Vercel production deploys (VERCEL_ENV=production). Elsewhere it does nothing,
-// unless run with --force, which is for trying it on a local database file.
+// It acts on Vercel production deploys (VERCEL_ENV=production), and on previews that have a
+// database of their own (PREVIEW_DATABASE_URL; previews never touch the live one, see client.ts).
+// Elsewhere it does nothing, unless run with --force, which is for trying it on a local database file.
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { DATABASE_URL, db } from "../src/client";
+import { DATABASE_URL, IS_PREVIEW, db } from "../src/client";
 import journal from "../drizzle/meta/_journal.json";
 
 const migrationsFolder = new URL("../drizzle", import.meta.url).pathname;
@@ -42,11 +43,15 @@ async function migrateWithRetry() {
   }
 }
 
-if (!production) {
+if (IS_PREVIEW && !DATABASE_URL) {
+  console.log("Database migration skipped: this preview has no database of its own (PREVIEW_DATABASE_URL).");
+  process.exit(0);
+}
+if (!production && !IS_PREVIEW) {
   console.log("Database migration skipped (not a production deploy).");
   process.exit(0);
 }
-if (!process.env.DATABASE_URL) {
+if (production && !process.env.DATABASE_URL) {
   console.error("DATABASE_URL isn't set for this production build. Add it in Vercel (see DEPLOY.md).");
   process.exit(1);
 }

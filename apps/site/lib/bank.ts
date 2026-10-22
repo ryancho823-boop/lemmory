@@ -3,7 +3,7 @@
 
 import data from "./generated/demo-bank.json";
 import type { DemoBank } from "./demo";
-import type { Formula } from "@lemmory/core/content/types";
+import type { Bank, Formula } from "@lemmory/core/content/types";
 
 const bank = data as DemoBank;
 
@@ -12,6 +12,8 @@ export type { LockedFormula } from "./demo";
 
 export const FORMULAS: Formula[] = bank.formulas;
 export const FORMULA_BY_ID: Record<string, Formula> = Object.fromEntries(FORMULAS.map((f) => [f.id, f]));
+/** The demo slice, for the shared code that takes a bank (practice problems, the simulated class). */
+export const BANK: Bank = { formulas: FORMULAS, byId: FORMULA_BY_ID };
 export const topicOf = (id: string) => FORMULA_BY_ID[id]?.topic;
 export const NOTES = bank.notes;
 export const LOCKED = bank.locked;

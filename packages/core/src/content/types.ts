@@ -118,6 +118,12 @@ export interface Formula {
   figure?: Figure;
 }
 
+/** The formulas to draw from: the full bank (server and seed script) or the demo's slice. */
+export interface Bank {
+  formulas: Formula[];
+  byId: Record<string, Formula>;
+}
+
 type Def = Omit<Formula, "topic" | "problems"> & {
   problems: (Omit<Problem, "uses"> & { uses?: string[] })[];
 };

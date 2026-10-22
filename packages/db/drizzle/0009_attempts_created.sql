@@ -1,0 +1,1 @@
+CREATE INDEX `attempts_created` ON `attempts` (`created_at`);

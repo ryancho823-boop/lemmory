@@ -12,32 +12,32 @@ function describe(raw: string | undefined) {
   return notes.length ? `set, but ${notes.join("; ")}` : "set";
 }
 
-/** A quick check of the database setup, safe to show publicly (no secrets). */
+/**
+ * A quick check of the database setup, safe to show publicly (no secrets). When the database
+ * works, it says only that; hints about how the variables are set appear only when it doesn't.
+ */
 export async function databaseHealth() {
-  const { cleanEnv, DATABASE_AUTH_TOKEN: token } = await import("./client");
-  const url = cleanEnv(process.env.DATABASE_URL);
-  // No host name or account count: this page is public, and neither helps fix a setup.
-  const report = {
-    DATABASE_URL: describe(process.env.DATABASE_URL),
-    url_starts_with: url ? url.split(":")[0] + ":" : "-",
-    DATABASE_AUTH_TOKEN: describe(process.env.DATABASE_AUTH_TOKEN),
-    // Turso tokens are three dot-separated parts, a few hundred characters long.
-    token_shape: token ? `${token.length} characters, ${token.split(".").length} parts` : "-",
-    database: "not checked",
-    /** Whether every migration in the code has been applied (deploys apply them before building). */
-    schema: "not checked",
-  };
   try {
     const { db } = await import("./client");
     await db.all(sql`select 1 from users limit 1`);
-    report.database = "connected";
     // Drizzle goes by date: every migration newer than the newest applied one is still to run.
     const [{ last }] = await db.all<{ last: number | null }>(sql`select max(created_at) as last from __drizzle_migrations`);
     const behind = journal.entries.filter((e) => e.when > Number(last ?? 0)).length;
-    report.schema = behind ? `${behind} migration(s) not applied: run npm run db:migrate:prod` : "up to date";
+    /** Whether every migration in the code has been applied (deploys apply them before building). */
+    return { database: "connected", schema: behind ? `${behind} migration(s) not applied: run npm run db:migrate:prod` : "up to date" };
   } catch (e) {
     const err = e as Error & { cause?: Error };
-    report.database = `ERROR: ${(err.cause?.message ?? err.message).slice(0, 300)}`;
+    const { DATABASE_URL: url, DATABASE_AUTH_TOKEN: token, IS_PREVIEW } = await import("./client");
+    // Previews read their own variables (see client.ts).
+    const name = (v: string) => (IS_PREVIEW ? `PREVIEW_${v}` : v);
+    // No host name or account count: this page is public, and neither helps fix a setup.
+    return {
+      database: `ERROR: ${(err.cause?.message ?? err.message).slice(0, 300)}`,
+      [name("DATABASE_URL")]: describe(process.env[name("DATABASE_URL")]),
+      url_starts_with: url ? url.split(":")[0] + ":" : "-",
+      [name("DATABASE_AUTH_TOKEN")]: describe(process.env[name("DATABASE_AUTH_TOKEN")]),
+      // Turso tokens are three dot-separated parts, a few hundred characters long.
+      token_shape: token ? `${token.length} characters, ${token.split(".").length} parts` : "-",
+    };
   }
-  return report;
 }

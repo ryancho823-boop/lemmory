@@ -40,7 +40,9 @@ For each site: **vercel.com → Add New → Project → import `lemmory`**, then
 | Teacher site | `apps/teacher` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
 | Student site | `apps/student` | `DATABASE_URL`, `DATABASE_AUTH_TOKEN` |
 
-Leave everything else as Vercel detects it (Next.js). For the variables, check **Production** and **Preview** and leave **Development** unchecked. Mark the token **Sensitive**.
+Leave everything else as Vercel detects it (Next.js). For the variables, check **Production** only. Mark the token **Sensitive**.
+
+The student and teacher sites run in Vercel's Cleveland region (`cle1`, set in their `vercel.json`), next to the database in Ohio, so each trip to the database is short.
 
 To copy the token to your clipboard without displaying it (then paste it once, with Cmd+V, into an empty value box):
 
@@ -52,6 +54,24 @@ The database address is the `DATABASE_URL=` line in the same file.
 
 After adding or changing a variable, redeploy: **Deployments → ⋯ on the latest one → Redeploy**.
 
+### Previews (one per pull request)
+
+Previews run code that isn't merged yet, so they never use the live database, even if `DATABASE_URL` is checked for Preview. Without a database of their own, the main site works and the student and teacher sites say "This preview has no database". To give previews one, make a separate, empty database once:
+
+```bash
+turso db create lemmory-preview
+```
+
+```bash
+turso db show lemmory-preview --url
+```
+
+```bash
+turso db tokens create lemmory-preview | tr -d '\n' | pbcopy
+```
+
+Then on the teacher and student projects, add `PREVIEW_DATABASE_URL` (the address) and `PREVIEW_DATABASE_AUTH_TOKEN` (paste the copied token), checking **Preview** only. Preview builds apply migrations to it themselves. Test accounts made there never reach the live site.
+
 ## Check that it works
 
 Open `/health` on the teacher and student sites:
@@ -59,7 +79,7 @@ Open `/health` on the teacher and student sites:
 - https://lemmory-teacher.vercel.app/health
 - https://lemmory-student.vercel.app/health
 
-Both should show `"database":"connected"` and `"token_shape":"348 characters, 3 parts"`. It never shows the token itself. If one says `MISSING`, that variable isn't set on that project (or it was added without redeploying).
+Both should show `"database":"connected"` and `"schema":"up to date"`, and nothing else. If the database can't be reached, the page also says how the variables look (never their values): `MISSING` means that variable isn't set on that project, or was added without redeploying.
 
 Then try the whole thing:
 

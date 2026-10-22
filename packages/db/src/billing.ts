@@ -127,7 +127,7 @@ export async function getPlan(teacherId: string) {
   return (await db.select().from(plans).where(eq(plans.teacherId, teacherId)).get()) ?? null;
 }
 
-export const planState = (plan: PlanRow | null, now = new Date()): PlanState =>
+export const planState = (plan: Pick<PlanRow, "pilotEndsAt" | "paidAt"> | null, now = new Date()): PlanState =>
   stateOf(plan?.pilotEndsAt ?? null, plan?.paidAt ?? null, now);
 
 /** Start the free trial of the plan the teacher picked. Returns why not, if they can't have one. */
@@ -173,9 +173,11 @@ export async function checkoutTeacher(teacherId: string, kind: PlanKind, info: O
 
 /** Can this teacher (and the students in their classes) use Lemmory right now? */
 export async function teacherActive(teacherId: string) {
-  const { state } = planState(await getPlan(teacherId));
-  return state === "active" || state === "trial";
+  return isOpen(planState(await getPlan(teacherId)));
 }
+
+/** On a trial or paid: what lets a teacher's classes (or a student on their own) use Lemmory. */
+export const isOpen = ({ state }: PlanState) => state === "active" || state === "trial";
 
 // ── Students on their own ──
 

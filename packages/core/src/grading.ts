@@ -1,7 +1,7 @@
 // Handing out application problems, from the full formula bank (server only). Prompts and
 // answer checking live in check.ts, which the demo uses with its own slice of the bank.
 
-import { FORMULA_BY_ID, type Formula } from "./formulas";
+import { FORMULAS, FORMULA_BY_ID, type Formula } from "./formulas";
 import { setupApply } from "./practice";
 import type { ApplyPrompt } from "./check";
 
@@ -9,7 +9,7 @@ export * from "./check";
 
 /** A fresh problem (not `lastProblemId`) with look-alike distractors from the student's deck and topic. */
 export function applyPrompt(f: Formula, avoid: string[], deck: string[]): ApplyPrompt {
-  const { problem, options } = setupApply(f, avoid, deck);
+  const { problem, options } = setupApply({ formulas: FORMULAS, byId: FORMULA_BY_ID }, f, avoid, deck);
   return {
     kind: "apply",
     formulaId: f.id,
