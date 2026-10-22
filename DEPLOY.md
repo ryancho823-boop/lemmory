@@ -17,6 +17,7 @@ Already set up. Your Turso values live in `.env.turso` on your Mac, which never 
 
 - After changing `packages/db/src/schema.ts`: run `npm run db:generate` and commit the new migration. Deploys apply it: the student and teacher sites' builds run every migration first (`packages/db/scripts/deploy.ts`), and if that fails the build fails, so the last working version stays live instead of one that can't log anyone in. You can still run `npm run db:migrate:prod` by hand; it's safe to repeat.
 - Keep migrations **additive** (new tables, new columns, new indexes). Deploys migrate first, so for a few minutes the old code runs against the new schema. Renaming or dropping a column would break live users in that window: do that in two releases (add the new, move the code over, then drop the old).
+- **Never edit or delete a migration once it's on `main`.** It may already have run on the live database, which would then be out of step with the code (Drizzle can even skip newer migrations). To undo one, add a new migration that reverses it. CI checks this on every pull request, and a deploy refuses to run if the database has a migration the code doesn't.
 - `/health` on the student or teacher site says whether the database is up to date (`"schema": "up to date"`).
 - Never run `npm run db:seed` for production. That's the fake sample class, for your computer only.
 

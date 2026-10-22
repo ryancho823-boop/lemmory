@@ -1,5 +1,5 @@
-// Bar chart for 0..1 values. Magnitude uses the sequential blue; status colors only
-// appear next to the printed value. Bars show a tooltip on hover.
+// Bar chart for 0..1 values. Magnitude uses the sequential blue; only a bar that stands out
+// (well below `flagBelow`) turns red. Bars show a tooltip on hover.
 
 import { type DayStatus, dayStatus } from "@lemmory/core/analytics";
 import type { StudentRecord } from "@lemmory/core/records";
@@ -8,22 +8,31 @@ import { pct } from "./ui";
 /** Horizontal bars for a 0..1 value with a label on the left and the value on the right. */
 export function BarList({
   rows,
-  tone = "seq",
+  flagBelow,
+  unit,
 }: {
   rows: { key: string; label: React.ReactNode; value: number | null; hint?: string; href?: string }[];
-  /** "status" colors bars by good / warning / critical thresholds (value text is always shown). */
-  tone?: "seq" | "status";
+  /**
+   * Bars under this value are red; the rest stay neutral. Pass a baseline such as the class's own
+   * average minus a margin, so a typical class doesn't look like an emergency.
+   */
+  flagBelow?: number;
+  /** A word after each value, so "73%" says what it counts ("73% right"). */
+  unit?: string;
 }) {
   return (
     <ul className="space-y-2.5">
       {rows.map((r) => {
         const v = r.value ?? 0;
-        const color =
-          tone === "seq" ? "var(--color-seq-400)" : v >= 0.8 ? "var(--color-good)" : v >= 0.65 ? "var(--color-warn)" : "var(--color-bad)";
+        const flagged = flagBelow !== undefined && r.value !== null && v < flagBelow;
+        const color = flagged ? "var(--color-bad)" : "var(--color-seq-400)";
         return (
           <li key={r.key} className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(120px,200px)_1fr_auto]">
             <div className="truncate text-sm">{r.label}</div>
-            <div className="text-right text-sm font-semibold tabular-nums sm:order-last">{pct(r.value)}</div>
+            <div className={`text-right text-sm font-semibold tabular-nums sm:order-last ${flagged ? "text-bad" : ""}`}>
+              {pct(r.value)}
+              {unit && r.value !== null && <span className="font-normal"> {unit}</span>}
+            </div>
             <div className="relative col-span-2 h-2.5 bg-ink/6 sm:col-span-1" title={r.hint}>
               <div className="h-full transition-[width] duration-500" style={{ width: `${Math.max(v * 100, 2)}%`, background: color }} />
               {r.hint && (
@@ -38,6 +47,15 @@ export function BarList({
     </ul>
   );
 }
+
+/** The average of these values (null if none), for comparing each one with the rest. */
+export function average(values: (number | null)[]) {
+  const xs = values.filter((v): v is number => v !== null);
+  return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+}
+
+/** How far under the class's own average a formula has to be before it's flagged red. */
+export const FLAG_MARGIN = 0.1;
 
 const STATUS_STYLE: Record<DayStatus, { bg: string; label: string }> = {
   done: { bg: "var(--color-good)", label: "All done" },

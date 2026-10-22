@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { FORMULAS, LOCKED, TOPIC_COLOR, TOTAL_FORMULAS, type Topic } from "@/lib/bank";
@@ -22,18 +21,17 @@ const TEXT = {
   bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {
     title: "Courses move on. Memory fades.",
-    body: "Hundreds of thousands of students take the AMC each year. A few thousand qualify for the AIME, and about 500 reach the USAMO or USAJMO. The formulas they learn in September have to last until contest day.",
+    body: "A formula taught in September has to last until the contest in November.",
   },
   mission: {
     quote: "Every formula a student learns should still be there on contest day.",
     body: "We make review part of the course, so every student keeps what they're taught, not just the ones with perfect study habits.",
-    photoAlt: "A student working through a geometry worksheet",
   },
   inside: { title: "A look inside", body: "Real screens from the app. The demo has all of them, with a sample class you can click around." },
   how: {
     title: "Five minutes a day. The scheduling is automatic.",
     tryTitle: "Try it: recall first, then apply.",
-    tryBody: "Every formula starts as a recall card: type it from memory, and any equivalent form counts. Once it sticks, it becomes an application card, where students choose the formula a problem needs and then solve it. Each review shows a different problem, with look-alike formulas mixed into the choices.",
+    tryBody: "Any equivalent form counts. Each review shows a different problem, with look-alike formulas among the choices.",
     schedulerTitle: "Then the scheduler takes over",
     schedulerBody: "Each correct review pushes the next one further out. A missed card comes back later in the same review until it's right, and then sooner on the calendar. Here is one formula, answered right every time:",
     fsrsTitle: "What is FSRS?",
@@ -72,8 +70,7 @@ const COUNTS = [...FORMULAS, ...LOCKED].reduce<Partial<Record<Topic, number>>>((
 
 const STEPS = [
   { title: "The teacher assigns", body: "Keep teaching your own curriculum. Each week, assign the formulas you covered, and they go into every student's deck." },
-  { title: "Students recall", body: "They see a formula's name and type it out. Any equivalent form counts." },
-  { title: "Then they apply", body: "Once recall is solid, the card becomes a real problem: choose the formula, then solve." },
+  { title: "Students review daily", body: "A few minutes a day: type each formula from memory, then, once it sticks, use it on real problems." },
   { title: "It comes back on time", body: "Each card returns right before it would be forgotten." },
 ];
 
@@ -159,19 +156,8 @@ export default function Overview() {
       </section>
 
       <section className="bg-ink text-white">
-        <Container className="grid items-center gap-10 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-20">
-          <div data-reveal className="overflow-hidden rounded-lg">
-            {/* Photo by Greg Rosenke on Unsplash (Unsplash License). */}
-            <Image
-              src="/student-studying.jpg"
-              width={1600}
-              height={1067}
-              sizes="(min-width: 1024px) 540px, 100vw"
-              alt={TEXT.mission.photoAlt}
-              className="h-auto w-full"
-            />
-          </div>
-          <blockquote data-reveal>
+        <Container className="py-16 lg:py-20">
+          <blockquote data-reveal className="max-w-3xl">
             <span aria-hidden className="block font-display text-7xl leading-[0.6] text-lemon">&ldquo;</span>
             <p className="mt-4 font-display text-3xl leading-snug sm:text-[38px]">{TEXT.mission.quote}</p>
             <p className="mt-5 text-lg text-white/80">{TEXT.mission.body}</p>
@@ -194,7 +180,7 @@ export default function Overview() {
       <section id="how" className="scroll-mt-20 border-t border-line bg-white py-20">
         <Container>
           <SectionTitle reveal>{TEXT.how.title}</SectionTitle>
-          <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-3">
             {STEPS.map((s, i) => (
               <li key={s.title} data-reveal className="border-t-4 pt-4" style={{ borderColor: ACCENT_CYCLE[i] }}>
                 <p className="font-display text-lg">

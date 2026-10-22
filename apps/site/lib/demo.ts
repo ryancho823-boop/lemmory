@@ -13,6 +13,8 @@ export const DEMO_IDS = [
   "vieta-quadratic",
   "arithmetic-series",
   "geometric-series",
+  // A look-alike for the series, so a "find the sum" problem has a real choice to make.
+  "power-sums",
   "sfft",
   // Geometry
   "stewart",

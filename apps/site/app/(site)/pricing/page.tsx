@@ -27,7 +27,7 @@ const COMPARE = {
   ],
 };
 
-export default function ForUsers() {
+export default function Pricing() {
   return (
     <div>
       <section className="bg-lemon">
@@ -65,6 +65,7 @@ export default function ForUsers() {
       <section className="border-t border-line bg-white py-20">
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
+          <p className="mt-3 max-w-2xl text-lg">Alcumus trains solving. Lemmory makes sure the formulas from your course are still there in November.</p>
           <div className="mt-8 overflow-x-auto rounded-lg border border-line">
             <table className="w-full min-w-[880px] text-left">
               <thead className="border-b border-line bg-canvas">

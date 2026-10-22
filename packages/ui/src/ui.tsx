@@ -80,13 +80,10 @@ export function LevelTag({ level }: { level: Formula["level"] }) {
   return <span className="rounded-md bg-ink/5 px-1.5 py-0.5 text-[11px] font-semibold text-ink/55">{LEVEL_LABEL[level]}</span>;
 }
 
+/** The card's stage as a plain colored word (no pill). */
 export function StageTag({ stage, mastered }: { stage: Stage; mastered?: boolean }) {
-  if (mastered) return <span className="rounded-full bg-good/10 px-2 py-0.5 text-[11px] font-bold text-good">Mastered</span>;
-  return stage === "recall" ? (
-    <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[11px] font-bold text-ink/60">Recall</span>
-  ) : (
-    <span className="rounded-full bg-lemon px-2 py-0.5 text-[11px] font-bold text-ink">Application</span>
-  );
+  if (mastered) return <span className="text-xs font-bold text-good">Mastered</span>;
+  return stage === "recall" ? <span className="text-xs font-bold text-ink/65">Recall</span> : <span className="text-xs font-bold text-lemon-deep">Application</span>;
 }
 
 export function Stat({ label, value, hint, icon }: { label: string; value: React.ReactNode; hint?: React.ReactNode; icon?: React.ReactNode }) {
@@ -166,15 +163,12 @@ export function StatStrip({ items }: { items: { label: string; value: React.Reac
   );
 }
 
-/** Topic as a soft tinted pill: reads as a label rather than a stray dot. */
+/** Topic as a label: a small square in the topic's color, then its name (no pill). */
 export function TopicPill({ topic }: { topic: Topic }) {
   const c = TOPIC_COLOR[topic];
   return (
-    <span
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold"
-      style={{ background: `color-mix(in srgb, ${c} 12%, white)`, color: `color-mix(in srgb, ${c} 75%, black)` }}
-    >
-      <span className="size-1.5 rounded-full" style={{ background: c }} />
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold" style={{ color: `color-mix(in srgb, ${c} 75%, black)` }}>
+      <span className="size-2 rounded-[2px]" style={{ background: c }} />
       {topic}
     </span>
   );

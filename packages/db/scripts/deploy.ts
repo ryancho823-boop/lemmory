@@ -8,20 +8,13 @@
 // Elsewhere it does nothing, unless run with --force, which is for trying it on a local database file.
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { DATABASE_URL, IS_PREVIEW, db } from "../src/client";
-import journal from "../drizzle/meta/_journal.json";
+import { describeMigrations, migrationStatus } from "../src/migrations";
 
 const migrationsFolder = new URL("../drizzle", import.meta.url).pathname;
 const production = process.env.VERCEL_ENV === "production" || process.argv.includes("--force");
 
-/** Is every migration in the code applied? Drizzle goes by date: anything newer than the newest applied one runs. */
-const upToDate = async () => {
-  try {
-    const rows = await db.$client.execute("select max(created_at) as last from __drizzle_migrations");
-    return Number(rows.rows[0].last ?? 0) >= journal.entries[journal.entries.length - 1].when;
-  } catch {
-    return false; // a brand-new database has no migrations table yet
-  }
-};
+/** Is every migration in the code applied? */
+const upToDate = async () => (await migrationStatus(db)).behind === 0;
 
 /**
  * The student and teacher sites build at the same time, so both may try to migrate at once and
@@ -56,6 +49,9 @@ if (production && !process.env.DATABASE_URL) {
   process.exit(1);
 }
 try {
+  // A migration that ran and was then deleted from the code would make Drizzle skip newer ones.
+  const before = await migrationStatus(db);
+  if (before.unknown) throw new Error(describeMigrations(before));
   await migrateWithRetry();
   console.log(`Database up to date (${DATABASE_URL.split("://")[0]}).`);
   process.exit(0);

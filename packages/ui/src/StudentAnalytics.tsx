@@ -107,6 +107,7 @@ export function StudentAnalytics({
             />
             <div className="px-5 pb-5 pt-4">
               <BarList
+                unit="right"
                 rows={topics.map((t) => ({
                   key: t.topic,
                   label: (

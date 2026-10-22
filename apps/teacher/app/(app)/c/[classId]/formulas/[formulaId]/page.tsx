@@ -111,7 +111,7 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
                 <Link href={`${base}/formulas/${x.picked}`} className="truncate font-semibold hover:underline">
                   {FORMULA_BY_ID[x.picked].name}
                 </Link>
-                <span className="ml-auto rounded-full bg-ink/5 px-2 py-0.5 text-xs font-bold">{x.count}×</span>
+                <span className="ml-auto text-sm font-bold tabular-nums">{x.count}×</span>
               </li>
             ))}
           </ul>

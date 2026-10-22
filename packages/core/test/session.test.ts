@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { NEW_PER_DAY, type StudentRecord } from "../src/records";
-import { applyDays, buildQueue, emptySession, isDoneToday, nothingDue, settleDays } from "../src/session";
+import { applyDays, buildQueue, emptySession, isDoneToday, nothingDue, recordAttempt, settleDays } from "../src/session";
 import { type Card, newCard } from "../src/srs";
 
 const DAY = 20_000;
@@ -64,4 +64,19 @@ test("a day with nothing scheduled counts as done", () => {
   assert.ok(nothingDue(rec, DAY));
   assert.ok(isDoneToday(rec, DAY));
   assert.ok(!isDoneToday(record(deck(reviewed("a", DAY))), DAY));
+});
+
+test("a miss keeps the card in today's queue, and only the first try is logged once it's right", () => {
+  const card = newCard("heron", "teacher", DAY);
+  const missed = recordAttempt(emptySession(DAY), card, false, DAY, ["stewart"]);
+  assert.equal(missed.done, null);
+  assert.deepEqual(buildQueue(deck(card), missed.session, DAY), ["heron"]);
+  const right = recordAttempt(missed.session, card, true, DAY, ["ptolemy"]);
+  assert.deepEqual(right.done!.entry, { day: DAY, formulaId: "heron", stage: "recall", firstTry: false, confusedWith: ["stewart"] });
+  assert.deepEqual(buildQueue(deck(right.done!.card), right.session, DAY), []);
+});
+
+test("a card the student added themselves is logged as extra", () => {
+  const { done } = recordAttempt(emptySession(DAY), newCard("heron", "self", DAY), true, DAY);
+  assert.equal(done!.entry.extra, true);
 });

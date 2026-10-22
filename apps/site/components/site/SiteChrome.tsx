@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/shell/AppShell";
 import { cx } from "@lemmory/ui/ui";
+import { CONTACT_EMAIL } from "@/lib/links";
 
-// `also` lists other pages that belong under a tab (Plan details sits under For users).
+// `also` lists other pages that belong under a tab (Plan details sits under Pricing).
 const TABS = [
   { href: "/", label: "Overview", also: [] as string[] },
-  { href: "/users", label: "For users", also: ["/plans"] },
+  { href: "/pricing", label: "Pricing", also: ["/plans"] },
 ];
 const isCurrent = (t: (typeof TABS)[number], path: string) => path === t.href || t.also.includes(path);
 
@@ -63,8 +64,11 @@ export function SiteHeader() {
   );
 }
 
-/** Where questions go. Shown in the footer of every page. */
-const CONTACT_EMAIL = "ryancho823@gmail.com";
+const FOOTER_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+];
 
 export function SiteFooter() {
   return (
@@ -73,6 +77,13 @@ export function SiteFooter() {
         <Logo />
         <div className="sm:text-right">
           <p>Spaced-repetition practice for competition math. Not affiliated with the MAA or AoPS.</p>
+          <p className="mt-1 flex flex-wrap gap-x-4 sm:justify-end">
+            {FOOTER_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} className="font-semibold text-ink hover:underline">
+                {l.label}
+              </Link>
+            ))}
+          </p>
           <p className="mt-1">
             Questions? Email{" "}
             <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold text-ink underline underline-offset-2">

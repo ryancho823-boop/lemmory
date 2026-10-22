@@ -1,6 +1,6 @@
 import "server-only";
 import { sql } from "drizzle-orm";
-import journal from "../drizzle/meta/_journal.json";
+import { describeMigrations, migrationStatus } from "./migrations";
 
 /** Describe a value without revealing it: length, and whether it has stray characters. */
 function describe(raw: string | undefined) {
@@ -20,11 +20,8 @@ export async function databaseHealth() {
   try {
     const { db } = await import("./client");
     await db.all(sql`select 1 from users limit 1`);
-    // Drizzle goes by date: every migration newer than the newest applied one is still to run.
-    const [{ last }] = await db.all<{ last: number | null }>(sql`select max(created_at) as last from __drizzle_migrations`);
-    const behind = journal.entries.filter((e) => e.when > Number(last ?? 0)).length;
-    /** Whether every migration in the code has been applied (deploys apply them before building). */
-    return { database: "connected", schema: behind ? `${behind} migration(s) not applied: run npm run db:migrate:prod` : "up to date" };
+    // Whether every migration in the code has been applied (deploys apply them before building).
+    return { database: "connected", schema: describeMigrations(await migrationStatus(db)) };
   } catch (e) {
     const err = e as Error & { cause?: Error };
     const { DATABASE_URL: url, DATABASE_AUTH_TOKEN: token, IS_PREVIEW } = await import("./client");

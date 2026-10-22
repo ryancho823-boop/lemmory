@@ -6,7 +6,7 @@ import { FORMULA_BY_ID, TOPIC_COLOR, topicOf } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
 import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
-import { BarList } from "@lemmory/ui/charts";
+import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
 import { Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function TeacherOverview() {
@@ -16,6 +16,8 @@ export default function TeacherOverview() {
   const sums = students.map((s) => ({ s, m: summary(s, today) }));
   const done = sums.filter((x) => x.m.doneToday).length;
   const health = classFormulaHealth(students, state.assignments.map((a) => a.formulaId), today);
+  // Formulas are compared with this class's own average, not a fixed cutoff.
+  const typical = average(health.map((h) => h.accuracy));
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
   const attention = sums
     .filter((x) => x.m.streak === 0 || (x.m.accuracy ?? 1) < 0.6)
@@ -56,7 +58,7 @@ export default function TeacherOverview() {
         <Panel>
           <PanelHeader
             title="What the class is forgetting"
-            info="Right on first try, last 14 days. Reteach the red ones."
+            info={`Right on the first try, last 14 days. Red means well below this class's average${typical === null ? "" : ` (${pct(typical)})`}: reteach those.`}
             action={
               <Link href="/teacher/formulas" className="text-sm font-semibold text-ink/50 hover:text-ink">
                 All
@@ -65,7 +67,8 @@ export default function TeacherOverview() {
           />
           <div className="px-5 pb-5 pt-4">
             <BarList
-              tone="status"
+              flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
+              unit="right"
               rows={health.slice(0, 8).map((h) => ({
                 key: h.formulaId,
                 label: (
