@@ -22,6 +22,13 @@ export interface Tier {
 
 const { academy, club, student } = PRICES;
 
+/** Each plan's color, used on the pricing cards and the Plan details tabs. */
+export const TIER_ACCENT: Record<Tier["id"], { bar: string; top: string; soft: string; dot: string }> = {
+  academy: { bar: "border-seq-400", top: "border-t-seq-400", soft: "bg-seq-100/50", dot: "bg-seq-400" },
+  club: { bar: "border-good", top: "border-t-good", soft: "bg-good/10", dot: "bg-good" },
+  student: { bar: "border-lemon-deep", top: "border-t-lemon-deep", soft: "bg-lemon-soft", dot: "bg-lemon-deep" },
+};
+
 // What a teacher plan includes. Academies and clubs get the same features; only the price differs.
 const TEACHER_FEATURES = [
   `All ${TOTAL_FORMULAS} formulas, from AMC 8 to AIME, ready to assign to your students`,
@@ -69,7 +76,7 @@ export const TIERS: Tier[] = [
       },
       {
         title: "How we confirm",
-        items: ["Sign up with your school email", "We confirm your school, then the club price starts", "Until we confirm, it's free"],
+        items: ["Sign up with your school email", "We confirm your school, then the $20 cap starts", `Until then, it's $${club.perStudent} for each student`],
       },
     ],
   },

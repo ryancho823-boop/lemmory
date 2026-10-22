@@ -31,7 +31,7 @@ export const RESEARCH = [
   {
     stat: "220M logs",
     label: "The FSRS scheduler",
-    body: "FSRS models each student's memory of each card and schedules the review for when recall is predicted to drop to 90%. It was built from 220 million real memory logs, and Anki made it a built-in scheduler in version 23.10.",
+    body: "FSRS models each student's memory of each card and schedules the review for when recall is predicted to drop to 90%. It was built from 220 million real memory logs.",
     use: "Lemmory schedules every card with FSRS, using its published default parameters.",
     cite: "Ye, Su & Cao (2022), ACM KDD",
     href: "https://dblp1.uni-trier.de/rec/conf/kdd/YeSC22.html",

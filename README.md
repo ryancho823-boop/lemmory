@@ -63,7 +63,7 @@ Locally the sites link to each other on localhost. Online they use the addresses
 | Route | What it is |
 | --- | --- |
 | `/` | The problem, how it works (with a live card to try), research |
-| `/users` | Plans and pricing, and how Lemmory compares with Podsie, Anki and Quizlet (`/academies` redirects here) |
+| `/users` | Plans and pricing, and how Lemmory compares with AoPS Alcumus, Achievable AMC, Podsie, Anki and Quizlet (`/academies` redirects here) |
 | `/plans` | Plan details: a button per plan showing what it includes, what it costs and how to start (`/plans#club` opens one) |
 | `/login` | Teacher or student? |
 | `/demo`, `/student/*`, `/teacher/*` | The demo: a simulated class of 13 saved in the browser. **Skip to tomorrow** shows the scheduler working (up to 30 days ahead). |

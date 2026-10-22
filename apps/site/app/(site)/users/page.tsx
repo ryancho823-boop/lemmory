@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import { TRIAL_DAYS, TIERS } from "@/lib/pricing";
+import { TIER_ACCENT, TRIAL_DAYS, TIERS } from "@/lib/pricing";
 import { TOTAL_FORMULAS } from "@/lib/bank";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
@@ -12,17 +12,18 @@ const INTRO = {
   sub: `Pick the plan that matches how you teach. Every plan starts with a ${TRIAL_DAYS}-day free trial, and students in a paid class never pay.`,
 };
 
-// "Yes", "No", or a short note. Keep claims about other tools conservative.
+// How Lemmory compares with the other ways contest students and clubs study. Keep claims about
+// other tools conservative and recheck them now and then (last checked October 2026).
 const COMPARE = {
-  // Podsie: free, by the nonprofit Teaching Lab. Teachers make cards or have AI generate them.
-  columns: ["Lemmory", "Podsie", "Anki", "Quizlet", "Studying alone"],
+  columns: ["Lemmory", "AoPS Alcumus", "Achievable AMC", "Podsie", "Quizlet", "Anki"],
   rows: [
-    { label: "Competition formulas, ready to assign", cells: [`Yes, ${TOTAL_FORMULAS}`, "Make your own or AI-made", "Make your own", "Make your own", "No"] },
-    { label: "Checks typed math in any equivalent form", cells: ["Yes", "No", "No", "No", "No"] },
-    { label: "Practice picking the right formula for a problem", cells: ["Yes", "No", "No", "No", "No"] },
-    { label: "Reviews spaced so formulas aren't forgotten", cells: ["Yes", "Yes", "Yes", "Partly", "No"] },
-    { label: "Teacher sees what the class is forgetting", cells: ["Yes", "Yes", "No", "Partly", "No"] },
-    { label: "Class leaderboard", cells: ["Yes", "Yes", "No", "Partly", "No"] },
+    { label: "Built for math competitions", cells: [`Yes, ${TOTAL_FORMULAS} formulas`, "Problems only", "Yes", "No", "No", "No"] },
+    { label: "Keeps formulas from being forgotten", cells: ["Yes", "Partly", "Yes", "Yes", "Partly", "Yes"] },
+    { label: "Teaches when to use each formula", cells: ["Yes", "Problems only", "Problems only", "Write your own", "Make your own", "Make your own"] },
+    { label: "Grades math in any equivalent form", cells: ["Yes", "Numbers only", "Multiple choice", "Partly", "No", "No"] },
+    { label: "Ready to use on day one", cells: ["Yes", "Yes", "Yes", "Write your own", "Make your own", "Make your own"] },
+    { label: "Shows what the class is forgetting", cells: ["Yes", "Reports", "No", "By standard", "Plus only", "No"] },
+    { label: "Price", cells: ["From $2/mo", "Free", "$99/yr", "Free", "Free, Plus $36/yr", "Free"] },
   ],
 };
 
@@ -39,7 +40,7 @@ export default function ForUsers() {
         <Container className="py-16">
           <div className="grid gap-5 md:grid-cols-3">
             {TIERS.map((t) => (
-              <div key={t.id} className="flex flex-col rounded-lg border-2 border-lemon bg-white p-7">
+              <div key={t.id} className={`flex flex-col rounded-lg border border-t-4 border-line bg-white p-7 ${TIER_ACCENT[t.id].top}`}>
                 <h2 className="text-xl font-semibold">{t.who}</h2>
                 <p className="mt-1 text-ink/70">{t.bestFor}</p>
                 <p className="mt-6">
@@ -65,12 +66,12 @@ export default function ForUsers() {
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
           <div className="mt-8 overflow-x-auto rounded-lg border border-line">
-            <table className="w-full min-w-[760px] text-left">
+            <table className="w-full min-w-[880px] text-left">
               <thead className="border-b border-line bg-canvas">
                 <tr>
                   <th className="px-5 py-3 font-semibold" />
                   {COMPARE.columns.map((c, i) => (
-                    <th key={c} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-bold" : "px-4 py-3 font-semibold text-ink/70"}>
+                    <th key={c} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-bold" : "px-4 py-3 font-semibold"}>
                       {c}
                     </th>
                   ))}
@@ -79,9 +80,9 @@ export default function ForUsers() {
               <tbody className="divide-y divide-line">
                 {COMPARE.rows.map((r) => (
                   <tr key={r.label}>
-                    <td className="px-5 py-3">{r.label}</td>
+                    <td className="px-5 py-3 font-semibold">{r.label}</td>
                     {r.cells.map((c, i) => (
-                      <td key={i} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-semibold" : "px-4 py-3 text-ink/70"}>
+                      <td key={i} className={i === 0 ? "bg-lemon-soft px-4 py-3 font-semibold" : "px-4 py-3"}>
                         {c}
                       </td>
                     ))}
