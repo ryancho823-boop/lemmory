@@ -69,7 +69,7 @@ export const TIERS: Tier[] = [
       },
       {
         title: "How we confirm",
-        items: ["Sign up with your school email", "We confirm your school, then the club price starts", "Until we confirm, it's free"],
+        items: ["Sign up with your school email", "We confirm your school, then the $20 cap starts", `Until then, it's $${club.perStudent} for each student`],
       },
     ],
   },
