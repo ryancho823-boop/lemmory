@@ -37,7 +37,7 @@ const TEXT = {
     schedulerTitle: "Then the scheduler takes over",
     schedulerBody: "Each correct review pushes the next one further out. A missed card comes back later in the same review until it's right, and then sooner on the calendar. Here is one formula, answered right every time:",
     fsrsTitle: "What is FSRS?",
-    fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews, and Anki, the most popular flashcard app, made it a built-in option in 2023.",
+    fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews.",
   },
   research: { title: "Built on how memory actually works" },
 };
