@@ -20,7 +20,7 @@ const COMPARE = {
     { label: "Built for math competitions", cells: [`Yes, ${TOTAL_FORMULAS} formulas`, "Problems only", "Yes", "No", "No", "No"] },
     { label: "Keeps formulas from being forgotten", cells: ["Yes", "Partly", "Yes", "Yes", "Partly", "Yes"] },
     { label: "Teaches when to use each formula", cells: ["Yes", "Problems only", "Problems only", "Write your own", "Make your own", "Make your own"] },
-    { label: "Grades math in any equivalent form", cells: ["Yes", "Numbers only", "—", "Partly", "No", "No"] },
+    { label: "Grades math in any equivalent form", cells: ["Yes", "Numbers only", "Multiple choice", "Partly", "No", "No"] },
     { label: "Ready to use on day one", cells: ["Yes", "Yes", "Yes", "Write your own", "Make your own", "Make your own"] },
     { label: "Shows what the class is forgetting", cells: ["Yes", "Reports", "No", "By standard", "Plus only", "No"] },
     { label: "Price", cells: ["From $2/mo", "Free", "$99/yr", "Free", "Free, Plus $36/yr", "Free"] },
