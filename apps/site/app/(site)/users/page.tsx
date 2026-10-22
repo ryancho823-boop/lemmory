@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container, PageIntro } from "@/components/site/blocks";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import { TRIAL_DAYS, TIERS } from "@/lib/pricing";
+import { TIER_ACCENT, TRIAL_DAYS, TIERS } from "@/lib/pricing";
 import { TOTAL_FORMULAS } from "@/lib/bank";
 
 export const metadata = { title: "Plans and pricing · Lemmory" };
@@ -40,7 +40,7 @@ export default function ForUsers() {
         <Container className="py-16">
           <div className="grid gap-5 md:grid-cols-3">
             {TIERS.map((t) => (
-              <div key={t.id} className="flex flex-col rounded-lg border-2 border-lemon bg-white p-7">
+              <div key={t.id} className={`flex flex-col rounded-lg border border-t-4 border-line bg-white p-7 ${TIER_ACCENT[t.id].top}`}>
                 <h2 className="text-xl font-semibold">{t.who}</h2>
                 <p className="mt-1 text-ink/70">{t.bestFor}</p>
                 <p className="mt-6">

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { cx } from "@lemmory/ui/ui";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import type { Tier } from "@/lib/pricing";
+import { TIER_ACCENT as ACCENT, type Tier } from "@/lib/pricing";
 
 /**
  * One button per plan; the chosen plan's details show below. The URL's #academy, #club or #student picks one.
@@ -29,6 +29,7 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
     history.replaceState(null, "", `#${id}`);
   };
   const t = tiers.find((x) => x.id === active) ?? tiers[0];
+  const a = ACCENT[t.id];
 
   // Teacher plans add the shared rules (free trial, students never pay) as a last section.
   const sections = t.id === "student" ? t.details : [...t.details, { title: "Every teacher plan", items: teacherRules }];
@@ -44,10 +45,13 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
             onClick={() => pick(x.id)}
             className={cx(
               "-mb-px border-b-[3px] pb-3 text-left transition-colors sm:mr-8 sm:last:mr-0",
-              x.id === active ? "border-ink text-ink" : "border-transparent text-ink/55 hover:text-ink",
+              x.id === active ? cx(ACCENT[x.id].bar, "text-ink") : "border-transparent text-ink/55 hover:text-ink",
             )}
           >
-            <span className="block font-semibold leading-snug sm:text-lg">{x.who}</span>
+            <span className="flex items-center gap-2 font-semibold leading-snug sm:text-lg">
+              <span className={cx("size-2.5 shrink-0 rounded-[2px]", ACCENT[x.id].dot)} />
+              {x.who}
+            </span>
             <span className="block text-sm">
               {x.price} {x.per}
             </span>
@@ -56,7 +60,7 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
       </div>
 
       <div role="tabpanel" key={t.id} className="rise mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] md:gap-16">
-        <div className="md:sticky md:top-24 md:self-start">
+        <div className={cx("rounded-lg border-l-4 p-7 md:sticky md:top-24 md:self-start", a.bar, a.soft)}>
           <h2 className="text-4xl font-extrabold tracking-tight">{t.who}</h2>
           <p className="mt-4">
             <span className="text-5xl font-extrabold">{t.price}</span> <span className="text-lg">{t.per}</span>
@@ -73,12 +77,13 @@ export function PlanTabs({ tiers, teacherRules }: { tiers: Tier[]; teacherRules:
 
         <div className="space-y-10">
           {sections.map((d) => (
-            <section key={d.title} className="border-t-2 border-ink pt-4">
+            <section key={d.title} className={cx("border-t-[3px] pt-4", a.bar)}>
               <h3 className="text-xl font-extrabold">{d.title}</h3>
               <ul className="mt-2">
                 {d.items.map((item) => (
-                  <li key={item} className="border-b border-line py-3 leading-relaxed text-ink/85 last:border-b-0">
-                    {item}
+                  <li key={item} className="flex gap-3 border-b border-line py-3 leading-relaxed text-ink/85 last:border-b-0">
+                    <span className={cx("mt-[0.55em] size-2 shrink-0 rounded-[2px]", a.dot)} />
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
