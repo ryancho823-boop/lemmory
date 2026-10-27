@@ -27,8 +27,9 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
   const [typos, setTypos] = useState<boolean[] | null>(null);
   const [error, setError] = useState(false);
   const [pending, start] = useTransition();
-  // The toolbar stays under the last-focused box so the layout never jumps mid-click.
-  const [active, setActive] = useState(0);
+  // The toolbar stays under the last-focused box so the layout never jumps mid-click. A card that
+  // doesn't take focus (the homepage) keeps it hidden until the box is clicked.
+  const [active, setActive] = useState(autoFocus ? 0 : -1);
   const inputs = useRef<(MathInputHandle | null)[]>([]);
   const results = graded?.results ?? null;
   const allRight = results?.every(Boolean) ?? false;
@@ -71,7 +72,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
         {prompt.blanks.map((b, i) => (
           <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
             <div className="shrink-0 pt-3 text-lg sm:min-w-40 sm:text-right">
-              <Tex math={b.lhs} />
+              <Tex math={`\\displaystyle ${b.lhs}`} />
             </div>
             <div className="flex-1">
               <MathInput

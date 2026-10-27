@@ -9,8 +9,10 @@ import { Button, Segmented } from "@lemmory/ui/ui";
 
 type Mode = "apply" | "recall";
 
-const PROBLEM = FORMULA_BY_ID["power-of-a-point"].problems[0];
-const OPTIONS = ["law-of-cosines", "power-of-a-point", "stewart", "inscribed-angle"];
+// AM-GM: one short box to recall, then a classic contest problem where spotting it is the skill.
+const FORMULA = "amgm";
+const PROBLEM = FORMULA_BY_ID[FORMULA].problems[0];
+const OPTIONS = ["vieta-quadratic", "amgm", "sfft", "arithmetic-series"];
 
 /**
  * The real review cards, embedded so visitors can try them without opening the demo: one formula
@@ -28,8 +30,8 @@ export function TryIt() {
   };
 
   return (
-    <div className="rounded-lg border border-ink/15 bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4">
+    <div className="rounded-lg border-2 border-ink bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
         <Segmented
           value={mode}
           onChange={(m) => reset(m)}
@@ -40,7 +42,7 @@ export function TryIt() {
         />
         <span className="text-sm text-ink/60">The same card students see</span>
       </div>
-      <div className="p-6 sm:p-8">
+      <div className="p-6">
         {result !== null ? (
           <div className="py-10 text-center">
             <CheckCircle2 size={44} className="mx-auto text-good" />
@@ -54,7 +56,7 @@ export function TryIt() {
           <ApplyCard key={run} problem={PROBLEM} options={OPTIONS} onDone={(ok) => setResult(ok)} />
         ) : (
           // Recall leads into step 2, the way a card graduates in the app.
-          <RecallCard key={run} formula={FORMULA_BY_ID["power-of-a-point"]} autoFocus={run > 0} onDone={() => reset("apply")} />
+          <RecallCard key={run} formula={FORMULA_BY_ID[FORMULA]} autoFocus={run > 0} onDone={() => reset("apply")} />
         )}
       </div>
     </div>

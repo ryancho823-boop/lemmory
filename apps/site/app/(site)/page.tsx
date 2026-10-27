@@ -39,7 +39,6 @@ const TEXT = {
     fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews.",
   },
   research: { title: "Built on how memory actually works" },
-  terms: "Each formula is a flashcard (a card for short), and a student's cards are their deck.",
 };
 
 // Who it's for. Each side sees what they get and where to start.
@@ -57,7 +56,7 @@ const AUDIENCES = [
   {
     title: "For students",
     points: [
-      "In a class: sign up with the code your teacher gives you, and their assignments show up in your deck.",
+      "Each formula is a flashcard, and your flashcards are your deck. In a class, sign up with your teacher's code and their assignments join your deck.",
       "On your own: pick your contest (AMC 8, AMC 10, AMC 12 or AIME) and start with its formulas.",
       `$${PRICES.student.monthly} a month after a ${TRIAL_DAYS}-day free trial.`,
     ],
@@ -116,7 +115,7 @@ export default function Overview() {
     <div>
       <ScrollReveal />
       <section className="bg-lemon">
-        <Container className="grid items-center gap-12 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_1fr]">
+        <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
             <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">{TEXT.hero.title}</h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed">{TEXT.hero.body}</p>
@@ -151,7 +150,6 @@ export default function Overview() {
             </a>
           </div>
         ))}
-        <p data-reveal className="md:col-span-2">{TEXT.terms}</p>
       </Container>
 
       <Container as="section" className="py-20">
