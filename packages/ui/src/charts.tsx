@@ -63,7 +63,7 @@ const STATUS_STYLE: Record<DayStatus, { bg: string; label: string }> = {
   some: { bg: "var(--color-warn)", label: "6–14 missed" },
   many: { bg: "var(--color-bad)", label: "15+ missed" },
   today: { bg: "transparent", label: "Today" },
-  none: { bg: "rgb(15 17 33 / 0.06)", label: "No cards yet" },
+  none: { bg: "rgb(15 17 33 / 0.06)", label: "No cards that day" },
 };
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const DAY_MS = 86_400_000;
@@ -108,7 +108,7 @@ export function WeekGrid({ student, today, weeks = 5 }: { student: StudentRecord
         ))}
       </div>
       <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink/55">
-        {(["done", "few", "some", "many"] as const).map((k) => (
+        {(["done", "few", "some", "many", "none"] as const).map((k) => (
           <li key={k} className="flex items-center gap-1.5">
             <span className="size-3 rounded-[4px]" style={{ background: STATUS_STYLE[k].bg }} />
             {STATUS_STYLE[k].label}

@@ -1,5 +1,6 @@
 import { streak } from "@lemmory/core/analytics";
 import { getView } from "@/lib/session";
+import { DayWatcher } from "./DayWatcher";
 import { StudentShell } from "./StudentShell";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
@@ -13,6 +14,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       doneToday={v.doneToday}
       locked={!v.canReview}
     >
+      <DayWatcher today={v.today} zone={v.zone} />
       {children}
     </StudentShell>
   );

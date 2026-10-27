@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { type Competition, type Student, pointsBetween, scoredByDay } from "@lemmory/core/analytics";
 import { type Assignment, CLASSMATES, type LogEntry, YOU, seedAssignments, simulate } from "./sim";
 import { type Card, isNew, newCard, realToday } from "@lemmory/core/srs";
-import { type QueueSession, buildQueue as coreBuildQueue, recordAttempt as recordCore } from "@lemmory/core/session";
+import { type QueueSession, buildQueue as coreBuildQueue, newCards, recordAttempt as recordCore } from "@lemmory/core/session";
 import { DEMO_MAX_DAYS } from "./demo";
 import { FORMULA_BY_ID } from "./bank";
 
@@ -17,6 +17,8 @@ const KEY = "lemmory:v4";
 type Session = QueueSession;
 
 interface State {
+  /** The real day this demo was set up. A save from an earlier day starts over (see below). */
+  createdOn: number;
   dayOffset: number;
   currentWeek: number;
   assignments: Assignment[];
@@ -39,6 +41,7 @@ function seed(today: number): State {
   const cards = { ...you.cards };
   for (const a of assignments) if (!cards[a.formulaId]) cards[a.formulaId] = newCard(a.formulaId, "teacher", a.day);
   return {
+    createdOn: today,
     dayOffset: 0,
     currentWeek: Math.max(...assignments.map((a) => a.week)),
     assignments,
@@ -92,8 +95,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const saved: State | null = raw ? JSON.parse(raw) : null;
       // A save that mentions a formula no longer in the bank starts over instead of crashing.
       const known = saved && saved.assignments.every((a) => FORMULA_BY_ID[a.formulaId]) && Object.keys(saved.cards).every((id) => FORMULA_BY_ID[id]);
+      // A save from an earlier day starts over too: days passed with no reviews, so the student
+      // would open behind, with a broken streak and a pile of cards due.
+      const fresh = known && saved.createdOn === t;
       // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from storage after mount
-      setState(known ? saved : seed(t));
+      setState(fresh ? saved : seed(t));
     } catch {
       setState(seed(t));
     }
@@ -184,7 +190,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addToDeck = useCallback(
-    (id: string) => update((s, t) => (s.cards[id] ? s : { ...s, cards: { ...s.cards, [id]: newCard(id, "self", t) } })),
+    (id: string) => update((s, t) => (s.cards[id] ? s : { ...s, cards: { ...s.cards, [id]: newCards(Object.values(s.cards), [id], "self", t)[0] } })),
     [update],
   );
 
@@ -206,7 +212,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return {
           ...s,
           assignments: [...s.assignments, { formulaId: id, week: s.currentWeek, day: t }],
-          cards: { ...s.cards, [id]: card ? { ...card, source: "teacher" } : newCard(id, "teacher", t) },
+          cards: { ...s.cards, [id]: card ? { ...card, source: "teacher" } : newCards(Object.values(s.cards), [id], "teacher", t)[0] },
         };
       }),
     [update],

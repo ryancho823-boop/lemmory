@@ -24,10 +24,17 @@ export function FormulaDetail({ f, note, aside, actions }: { f: Formula; note: N
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="space-y-5">
-          <Panel className="overflow-x-auto px-6 py-10 text-center text-xl">
+          <Panel className="math-scroll px-6 py-10 text-center text-xl">
             <Tex math={f.statement} display />
             <p className="mt-2 text-sm text-ink/60">
               <Rich text={f.setup} />
+              {/* The formula page shows everything; only review cards hold this back until answered. */}
+              {f.after && (
+                <>
+                  {" "}
+                  <Rich text={f.after} />
+                </>
+              )}
             </p>
             {f.figure && <Figure figure={f.figure} className="mx-auto mt-6 h-auto w-full max-w-[300px]" />}
           </Panel>

@@ -49,7 +49,7 @@ export default function StudentHome() {
                 </InfoTip>
               </p>
               <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                +{bonus} streak bonus
+                {s > 0 ? `Finish to keep your ${s}-day streak: +${bonus} bonus points` : `Finish to start a streak: +${bonus} bonus points`}
               </p>
             </div>
           )}
@@ -65,7 +65,7 @@ export default function StudentHome() {
         <Panel>
           <PanelHeader
             title="Focus on these"
-            info="Formulas you get right on the first try less than 70% of the time. The percent is how likely you are to remember each one today."
+            info="Formulas you get right on the first try less than 70% of the time, lowest first. The same numbers as Needs work on My stats."
             action={
               <Link href="/student/stats" className="text-sm font-semibold text-ink/50 hover:text-ink">
                 My stats
@@ -83,9 +83,9 @@ export default function StudentHome() {
                     <span className="min-w-0 flex-1 truncate font-semibold" title={f.topic}>
                       {f.name}
                     </span>
-                    <Meter value={w.retention} className="hidden w-20 xl:block" />
+                    <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {pct(w.retention)} <span className="text-ink/70">retained</span>
+                      {pct(w.accuracy)} <span className="text-ink/70">right</span>
                     </span>
                   </Link>
                 </li>

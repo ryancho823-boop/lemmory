@@ -198,7 +198,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     name: "Ptolemy's Theorem",
     level: "AMC 12",
     statement: "AC\\cdot BD = AB\\cdot CD + AD\\cdot BC",
-    setup: "Cyclic quadrilateral with consecutive sides $a, b, c, d$ and diagonals $p, q$: $pq = ac + bd$.",
+    setup: "Cyclic quadrilateral with consecutive sides $a, b, c, d$ and diagonals $p, q$.",
     whenToUse: "A cyclic quadrilateral where you need a diagonal, or a point on a circle around a regular polygon.",
     recall: [{ lhs: "pq =", answer: "ac+bd", vars: { a: pos, b: pos, c: pos, d: pos } }],
     related: ["brahmagupta", "inscribed-angle", "power-of-a-point"],

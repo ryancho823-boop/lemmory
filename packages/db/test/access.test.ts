@@ -107,3 +107,14 @@ test("missed days are filled in by a practice check too, and loading again adds 
   await student.loadStudentView({ id: pat, name: "Pat", username: "pat" });
   assert.equal((await db.select().from(schema.days).where(eq(schema.days.studentId, pat))).length, filled.length);
 });
+
+test("a student on their own can start with a starter deck, and today's queue has new cards", async () => {
+  const solo = (await createStudent("Starter Test", "starter", "correct-horse", "UTC"))!;
+  await student.addStarterDeck(solo, "AMC 10");
+  const deck = await db.select().from(schema.cards).where(eq(schema.cards.studentId, solo));
+  assert.ok(deck.length > 20 && deck.every((c) => c.source === "self" && FORMULA_BY_ID[c.formulaId].level === "AMC 10"));
+  const v = await student.loadStudentView({ id: solo, name: "Starter", username: "starter" });
+  assert.equal(v.queue.length, 6, "six new cards a day");
+  await student.addStarterDeck(solo, "AMC 10");
+  assert.equal((await db.select().from(schema.cards).where(eq(schema.cards.studentId, solo))).length, deck.length, "picking again adds nothing");
+});

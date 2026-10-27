@@ -18,7 +18,28 @@ function loadMathLive() {
   return (loader ??= import("mathlive").then(({ MathfieldElement }) => {
     MathfieldElement.fontsDirectory = "/mathlive/fonts";
     MathfieldElement.soundsDirectory = null;
+    keepAboveKeyboard();
   }));
+}
+
+/** Room below the answer box for the math toolbar and the Check / Continue buttons. */
+const BELOW = 150;
+
+/**
+ * On phones and tablets the on-screen math keyboard slides up over the bottom of the page. While
+ * it's open, add that much space under the page and scroll the answer box, with the buttons under
+ * it, above the keyboard.
+ */
+function keepAboveKeyboard() {
+  const kb = window.mathVirtualKeyboard;
+  kb.addEventListener("geometrychange", () => {
+    const h = kb.visible ? kb.boundingRect.height : 0;
+    document.body.style.paddingBottom = h ? `${h}px` : "";
+    const field = document.activeElement;
+    if (!h || field?.tagName !== "MATH-FIELD") return;
+    const overlap = field.getBoundingClientRect().bottom + BELOW - (window.innerHeight - h);
+    if (overlap > 0) window.scrollBy({ top: overlap, behavior: "smooth" });
+  });
 }
 
 export interface MathInputHandle {

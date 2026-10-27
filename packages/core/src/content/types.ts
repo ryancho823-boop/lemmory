@@ -109,7 +109,10 @@ export interface Formula {
   topic: Topic;
   level: Level;
   statement: string;
+  /** Context shown above the recall boxes. It must never give an answer away (npm run check tests this). */
   setup: string;
+  /** Shown only after the card is answered: a related fact that would give the answer away if shown first. */
+  after?: string;
   whenToUse: string;
   recall: RecallBlank[];
   related: string[];

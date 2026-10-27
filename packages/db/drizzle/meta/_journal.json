@@ -71,6 +71,20 @@
       "when": 1792652944765,
       "tag": "0009_attempts_created",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1793144167126,
+      "tag": "0010_student_settled_through",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1793144321915,
+      "tag": "0011_drop_reverted_tables",
+      "breakpoints": true
     }
   ]
 }

@@ -67,7 +67,8 @@ export const ALGEBRA = defineTopic("Algebra", [
     name: "Sum & Difference of Cubes",
     level: "AMC 10",
     statement: "a^3 \\pm b^3 = (a \\pm b)(a^2 \\mp ab + b^2)",
-    setup: "Factoring identities for cubes; also $a^3 + b^3 = (a+b)^3 - 3ab(a+b)$.",
+    setup: "Factoring identities for cubes.",
+    after: "Also $a^3 + b^3 = (a+b)^3 - 3ab(a+b)$.",
     whenToUse: "You see a sum or difference of cubes, or know $a+b$ and $ab$ and need $a^3 + b^3$.",
     recall: [
       { lhs: "a^3+b^3 =", answer: "(a+b)(a^2-ab+b^2)", vars: { a: pos, b: pos }, form: "product" },
@@ -128,7 +129,7 @@ export const ALGEBRA = defineTopic("Algebra", [
     whenToUse: "Each term is a constant multiple of the one before it, or an infinite repeating process needs summing.",
     recall: [
       { lhs: "S_n =", answer: "a\\cdot\\frac{1-r^n}{1-r}", vars: { a: pos, r: [0.1, 0.9], n: int(2, 8) } },
-      { lhs: "S_\\infty =", answer: "\\frac{a}{1-r}", vars: { a: pos, r: [0.1, 0.9] } },
+      { lhs: "S_\\infty\\ (|r|<1) =", answer: "\\frac{a}{1-r}", vars: { a: pos, r: [0.1, 0.9] } },
     ],
     related: ["arithmetic-series", "exp-series"],
     problems: [

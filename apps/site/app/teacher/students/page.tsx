@@ -31,7 +31,7 @@ export default function StudentsPage() {
               <th className="px-3 py-3 font-semibold">Streak</th>
               <th className="px-3 py-3 font-semibold">First-try accuracy</th>
               <th className="px-3 py-3 font-semibold">Weakest topic</th>
-              <th className="px-3 py-3 font-semibold">XP this week</th>
+              <th className="px-3 py-3 font-semibold">Points this week</th>
               <th />
             </tr>
           </thead>

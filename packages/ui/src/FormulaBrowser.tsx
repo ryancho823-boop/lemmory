@@ -105,7 +105,11 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/35" />
             <input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => {
+                setQ(e.target.value);
+                // Searching looks through every topic, not just the one picked.
+                if (e.target.value.trim() && topic !== "All") setTopic("All");
+              }}
               placeholder="Search"
               aria-label="Search formulas"
               className="h-10 w-full rounded-xl border border-line bg-white pl-9 pr-3 text-sm outline-none focus:border-ink/40"
@@ -131,7 +135,8 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
                       <DifficultyMeter tier={f.tier} />
                       {meta && <span className="shrink-0 text-xs text-ink/45">{meta(f)}</span>}
                     </span>
-                    <span className="mt-1 block truncate text-sm text-ink/60">
+                    {/* Long formulas fade out before the button instead of being cut off at its edge. */}
+                    <span className="mt-1 block overflow-hidden whitespace-nowrap py-0.5 pr-4 text-sm text-ink/60 [mask-image:linear-gradient(to_right,black_85%,transparent)]">
                       <Tex math={f.statement} />
                     </span>
                   </Link>

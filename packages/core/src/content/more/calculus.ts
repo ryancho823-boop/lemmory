@@ -93,7 +93,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     name: "Related Rates",
     level: "Calculus",
     statement: "\\frac{dA}{dt} = \\frac{dA}{dr}\\cdot\\frac{dr}{dt}",
-    setup: "Differentiate the relationship with respect to time. For a circle with $v = \\frac{dr}{dt}$: $\\frac{dA}{dt} = 2\\pi r v$.",
+    setup: "Differentiate the relationship with respect to time. Here $v = \\frac{dr}{dt}$.",
     whenToUse: "Two quantities change together over time, like a growing circle or a sliding ladder.",
     recall: [{ lhs: "\\frac{dA}{dt} \\text{ for a circle} =", answer: "2\\pi rv", vars: { r: [1, 5], v: [1, 5] } }],
     related: ["chain-rule"],

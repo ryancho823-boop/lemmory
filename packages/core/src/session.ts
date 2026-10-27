@@ -3,7 +3,7 @@
 // until the student gets them right.
 
 import { type LogEntry, NEW_PER_DAY, type StudentRecord } from "./records";
-import { type Card, isNew, review } from "./srs";
+import { type Card, isNew, newCard, review } from "./srs";
 
 export interface DaySession {
   day: number;
@@ -35,19 +35,22 @@ export const emptySession = (day: number): DaySession => ({
 /** The parts of a day's session that decide the queue and record attempts (the demo keeps only these). */
 export type QueueSession = Pick<DaySession, "day" | "attempts" | "confusions" | "completed" | "newStarted">;
 
+/**
+ * Today's cards: reviews that are due, and new cards whose first day has come (newCards spreads
+ * them out, NEW_PER_DAY a day). Anything not finished stays due, so a missed day's cards come back
+ * the next day on top of that day's own. A card that just graduated waits for its due day too.
+ */
 export function buildQueue(cards: Record<string, Card>, session: QueueSession, today: number) {
-  const all = Object.values(cards);
+  const all = Object.values(cards).filter((c) => c.memory.due <= today);
   const pending = Object.keys(session.attempts).filter((id) => !session.completed.includes(id) && cards[id]);
   const due = all
-    .filter((c) => !isNew(c) && c.memory.due <= today && !pending.includes(c.formulaId))
+    .filter((c) => !isNew(c) && !pending.includes(c.formulaId))
     .sort((a, b) => a.memory.due - b.memory.due)
     .map((c) => c.formulaId);
-  const room = Math.max(0, NEW_PER_DAY - session.newStarted.length);
-  // Assigned homework is introduced first, so cards a student adds on their own can't push it back.
+  // Assigned homework first, so cards a student adds on their own can't push it back.
   const fresh = all
     .filter((c) => isNew(c) && !pending.includes(c.formulaId))
-    .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.addedDay - b.addedDay)
-    .slice(0, room)
+    .sort((a, b) => Number(a.source === "self") - Number(b.source === "self") || a.memory.due - b.memory.due || a.addedDay - b.addedDay)
     .map((c) => c.formulaId);
   // Interleave new cards among reviews (mixed practice beats blocked practice).
   const out = [...pending, ...due];
@@ -78,6 +81,22 @@ export function recordAttempt<S extends QueueSession>(session: S, card: Card, co
   return { session: { ...next, completed: [...next.completed, id] }, done: { card: updated, promoted, entry } };
 }
 
+/**
+ * New cards for `ids`, each with the day it's first shown: up to NEW_PER_DAY a day from today,
+ * after the new cards already waiting. Assigned homework and cards a student adds themselves are
+ * spread out separately, so a big deck of their own never pushes homework back.
+ */
+export function newCards(deck: Card[], ids: string[], source: Card["source"], today: number): Card[] {
+  const taken = new Map<number, number>();
+  for (const c of deck) if (isNew(c) && c.source === source && c.memory.due >= today) taken.set(c.memory.due, (taken.get(c.memory.due) ?? 0) + 1);
+  let day = today;
+  return ids.map((id) => {
+    while ((taken.get(day) ?? 0) >= NEW_PER_DAY) day++;
+    taken.set(day, (taken.get(day) ?? 0) + 1);
+    return newCard(id, source, today, day);
+  });
+}
+
 /** Nothing was scheduled today at all (not "everything is already finished"). */
 export function nothingDue(record: StudentRecord, today: number) {
   return (
@@ -101,13 +120,15 @@ export interface DayRow {
  * otherwise how many assigned cards were left. Settling runs before anything changes a
  * student's cards, so the cards' due dates are still what they were on those days.
  */
-export function settleDays(record: StudentRecord, from: number, to: number): DayRow[] {
+export function settleDays(record: StudentRecord, from: number, to: number, ownCardsCount = false): DayRow[] {
   const cards = Object.values(record.cards);
   const out: DayRow[] = [];
   for (let d = from; d <= to; d++) {
     if (record.doneDays.includes(d) || d in record.missed) continue;
-    const due = cards.filter((c) => c.addedDay <= d && c.memory.due <= d);
-    out.push(due.length ? { day: d, done: false, missed: due.filter((c) => c.source === "teacher").length } : { day: d, done: true, missed: 0 });
+    // In a class, cards a student added themselves are extra practice: leaving them doesn't miss
+    // the day. A student on their own has only their own cards, so those are the day's work.
+    const left = cards.filter((c) => c.addedDay <= d && c.memory.due <= d && (ownCardsCount || c.source === "teacher"));
+    out.push(left.length ? { day: d, done: false, missed: left.length } : { day: d, done: true, missed: 0 });
   }
   return out;
 }

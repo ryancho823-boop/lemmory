@@ -21,6 +21,11 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   /** Students on their own have no class time zone, so "today" uses their browser's (IANA name). */
   timezone: text("timezone"),
+  /**
+   * Students in no class: past days are recorded through this day (in a class, enrollments keep
+   * it per class). Null until their first visit.
+   */
+  settledThrough: integer("settled_through"),
   createdAt: createdAt(),
 });
 

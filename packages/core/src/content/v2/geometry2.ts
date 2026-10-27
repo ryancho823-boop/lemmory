@@ -482,7 +482,7 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "When a Line Meets a Circle",
     level: "AMC 12",
     statement: "\\text{Substitute the line into the circle: } \\Delta > 0 \\text{ crosses}, \\ \\Delta = 0 \\text{ tangent}, \\ \\Delta < 0 \\text{ misses}",
-    setup: "Equivalently, compare the distance from the center to the line with $r$. $y = mx + c$ is tangent to $x^2 + y^2 = r^2$ exactly when $c^2 = r^2(1 + m^2)$.",
+    setup: "Substitute the line into the circle and look at the discriminant, or compare the distance from the center to the line with $r$.",
     whenToUse: "Tangency conditions, or counting intersections of a line and a circle.",
     figure: (() => {
       const O: Pt = [0, 0];

@@ -7,6 +7,7 @@ import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
 import { Button, Meter, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getUnlockedView } from "@/lib/session";
+import { StarterDeck } from "./StarterDeck";
 
 export default async function StudentHome() {
   const v = await getUnlockedView();
@@ -25,20 +26,26 @@ export default async function StudentHome() {
         {v.klass?.contest && <p className="text-ink/75">{v.klass.contest}</p>}
       </div>
 
-      {!v.klass && (
+      {!v.klass && emptyDeck && <StarterDeck />}
+      {!v.klass && !emptyDeck && (
         <Panel className="flex flex-wrap items-center gap-4 p-5">
           <Users className="text-ink/40" />
-          <p className="min-w-0 flex-1">
-            {emptyDeck
-              ? "Add formulas from the Formula bank. They'll show up in your daily review."
-              : "You're on the individual plan. If your teacher gives you a class code, you can join their class too."}
-          </p>
-          <Button href={emptyDeck ? "/bank" : "/class"} size="sm">
-            {emptyDeck ? "Formula bank" : "Join a class"}
+          <p className="min-w-0 flex-1">You&apos;re on the individual plan. If your teacher gives you a class code, you can join their class too.</p>
+          <Button href="/class" size="sm">
+            Join a class
           </Button>
         </Panel>
       )}
 
+      {/* Nothing to review until there's a deck: the starter deck picker above comes first. */}
+      {!(emptyDeck && !v.klass) && <Today v={v} s={s} bonus={bonus} fresh={fresh} weak={weak} />}
+    </div>
+  );
+}
+
+function Today({ v, s, bonus, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlockedView>>; s: number; bonus: number; fresh: number; weak: ReturnType<typeof weakest> }) {
+  return (
+    <>
       {/* Do your cards */}
       <section className="rounded-2xl border border-lemon bg-lemon-soft p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-6">
@@ -60,7 +67,7 @@ export default async function StudentHome() {
               </p>
               {v.klass && (
                 <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                  +{bonus} streak bonus
+                  {s > 0 ? `Finish to keep your ${s}-day streak: +${bonus} bonus points` : `Finish to start a streak: +${bonus} bonus points`}
                 </p>
               )}
             </div>
@@ -77,7 +84,7 @@ export default async function StudentHome() {
         <Panel>
           <PanelHeader
             title="Focus on these"
-            info="Formulas you get right on the first try less than 70% of the time. The percent is how likely you are to remember each one today."
+            info="Formulas you get right on the first try less than 70% of the time, lowest first. The same numbers as Needs work on My stats."
             action={
               <Link href="/stats" className="text-sm font-semibold text-ink/50 hover:text-ink">
                 My stats
@@ -95,9 +102,9 @@ export default async function StudentHome() {
                     <span className="min-w-0 flex-1 truncate font-semibold" title={f.topic}>
                       {f.name}
                     </span>
-                    <Meter value={w.retention} className="hidden w-20 xl:block" />
+                    <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {pct(w.retention)} <span className="text-ink/70">retained</span>
+                      {pct(w.accuracy)} <span className="text-ink/70">right</span>
                     </span>
                   </Link>
                 </li>
@@ -107,6 +114,6 @@ export default async function StudentHome() {
         </Panel>
         {v.klass && <Leaderboard rows={v.leaderboard} gameAge={v.gameAge} compact />}
       </div>
-    </div>
+    </>
   );
 }

@@ -11,9 +11,9 @@ export function NewGameButton({ classId }: { classId: string }) {
     <Button
       className="mt-4 w-full"
       disabled={pending}
-      onClick={() => confirm("Start a new game? Game points go back to 0 for everyone.") && start(() => newGameAction(classId))}
+      onClick={() => confirm("Start a new round? Round points go back to 0 for everyone.") && start(() => newGameAction(classId))}
     >
-      <RotateCcw size={15} /> Start a new game
+      <RotateCcw size={15} /> Start a new round
     </Button>
   );
 }

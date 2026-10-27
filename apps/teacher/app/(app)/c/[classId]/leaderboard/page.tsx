@@ -18,9 +18,9 @@ export default async function TeacherLeaderboard({ params }: PageProps<"/c/[clas
       </div>
       <Panel className="p-5">
         <h2 className="flex items-center gap-1 text-[17px] font-semibold">
-          Current game
-          <InfoTip title="New games" align="left">
-            A new game sets everyone&apos;s game points to 0. Streaks and all-time points stay.
+          Current round
+          <InfoTip title="New rounds" align="left">
+            A new round sets everyone&apos;s round points to 0. Streaks and all-time points stay.
           </InfoTip>
         </h2>
         <p className="mt-1">Started {age === 0 ? "today" : age === 1 ? "yesterday" : `${age} days ago`}.</p>

@@ -7,6 +7,7 @@ import { MathInput, type MathInputHandle } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, TopicTag } from "../ui";
 import { Figure } from "../Figure";
+import { useEnter } from "./useEnter";
 
 type Graded = Extract<RecallResult, { status: "graded" }>;
 
@@ -51,6 +52,8 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
       }
     });
   };
+
+  useEnter(!!graded, () => onDone(allRight));
 
   return (
     <div>
@@ -105,13 +108,16 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
       {graded && (
         <Feedback right={allRight} title={allRight ? "Correct" : "Here's the formula"}>
           {allRight ? (
-            "Any equivalent form counts."
+            <span className="block">Any equivalent form counts.</span>
           ) : (
-            <>
-              <span className="block overflow-x-auto py-1">
-                <Tex math={`\\displaystyle ${graded.statement}`} />
-              </span>
-            </>
+            <span className="math-scroll block">
+              <Tex math={`\\displaystyle ${graded.statement}`} />
+            </span>
+          )}
+          {graded.after && (
+            <span className="block">
+              <Rich text={graded.after} display />
+            </span>
           )}
         </Feedback>
       )}

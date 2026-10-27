@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { changePassword, checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
 import { isTimeZone } from "@lemmory/core/days";
+import { STARTER_LEVELS, type StarterLevel } from "@lemmory/core/starter";
 import { MAX_ANSWER_LENGTH } from "@lemmory/core/grade";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt, tooFast } from "@lemmory/db/limits";
@@ -13,6 +14,7 @@ import { checkoutStudent, startStudentTrial } from "@lemmory/db/billing";
 import {
   type Mode,
   ReviewError,
+  addStarterDeck,
   addToDeck,
   answerPick,
   canStudentReview,
@@ -161,7 +163,8 @@ export async function startTrialAction(): Promise<FormState> {
   if (error) return { error };
   // The sidebar unlocks too, so re-render the layout, not just the page.
   revalidatePath("/", "layout");
-  redirect("/bank");
+  // Home, where a student with an empty deck picks a starter deck.
+  redirect("/");
 }
 
 /** Simulated checkout for the individual plan, with a parent or guardian for the receipt. Nothing is charged. */
@@ -243,6 +246,12 @@ export async function markDone() {
 
 export async function addCard(formulaId: unknown) {
   await addToDeck(await unlocked(), str(formulaId));
+  refresh();
+}
+
+export async function startDeck(level: unknown) {
+  if (!STARTER_LEVELS.includes(level as StarterLevel)) throw new ReviewError("Bad request");
+  await addStarterDeck(await unlocked(), level as StarterLevel);
   refresh();
 }
 

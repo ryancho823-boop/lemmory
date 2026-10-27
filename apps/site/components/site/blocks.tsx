@@ -55,7 +55,7 @@ export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a
             </a>
           </p>
         </div>
-        <CtaLink href="/demo">Open the live demo</CtaLink>
+        <CtaLink href="/student">Open the live demo</CtaLink>
       </Container>
     </section>
   );
