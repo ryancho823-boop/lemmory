@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { NEW_PER_DAY, type StudentRecord } from "../src/records";
-import { applyDays, buildQueue, emptySession, isDoneToday, nothingDue, recordAttempt, settleDays } from "../src/session";
+import { applyDays, buildQueue, emptySession, isDoneToday, newCards, nothingDue, recordAttempt, settleDays } from "../src/session";
 import { type Card, newCard } from "../src/srs";
 
 const DAY = 20_000;
@@ -25,20 +25,28 @@ test("a missed card stays at the front until it's right", () => {
   assert.ok(!buildQueue(deck(reviewed("a", DAY + 1), reviewed("b", DAY - 1)), done, DAY).includes("a"));
 });
 
-test("new cards are capped per day, mixed in among reviews, homework first", () => {
-  const fresh = Array.from({ length: NEW_PER_DAY + 3 }, (_, i) => newCard(`n${i}`, i < 3 ? "self" : "teacher", DAY - 1));
-  const q = buildQueue(deck(reviewed("r1", DAY), reviewed("r2", DAY), ...fresh), emptySession(DAY), DAY);
-  const news = q.filter((id) => id.startsWith("n"));
-  assert.equal(news.length, NEW_PER_DAY);
-  // The self-added cards (n0..n2) come after every assigned one.
-  assert.deepEqual(news.slice(0, NEW_PER_DAY - 3), ["n3", "n4", "n5"]);
-  assert.notEqual(q[0].startsWith("n") && q[1].startsWith("n"), true, "new cards are interleaved, not blocked");
+test("new cards come in NEW_PER_DAY a day, mixed in among reviews, homework first", () => {
+  const homework = newCards([], Array.from({ length: NEW_PER_DAY + 3 }, (_, i) => `t${i}`), "teacher", DAY);
+  const own = newCards(homework, ["s0", "s1"], "self", DAY);
+  const q = buildQueue(deck(reviewed("r1", DAY), reviewed("r2", DAY), ...homework, ...own), emptySession(DAY), DAY);
+  const news = q.filter((id) => !id.startsWith("r"));
+  // Six assigned cards today (the rest tomorrow), then the student's own, spread separately.
+  assert.deepEqual(news, ["t0", "t1", "t2", "t3", "t4", "t5", "s0", "s1"]);
+  assert.notEqual(q[0] !== "r1" && q[1] !== "r2", true, "new cards are interleaved, not blocked");
+  assert.deepEqual(homework.slice(NEW_PER_DAY).map((c) => c.memory.due), [DAY + 1, DAY + 1, DAY + 1]);
 });
 
-test("new cards started today count against the daily cap", () => {
-  const fresh = Array.from({ length: NEW_PER_DAY }, (_, i) => newCard(`n${i}`, "teacher", DAY - 1));
-  const session = { ...emptySession(DAY), newStarted: ["x", "y"] };
-  assert.equal(buildQueue(deck(...fresh), session, DAY).length, NEW_PER_DAY - 2);
+test("cards missed today come back tomorrow on top of tomorrow's own", () => {
+  const cards = deck(...newCards([], Array.from({ length: 2 * NEW_PER_DAY }, (_, i) => `n${i}`), "teacher", DAY));
+  // Today: three done, three left. Tomorrow: those three plus tomorrow's six.
+  const done = Object.fromEntries(["n0", "n1", "n2"].map((id) => [id, { ...cards[id], memory: { ...cards[id].memory, last: DAY, due: DAY + 3 } }]));
+  assert.equal(buildQueue({ ...cards, ...done }, emptySession(DAY + 1), DAY + 1).length, 3 + NEW_PER_DAY);
+});
+
+test("a card that just graduated waits for its due day instead of coming back today", () => {
+  const c = { ...newCard("g", "teacher", DAY - 5), stage: "apply" as const, memory: { ...newCard("g", "teacher", DAY).memory, due: DAY + 1 } };
+  assert.deepEqual(buildQueue(deck(c), emptySession(DAY), DAY), []);
+  assert.deepEqual(buildQueue(deck(c), emptySession(DAY + 1), DAY + 1), ["g"]);
 });
 
 test("settling: a day with nothing due is done; otherwise it counts missed homework only", () => {

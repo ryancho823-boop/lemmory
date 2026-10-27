@@ -8,6 +8,7 @@ import { Rich, Tex } from "../Tex";
 import { Button, StageTag, cx } from "../ui";
 import { Feedback } from "./RecallCard";
 import { Figure } from "../Figure";
+import { useEnter } from "./useEnter";
 
 interface Props {
   prompt: ApplyPrompt;
@@ -45,6 +46,10 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
     if (solve) return onDone(solve.right);
     if (value.trim() && !pending) run(async () => setSolve(await onSolve(picked, value)));
   };
+  // Enter checks the chosen formulas, then continues once the card is over.
+  useEnter(!pick && picked.length > 0, checkPick);
+  useEnter(!!pick && !pick.right, () => onDone(false));
+  useEnter(!!solve, () => onDone(solve!.right));
 
   return (
     <div>
@@ -78,7 +83,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
                 {pick && needed && <Check size={16} strokeWidth={3} className="text-good" />}
               </span>
               {pick?.statements[o.id] && (needed || on) && (
-                <span className="mt-2 block overflow-x-auto py-0.5 text-[17px]">
+                <span className="math-scroll mt-1 block text-[17px]">
                   <Tex math={`\\displaystyle ${pick.statements[o.id]}`} />
                 </span>
               )}
@@ -121,11 +126,10 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
           </div>
           {solve && (
             <Feedback right={solve.right} title={solve.right ? "Correct" : "Not quite"}>
-              {!solve.right && (
-                <span className="block">
-                  Answer: <Tex math={solve.answer} />
-                </span>
-              )}
+              {/* Always stated: many solutions stop at the last step before the number. */}
+              <span className="block">
+                Answer: <Tex math={solve.answer} />
+              </span>
               <span className="block">
                 <Rich text={solve.solution} display />
               </span>

@@ -26,7 +26,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     name: "Ellipse",
     level: "AMC 12",
     statement: "\\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1, \\qquad c^2 = a^2 - b^2",
-    setup: "Semi-axes $a > b$, foci $(\\pm c, 0)$. Distances from any point to the two foci add up to $2a$. The area is $\\pi ab$.",
+    setup: "Semi-axes $a > b$, foci $(\\pm c, 0)$. Distances from any point to the two foci add up to $2a$.",
     whenToUse: "Two distances to fixed points add to a constant, or you need an ellipse's foci, axes, or area.",
     recall: [
       { lhs: "c =", answer: "\\sqrt{a^2-b^2}", vars: { a: [3, 5], b: [1, 2] } },
@@ -43,7 +43,8 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
     name: "Hyperbola",
     level: "AMC 12",
     statement: "\\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 1, \\qquad c^2 = a^2 + b^2",
-    setup: "Foci $(\\pm c, 0)$, asymptotes $y = \\pm\\frac{b}{a}x$. Distances from any point to the two foci differ by $2a$.",
+    setup: "Foci $(\\pm c, 0)$. Distances from any point to the two foci differ by $2a$.",
+    after: "The asymptotes are $y = \\pm\\frac{b}{a}x$.",
     whenToUse: "Two distances to fixed points differ by a constant, or you need a hyperbola's foci or asymptotes.",
     recall: [
       { lhs: "c =", answer: "\\sqrt{a^2+b^2}", vars: { a: pos, b: pos } },

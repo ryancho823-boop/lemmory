@@ -3,6 +3,14 @@ import type { Db } from "./client";
 import journal from "../drizzle/meta/_journal.json";
 
 /**
+ * Migrations that ran somewhere and were later removed from the code, each undone by a newer
+ * migration. They're expected in a database's history, so they don't count as unknown.
+ */
+const RETIRED = new Set([
+  1792020464316, // 0003_password_resets_kick_out_prefs (reverted PR #1), undone by 0011_drop_reverted_tables
+]);
+
+/**
  * How the database's applied migrations compare with the ones in the code. Drizzle records each
  * by its date and runs only those newer than the newest applied one, so a migration that was
  * applied and later deleted from the code (`unknown`) can make it silently skip real ones.
@@ -18,7 +26,7 @@ export async function migrationStatus(db: Db) {
   const last = Math.max(0, ...applied);
   return {
     behind: journal.entries.filter((e) => e.when > last).length,
-    unknown: applied.filter((at) => !inCode.has(at)).length,
+    unknown: applied.filter((at) => !inCode.has(at) && !RETIRED.has(at)).length,
   };
 }
 

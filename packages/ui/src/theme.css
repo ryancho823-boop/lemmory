@@ -105,6 +105,14 @@ math-field::part(virtual-keyboard-toggle) {
 .katex {
   font-size: 1.06em;
 }
+/* A formula that may be too wide for its box scrolls sideways. Only sideways: with the default
+   (vertical scrolling too), a tall fraction showed tiny up/down arrows. The padding keeps tall
+   fractions and roots from being clipped. */
+.math-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.3em;
+}
 
 @keyframes rise {
   from {

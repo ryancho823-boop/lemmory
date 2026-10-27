@@ -30,11 +30,14 @@ export function Leaderboard({ rows: raw, compact = false }: { rows: LeaderRow[];
           <InfoTip title="How scoring works" align="left">
             <b className="text-ink">10 points per assigned card</b>, however many tries it takes. Finish the day&apos;s review for a{" "}
             <b className="text-ink">streak bonus</b>: +5 per day of your streak, up to +100. Cards you add yourself don&apos;t earn
-            points. Your teacher can start a new game anytime; streaks carry over.
+            points. Your teacher can start a new round anytime; streaks and all-time points carry over.
           </InfoTip>
         </h2>
-        {!compact && (
-          <Segmented value={range} onChange={setRange} options={[{ value: "game", label: "This game" }, { value: "all", label: "All time" }]} />
+        {compact ? (
+          // The small card always shows this round's points; say so, since other pages count by week or all time.
+          <span className="text-sm text-ink/70">This round</span>
+        ) : (
+          <Segmented value={range} onChange={setRange} options={[{ value: "game", label: "This round" }, { value: "all", label: "All time" }]} />
         )}
       </div>
 
@@ -65,7 +68,7 @@ function Row({ r }: { r: LeaderRow & { xp: number; label: string; rank: number }
     <li className={cx("flex items-center gap-3 px-3 py-2.5", r.you && "font-semibold")}>
       <span className="w-6 text-right tabular-nums">{r.rank}</span>
       <span className="min-w-0 flex-1 truncate">{r.label}</span>
-      <span className="tabular-nums">{r.xp} pts</span>
+      <span className="tabular-nums">{r.xp} points</span>
     </li>
   );
 }

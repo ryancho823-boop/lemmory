@@ -4,8 +4,8 @@ import { and, eq, gte, inArray } from "drizzle-orm";
 import { FORMULA_BY_ID } from "@lemmory/core/formulas";
 import type { Student } from "@lemmory/core/analytics";
 import { LOG_DAYS, type LogEntry, type StudentRecord } from "@lemmory/core/records";
-import { applyDays, settleDays } from "@lemmory/core/session";
-import { type Card, newCard } from "@lemmory/core/srs";
+import { applyDays, newCards, settleDays } from "@lemmory/core/session";
+import type { Card } from "@lemmory/core/srs";
 import { contestLabel, dayInZone } from "@lemmory/core/days";
 import { db, type Tx } from "./client";
 import { assignments, cards, classes, dailyScores, days, enrollments, reviews, users } from "./schema";
@@ -93,9 +93,12 @@ export async function loadRecords(studentIds: string[], logSince: number | null,
   return out;
 }
 
-/** Record every finished past day for these students (before anything changes their cards). `today` is each student's own. */
+/**
+ * Record every finished past day for these students (before anything changes their cards). `today`
+ * is each student's own. `classId` null is a student in no class, tracked on their user row.
+ */
 export async function settle(
-  rows: { studentId: string; classId: string; settledThrough: number; today: number }[],
+  rows: { studentId: string; classId: string | null; settledThrough: number; today: number }[],
   records: Map<string, StudentRecord>,
   q: Tx | typeof db = db,
 ) {
@@ -104,16 +107,18 @@ export async function settle(
     if (e.settledThrough >= today - 1) continue;
     const rec = records.get(e.studentId);
     if (!rec) continue;
-    const newRows = settleDays(rec, e.settledThrough + 1, today - 1);
+    const newRows = settleDays(rec, e.settledThrough + 1, today - 1, e.classId === null);
     if (newRows.length)
       await q
         .insert(days)
         .values(newRows.map((r) => ({ studentId: e.studentId, ...r })))
         .onConflictDoNothing();
-    await q
-      .update(enrollments)
-      .set({ settledThrough: today - 1 })
-      .where(and(eq(enrollments.studentId, e.studentId), eq(enrollments.classId, e.classId)));
+    if (e.classId === null) await q.update(users).set({ settledThrough: today - 1 }).where(eq(users.id, e.studentId));
+    else
+      await q
+        .update(enrollments)
+        .set({ settledThrough: today - 1 })
+        .where(and(eq(enrollments.studentId, e.studentId), eq(enrollments.classId, e.classId)));
     applyDays(rec, newRows);
   }
 }
@@ -178,24 +183,25 @@ export async function loadClass(classId: string, withLogs = true): Promise<Class
 /** Give every enrolled student a card for a newly assigned formula. */
 export async function addAssignedCards(q: Tx, studentIds: string[], formulaIds: string[], today: number) {
   if (!studentIds.length || !formulaIds.length) return;
-  const existing = await q
-    .select({ studentId: cards.studentId, formulaId: cards.formulaId, source: cards.source })
-    .from(cards)
-    .where(and(inArray(cards.studentId, studentIds), inArray(cards.formulaId, formulaIds)));
-  const has = new Map(existing.map((c) => [`${c.studentId}:${c.formulaId}`, c.source]));
+  // Each student's whole deck, so new cards are spread after the ones already waiting.
+  const existing = await q.select().from(cards).where(inArray(cards.studentId, studentIds));
+  const decks = new Map<string, Card[]>(studentIds.map((id) => [id, []]));
+  for (const r of existing) decks.get(r.studentId)!.push(toCard(r));
   const fresh = [];
-  for (const studentId of studentIds)
+  for (const studentId of studentIds) {
+    const deck = decks.get(studentId)!;
+    const missing = [];
     for (const formulaId of formulaIds) {
-      const source = has.get(`${studentId}:${formulaId}`);
+      const source = deck.find((c) => c.formulaId === formulaId)?.source;
       if (source === "self")
         await q
           .update(cards)
           .set({ source: "teacher" })
           .where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId)));
-      else if (!source) {
-        const c = newCard(formulaId, "teacher", today);
-        fresh.push({ studentId, formulaId, source: c.source, stage: c.stage, memory: c.memory, addedDay: c.addedDay });
-      }
+      else if (!source) missing.push(formulaId);
     }
+    for (const c of newCards(deck, missing, "teacher", today))
+      fresh.push({ studentId, formulaId: c.formulaId, source: c.source, stage: c.stage, memory: c.memory, addedDay: c.addedDay });
+  }
   if (fresh.length) await q.insert(cards).values(fresh);
 }

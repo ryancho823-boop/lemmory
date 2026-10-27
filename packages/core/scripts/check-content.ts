@@ -26,6 +26,14 @@ for (const f of FORMULAS) {
     if (!gradeNumber(p.answer, p.answer)) { fail++; console.log("PROB FAIL", p.id, p.answer); }
   }
 }
+// The setup line sits above the answer boxes, so no piece of math in it may grade as an answer
+// (facts that would give one away go in `after`, shown once the card is answered).
+for (const f of FORMULAS) {
+  const pieces = f.setup.split("$").filter((_, i) => i % 2 === 1).flatMap((m) => m.split(/=|\\le|\\ge|<|>/));
+  for (const b of f.recall)
+    for (const piece of pieces)
+      if (piece.trim().length > 1 && gradeRecall(b, piece)) { fail++; console.log("SETUP GIVES AWAY", f.id, b.lhs, piece); }
+}
 const g = (id: string, i: number, s: string) => gradeRecall(FORMULA_BY_ID[id].recall[i], s);
 const cases: [string, number, string, boolean][] = [
   ["sum-of-cubes", 0, "a^3+b^3", false], ["sum-of-cubes", 0, "(a+b)\\left(a^2-ab+b^2\\right)", true],

@@ -82,12 +82,11 @@ export function byFormula(s: Student, today: number, days = 28): FormulaStat[] {
 /** Below this first-try accuracy, a formula "needs work". */
 export const NEEDS_WORK = 0.7;
 
-/** Formulas under 70% first-try accuracy, weakest first. */
+/** Formulas under 70% first-try accuracy, lowest first (ties: the one fading fastest first). */
 export function weakest(s: Student, today: number, k = 5) {
   return byFormula(s, today)
     .filter((f) => f.n >= 2 && (f.accuracy ?? 1) < NEEDS_WORK)
-    .map((f) => ({ ...f, score: (f.accuracy ?? 1) * 0.6 + (f.retention ?? 1) * 0.4 }))
-    .sort((a, b) => a.score - b.score)
+    .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1) || (a.retention ?? 1) - (b.retention ?? 1))
     .slice(0, k);
 }
 

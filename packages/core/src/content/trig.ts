@@ -10,7 +10,8 @@ export const TRIG = defineTopic("Trigonometry", [
     name: "Double Angle Formulas",
     level: "AMC 12",
     statement: "\\sin 2x = 2\\sin x\\cos x, \\qquad \\cos 2x = \\cos^2 x - \\sin^2 x",
-    setup: "Also $\\cos 2x = 2\\cos^2 x - 1 = 1 - 2\\sin^2 x$.",
+    setup: "From the angle addition formulas with both angles equal to $x$.",
+    after: "Also $\\cos 2x = 2\\cos^2 x - 1 = 1 - 2\\sin^2 x$.",
     whenToUse: "An angle and its double both appear, or a product $\\sin x \\cos x$ needs simplifying.",
     recall: [
       { lhs: "\\sin 2x =", answer: "2\\sin x\\cos x", vars: { x: angle }, banned: noDouble },

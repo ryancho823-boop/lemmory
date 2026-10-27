@@ -51,7 +51,7 @@ export function TeacherFormula({ id }: { id: string }) {
           <span className="text-xs font-semibold text-ink/45">Assigned week {assignment.week}</span>
         </div>
         <h1 className="mt-2 text-[28px] font-extrabold tracking-tight">{f.name}</h1>
-        <div className="mt-2 overflow-x-auto text-ink/75">
+        <div className="math-scroll mt-2 text-ink/75">
           <Tex math={f.statement} />
         </div>
       </div>

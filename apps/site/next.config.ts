@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   redirects: async () => [
     { source: "/academies", destination: "/pricing", permanent: true },
     { source: "/users", destination: "/pricing", permanent: true },
+    // The demo opens straight on the student side (it has a Student | Teacher switch).
+    { source: "/demo", destination: "/student", permanent: false },
   ],
   partialPrefetching: true,
   turbopack: {

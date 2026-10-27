@@ -30,7 +30,7 @@ export type Prompt = RecallPrompt | ApplyPrompt;
 
 export type RecallResult =
   | { status: "typo"; typos: boolean[] }
-  | { status: "graded"; results: boolean[]; answers: string[]; statement: string };
+  | { status: "graded"; results: boolean[]; answers: string[]; statement: string; after?: string };
 
 export interface PickResult {
   right: boolean;
@@ -71,7 +71,7 @@ export function checkRecall(f: Formula, inputs: string[], allowTypo: boolean): R
     const typos = f.recall.map((b, i) => !results[i] && findTypo(b, inputs[i] ?? "") !== null);
     if (typos.some(Boolean)) return { status: "typo", typos };
   }
-  return { status: "graded", results, answers: f.recall.map((b) => b.answer), statement: f.statement };
+  return { status: "graded", results, answers: f.recall.map((b) => b.answer), statement: f.statement, after: f.after };
 }
 
 export function checkPick(problem: Problem, picked: string[], formulaById: Record<string, Formula>): PickResult {

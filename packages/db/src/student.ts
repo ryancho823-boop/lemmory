@@ -17,11 +17,12 @@ import {
   wrongPicks,
 } from "@lemmory/core/grading";
 import { LOG_DAYS, type StudentRecord } from "@lemmory/core/records";
-import { type DaySession, buildQueue, emptySession, isDoneToday, nothingDue, recordAttempt } from "@lemmory/core/session";
-import { isNew, newCard } from "@lemmory/core/srs";
+import { type DaySession, buildQueue, emptySession, isDoneToday, newCards, nothingDue, recordAttempt } from "@lemmory/core/session";
+import { isNew } from "@lemmory/core/srs";
+import { type StarterLevel, starterDeck } from "@lemmory/core/starter";
 import { getStudentPlan, isOpen, planState, studentPlanState } from "./billing";
 import { db, type Tx } from "./client";
-import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday } from "./records";
+import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday, studentZones } from "./records";
 import { dayInZone } from "@lemmory/core/days";
 import { assignments, cards, classes, dailyScores, days, enrollments, plans, reviewSessions, reviews, users } from "./schema";
 
@@ -36,6 +37,8 @@ export interface StudentView {
   /** Every class the student is in, for the class switcher. */
   classes: { id: string; name: string }[];
   today: number;
+  /** The time zone "today" follows, so an open page can tell when the day changes. */
+  zone: string;
   record: StudentRecord;
   assigned: string[];
   leaderboard: LeaderRow[];
@@ -88,12 +91,15 @@ export async function studentClasses(studentId: string, q: Tx | typeof db = db) 
 export async function loadStudentView(user: { id: string; name: string; username: string | null }, selected?: string): Promise<StudentView> {
   const mine = await studentClasses(user.id);
   const current = mine.find((c) => c.id === selected) ?? mine[0];
-  const [view, today, canReview] = await Promise.all([
+  if (!current) await settleSolo(user.id);
+  const [view, zones, canReview] = await Promise.all([
     // Classmates appear only on the leaderboard, so their review logs aren't loaded.
     current ? loadClass(current.id, false) : null,
-    studentToday(user.id),
+    studentZones([user.id]),
     canStudentReview(user.id),
   ]);
+  const zone = zones.get(user.id)!;
+  const today = dayInZone(zone);
   const classList = mine.map((c) => ({ id: c.id, name: c.name }));
   // Loaded after the class, which settled this student's past days.
   const [records, saved, teacher] = await Promise.all([
@@ -108,6 +114,7 @@ export async function loadStudentView(user: { id: string; name: string; username
     me: user,
     classes: classList,
     today,
+    zone,
     record,
     queue: done ? [] : buildQueue(record.cards, session, today),
     completedToday: session.completed.length,
@@ -128,6 +135,18 @@ export async function loadStudentView(user: { id: string; name: string; username
   };
 }
 
+/** A student in no class: record their past days too (a class's page load does it for its students). */
+async function settleSolo(studentId: string) {
+  const [row, today] = await Promise.all([
+    db.select({ settledThrough: users.settledThrough }).from(users).where(eq(users.id, studentId)).get(),
+    studentToday(studentId),
+  ]);
+  // First visit since this was tracked: start from yesterday.
+  if (row?.settledThrough == null) return db.update(users).set({ settledThrough: today - 1 }).where(eq(users.id, studentId));
+  if (row.settledThrough >= today - 1) return;
+  await settleIfBehind([{ studentId, classId: null, settledThrough: row.settledThrough, today }], await loadRecords([studentId], null, db, false));
+}
+
 const savedSession = (q: Tx | typeof db, studentId: string) => q.select().from(reviewSessions).where(eq(reviewSessions.studentId, studentId)).get();
 
 /** Today's session from the saved row (a session saved on an earlier day is over). */
@@ -145,12 +164,14 @@ async function saveSession(q: Tx, studentId: string, data: DaySession) {
 async function context(studentId: string, q?: Tx) {
   const [mine, own, records, saved] = await Promise.all([
     studentClasses(studentId, q),
-    (q ?? db).select({ timezone: users.timezone }).from(users).where(eq(users.id, studentId)).get(),
+    (q ?? db).select({ timezone: users.timezone, settledThrough: users.settledThrough }).from(users).where(eq(users.id, studentId)).get(),
     loadRecords([studentId], null, q, false),
     savedSession(q ?? db, studentId),
   ]);
   const today = dayInZone(pickZone(own?.timezone, mine[0]?.timezone));
-  const rows = mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today }));
+  const rows: Parameters<typeof settle>[0] = mine.map((c) => ({ studentId, classId: c.id, settledThrough: c.settledThrough, today }));
+  // In no class: settled on the user row (it starts on their first page load, see settleSolo).
+  if (!mine.length && own?.settledThrough != null) rows.push({ studentId, classId: null, settledThrough: own.settledThrough, today });
   await (q ? settle(rows, records, q) : settleIfBehind(rows, records));
   return { today, record: records.get(studentId)!, session: sessionOn(saved, today) };
 }
@@ -347,12 +368,29 @@ export async function finishIfEmpty(studentId: string) {
 
 export async function addToDeck(studentId: string, formulaId: string) {
   formula(formulaId);
-  const today = await studentToday(studentId);
-  const c = newCard(formulaId, "self", today);
-  await db
-    .insert(cards)
-    .values({ studentId, formulaId, source: "self", stage: c.stage, memory: c.memory, addedDay: today })
-    .onConflictDoNothing();
+  await addOwnCards(studentId, [formulaId]);
+}
+
+/** Cards a student adds themselves, spread out after the new ones already waiting (see newCards). */
+async function addOwnCards(studentId: string, formulaIds: string[]) {
+  const [today, deck] = await Promise.all([studentToday(studentId), loadRecords([studentId], null, db, false)]);
+  const have = deck.get(studentId)!.cards;
+  const ids = formulaIds.filter((id) => !have[id]);
+  if (!ids.length) return;
+  const rows = newCards(Object.values(have), ids, "self", today).map((c) => ({
+    studentId,
+    formulaId: c.formulaId,
+    source: "self" as const,
+    stage: c.stage,
+    memory: c.memory,
+    addedDay: c.addedDay,
+  }));
+  await db.insert(cards).values(rows).onConflictDoNothing();
+}
+
+/** A first deck for a student on their own (see core/starter.ts). Formulas already in the deck are kept as they are. */
+export async function addStarterDeck(studentId: string, level: StarterLevel) {
+  await addOwnCards(studentId, starterDeck(level));
 }
 
 /** Only cards the student added themselves can be removed. */

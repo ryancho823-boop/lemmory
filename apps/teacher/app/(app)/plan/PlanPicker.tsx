@@ -23,7 +23,7 @@ interface Props {
 
 export function PlanPicker({ formulaCount, trialDays, academy, club, current, state, students }: Props) {
   const [open, setOpen] = useState<Kind | null>(null);
-  const included = [`All ${formulaCount} formulas`, "Class and student analytics", "Leaderboard games", "Your students never pay"];
+  const included = [`All ${formulaCount} formulas`, "Class and student analytics", "Class leaderboards", "Your students never pay"];
   const action = (kind: Kind) =>
     state === "none" ? (
       <StartTrial kind={kind} trialDays={trialDays} onPay={() => setOpen(kind)} />

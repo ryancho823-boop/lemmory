@@ -80,8 +80,9 @@ function freshMemory(day: number): Memory {
   return { ...fromFsrs(c, day), due: day, last: null };
 }
 
-export function newCard(formulaId: string, source: Card["source"], day: number): Card {
-  return { formulaId, source, stage: "recall", memory: freshMemory(day), addedDay: day };
+/** A card that joins the deck on `day` and is first shown on `introduceOn` (see newCards in session.ts). */
+export function newCard(formulaId: string, source: Card["source"], day: number, introduceOn = day): Card {
+  return { formulaId, source, stage: "recall", memory: { ...freshMemory(day), due: introduceOn }, addedDay: day };
 }
 
 export function review(card: Card, firstTryCorrect: boolean, day: number): { card: Card; promoted: boolean } {

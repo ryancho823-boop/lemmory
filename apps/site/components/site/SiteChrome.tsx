@@ -37,7 +37,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <Link href="/demo" className="hidden h-10 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold hover:border-ink/30 sm:inline-flex">
+          <Link href="/student" className="hidden h-10 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold hover:border-ink/30 sm:inline-flex">
             Live demo
           </Link>
           {/* One way in: the login page sends people without an account to sign up. */}
