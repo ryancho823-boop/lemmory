@@ -2,6 +2,7 @@
 @theme {
   --font-sans: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-hand: var(--font-caveat), "Bradley Hand", cursive;
   /* Headings read calmer at semibold than at a heavy 800. */
   --font-weight-extrabold: 600;
   --color-ink: #0f1121;

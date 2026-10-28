@@ -30,7 +30,7 @@ export function TryIt() {
   };
 
   return (
-    <div className="rounded-lg border-2 border-ink bg-white">
+    <div className="rounded-lg border-2 border-ink bg-white shadow-[6px_6px_0_var(--color-ink)]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
         <Segmented
           value={mode}

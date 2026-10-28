@@ -15,8 +15,7 @@ import { ACCENT_CYCLE } from "@/lib/accents";
 // The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
 const TEXT = {
   hero: {
-    title: "Remember every formula. Know when to use it.",
-    body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend about five minutes a day, and each formula comes back right before it would be forgotten.",
+      body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend about five minutes a day, and each formula comes back right before it would be forgotten.",
     button: "Try the student demo",
     second: "See the teacher view",
     note: <>Every plan starts with a {TRIAL_DAYS}-day free trial. Students in a paid class never pay.</>,
@@ -80,6 +79,14 @@ const PROBLEMS = [
   },
 ];
 
+// Short ones from four topics, for the strip under the hero (they fit one line on a laptop).
+const STRIP = [
+  { name: "Vieta", tex: "r_1 + r_2 = -\\tfrac{b}{a}" },
+  { name: "Power of a Point", tex: "PA \\cdot PB = PC \\cdot PD" },
+  { name: "Fermat", tex: "a^{p-1} \\equiv 1 \\pmod p" },
+  { name: "Stars and Bars", tex: "\\binom{n+k-1}{k-1}" },
+];
+
 // One well-known formula per topic, as a taste of the bank.
 const TOPICS: { topic: Topic; sample: string; tex: string }[] = [
   { topic: "Algebra", sample: "Vieta's Formulas", tex: "r_1 + r_2 = -\\tfrac{b}{a}" },
@@ -117,7 +124,9 @@ export default function Overview() {
       <section className="bg-lemon">
         <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
-            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">{TEXT.hero.title}</h1>
+            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">
+              Remember every formula. Know when to <Inked>use it</Inked>.
+            </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed">{TEXT.hero.body}</p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <CtaLink href="/student">{TEXT.hero.button}</CtaLink>
@@ -128,9 +137,22 @@ export default function Overview() {
             <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
-          <div className="rise" style={{ animationDelay: "120ms" }}>
+          <div className="rise relative" style={{ animationDelay: "120ms" }}>
+            <MarginNote />
             <TryIt />
           </div>
+        </Container>
+      </section>
+
+      {/* A strip of real formulas from the bank, so the page shows its math right away. */}
+      <section className="bg-ink text-white" aria-label="Formulas from the bank">
+        <Container className="math-scroll flex items-center gap-10 py-5 whitespace-nowrap [scrollbar-width:none] lg:justify-between">
+          {STRIP.map((t) => (
+            <span key={t.name} className="flex shrink-0 items-baseline gap-3">
+              <span className="font-hand text-xl text-lemon">{t.name}</span>
+              <Tex math={t.tex} className="text-[15px] text-white/85" />
+            </span>
+          ))}
         </Container>
       </section>
 
@@ -284,5 +306,30 @@ export default function Overview() {
 
       <DemoCTA />
     </div>
+  );
+}
+
+/** A word underlined by hand, in ink. */
+function Inked({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="relative inline-block">
+      {children}
+      <svg aria-hidden viewBox="0 0 200 14" preserveAspectRatio="none" className="absolute -bottom-2 left-0 h-[0.28em] w-full">
+        <path d="M3 9 C 40 3, 70 12, 105 7 S 165 3, 197 8" fill="none" stroke="var(--color-ink)" strokeWidth="4" strokeLinecap="round" />
+      </svg>
+    </span>
+  );
+}
+
+/** A note in the margin, the way a teacher would scribble one, pointing at the card. */
+function MarginNote() {
+  return (
+    <p aria-hidden className="mb-3 flex items-end justify-end gap-1 pr-8 font-hand text-2xl text-ink lg:absolute lg:-top-14 lg:right-0 lg:mb-0">
+      <span className="-rotate-3">try it, from memory</span>
+      <svg viewBox="0 0 40 40" className="mb-[-14px] size-9 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M6 6 C 22 8, 32 18, 30 34" />
+        <path d="M22 28 L 30 35 L 36 26" />
+      </svg>
+    </p>
   );
 }
