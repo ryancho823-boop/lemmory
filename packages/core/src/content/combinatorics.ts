@@ -6,7 +6,8 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     name: "Lattice Paths",
     level: "AMC 8",
     statement: "\\#\\text{paths } (0,0)\\to(m,n) = \\binom{m+n}{m}",
-    setup: "Paths using only unit steps right and up. Choose which of the $m + n$ steps go right.",
+    setup: "Paths using only unit steps right and up.",
+    after: "Choose which of the $m + n$ steps go right.",
     whenToUse: "Counting shortest routes on a grid, possibly through or around a point.",
     recall: [{ lhs: "\\text{Paths to } (m,n) =", answer: "\\binom{m+n}{m}", vars: { m: int(1, 6), n: int(1, 6) } }],
     related: ["catalan", "binomial-theorem"],
@@ -87,7 +88,8 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     name: "Hockey Stick Identity",
     level: "AMC 12",
     statement: "\\binom{r}{r} + \\binom{r+1}{r} + \\cdots + \\binom{n}{r} = \\binom{n+1}{r+1}",
-    setup: "A diagonal run in Pascal's triangle sums to the entry just below and beside it.",
+    setup: "A diagonal run in Pascal's triangle.",
+    after: "It sums to the entry just below and beside its last term.",
     whenToUse: "A sum of binomial coefficients with a fixed bottom index.",
     recall: [
       {

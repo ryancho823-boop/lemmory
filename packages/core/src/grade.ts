@@ -56,11 +56,18 @@ function topHead(latex: string) {
   }
 }
 
+/** The letters an answer may use: the sampled variables and the defined ones. */
+const allowedVars = (blank: RecallBlank) => [...Object.keys(blank.vars), ...Object.keys(blank.defs ?? {})];
+
 function sameValue(blank: RecallBlank, answer: string, input: string) {
   let checked = 0;
   // Plenty of tries, so answers whose domain skips half the samples (like (-1)^{(p-1)/2}) still get checked.
   for (let i = 0; i < TRIALS * 8 && checked < TRIALS; i++) {
-    const values = Object.fromEntries(Object.entries(blank.vars).map(([k, [lo, hi, int]]) => [k, rand(lo, hi, int)]));
+    const values: Record<string, number> = Object.fromEntries(Object.entries(blank.vars).map(([k, [lo, hi, int]]) => [k, rand(lo, hi, int)]));
+    for (const [k, expr] of Object.entries(blank.defs ?? {})) {
+      const v = evaluate(expr, values);
+      if (v !== null) values[k] = v;
+    }
     const want = evaluate(answer, values);
     const got = evaluate(input, values);
     if (want === null) continue; // sample fell outside the domain; try another
@@ -84,7 +91,7 @@ export function gradeRecall(blank: RecallBlank, input: string): boolean {
   if (input.length > MAX_ANSWER_LENGTH) return false;
   return scoped(() => {
     // Declared variables read `a(b+c)` as multiplication instead of a function call.
-    for (const v of Object.keys(blank.vars)) ce().declare(v, "real");
+    for (const v of allowedVars(blank)) ce().declare(v, "real");
     return recall(blank, input);
   });
 }
@@ -106,7 +113,7 @@ function recall(blank: RecallBlank, input: string): boolean {
   const clean = normalize(input);
   if (!clean) return false;
   if (blank.banned?.some((b) => clean.replace(/\s+/g, "").includes(b))) return false;
-  if (strayUnknowns(clean, Object.keys(blank.vars)).length) return false;
+  if (strayUnknowns(clean, allowedVars(blank)).length) return false;
   if (blank.form === "product" && !["Multiply", "Power"].includes(topHead(clean) ?? "")) return false;
   if (blank.form === "sum" && !["Add", "Subtract"].includes(topHead(clean) ?? "")) return false;
   return [blank.answer, ...(blank.accept ?? [])].some((a) => sameValue(blank, a, clean));
@@ -176,11 +183,11 @@ function oneLetterEdits(latex: string, vars: string[]) {
 export function findTypo(blank: RecallBlank, input: string): string | null {
   if (input.length > MAX_TYPO_LENGTH) return null;
   return scoped(() => {
-    for (const v of Object.keys(blank.vars)) ce().declare(v, "real");
+    for (const v of allowedVars(blank)) ce().declare(v, "real");
     const clean = normalize(input);
     if (clean.replace(/\s+/g, "").length < MIN_TYPO_LENGTH) return null;
     if (recall(blank, clean)) return null;
-    for (const candidate of oneLetterEdits(clean, Object.keys(blank.vars))) {
+    for (const candidate of oneLetterEdits(clean, allowedVars(blank))) {
       if (recall(blank, candidate)) return candidate;
     }
     return null;

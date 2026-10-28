@@ -27,10 +27,10 @@ if (!DATABASE_URL.startsWith("file:") && !process.argv.includes("--force")) {
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const today = dayInZone(timezone);
 
-/** The next Nov 6 (AMC 10A is usually early November). */
+/** The next Nov 5 (the 2026 AMC 10A date; it's early November each year). */
 function nextContest() {
   const year = new Date(today * 86_400_000).getUTCFullYear();
-  const day = (y: number) => Date.UTC(y, 10, 6) / 86_400_000;
+  const day = (y: number) => Date.UTC(y, 10, 5) / 86_400_000;
   return day(year) >= today ? day(year) : day(year + 1);
 }
 

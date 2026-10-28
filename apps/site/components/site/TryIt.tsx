@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, RotateCcw } from "lucide-react";
 import { FORMULA_BY_ID } from "@/lib/bank";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
@@ -41,15 +41,21 @@ export function TryIt() {
           ]}
         />
       </div>
-      <div className="p-6">
+      {/* A fixed minimum height (step 2 with its feedback), so the card doesn't jump as it changes. */}
+      <div className="min-h-[430px] p-6">
         {result !== null ? (
           <div className="py-10 text-center">
             <CheckCircle2 size={44} className="mx-auto text-good" />
             <p className="mt-3 text-xl font-extrabold">{result ? "That's the whole card: recalled, then used." : "That one's done. You'll get it next time."}</p>
             <p className="mt-1 text-ink/55">In the app, FSRS now picks the day it comes back.</p>
-            <Button variant="outline" className="mt-6" onClick={() => reset()}>
-              <RotateCcw size={15} /> Try again
-            </Button>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <Button href="/student">
+                Try the full student demo <ArrowRight size={16} />
+              </Button>
+              <Button variant="outline" onClick={() => reset("recall")}>
+                <RotateCcw size={15} /> Try again
+              </Button>
+            </div>
           </div>
         ) : mode === "apply" ? (
           <ApplyCard key={run} problem={PROBLEM} options={OPTIONS} onDone={(ok) => setResult(ok)} />

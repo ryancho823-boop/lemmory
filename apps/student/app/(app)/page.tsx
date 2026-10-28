@@ -92,7 +92,9 @@ function Today({ v, s, bonus, fresh, weak }: { v: Awaited<ReturnType<typeof getU
             }
           />
           <ul className="mt-3 divide-y divide-line">
-            {weak.length === 0 && <li className="px-5 py-6">Nothing under 70%. Nice work.</li>}
+            {weak.length === 0 && (
+              <li className="px-5 py-6">{v.record.log.length ? "Nothing under 70%. Nice work." : "Do your first review to see what needs work."}</li>
+            )}
             {weak.map((w) => {
               const f = FORMULA_BY_ID[w.formulaId];
               return (

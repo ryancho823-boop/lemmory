@@ -17,14 +17,15 @@ export const simulate = (
 ): StudentRecord => run(profile, assignments, until, BANK, opts);
 
 export const CLASS_NAME = "Long-Term AMC 10 Course";
-export const CONTEST = "AMC 10A · Nov 6";
+// The 2026 AMC 10A is on November 5 (maa.org/AMC).
+export const CONTEST = "AMC 10A · Nov 5";
 
-/** The contest label with a countdown from `today` (a local day number) to the next Nov 6. */
+/** The contest label with a countdown from `today` (a local day number) to the next Nov 5. */
 export function contestLabel(today: number) {
   const DAY = 86_400_000;
   const year = new Date(today * DAY).getUTCFullYear();
-  let contest = Date.UTC(year, 10, 6) / DAY;
-  if (contest < today) contest = Date.UTC(year + 1, 10, 6) / DAY;
+  let contest = Date.UTC(year, 10, 5) / DAY;
+  if (contest < today) contest = Date.UTC(year + 1, 10, 5) / DAY;
   const n = contest - today;
   return `${CONTEST} · ${n === 0 ? "today" : n === 1 ? "tomorrow" : `${n} days away`}`;
 }

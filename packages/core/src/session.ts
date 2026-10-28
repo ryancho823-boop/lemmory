@@ -60,8 +60,9 @@ export function buildQueue(cards: Record<string, Card>, session: QueueSession, t
 
 /**
  * One attempt at a card, used by the app (db/student.ts) and the demo alike. Only the first
- * attempt each day goes to the scheduler; a miss stays in today's queue until it's right.
- * `done` is set once the card is right: its rescheduled state and the review-log entry.
+ * attempt each day counts: `entry` is its review-log row, saved right away, so a miss shows in the
+ * stats even if the student stops before getting it right. A miss stays in today's queue until
+ * it's right; `done` is set then, with the card rescheduled from that first try.
  */
 export function recordAttempt<S extends QueueSession>(session: S, card: Card, correct: boolean, today: number, confusedWith?: string[]) {
   const id = card.formulaId;
@@ -73,12 +74,15 @@ export function recordAttempt<S extends QueueSession>(session: S, card: Card, co
     confusions: isFirst && confusedWith?.length ? { ...session.confusions, [id]: confusedWith } : session.confusions,
     newStarted: isNew(card) && !session.newStarted.includes(id) ? [...session.newStarted, id] : session.newStarted,
   };
-  if (!correct) return { session: next, done: null };
+  let entry: LogEntry | null = null;
+  if (isFirst) {
+    entry = { day: today, formulaId: id, stage: card.stage, firstTry };
+    if (next.confusions[id]) entry.confusedWith = next.confusions[id];
+    if (card.source === "self") entry.extra = true;
+  }
+  if (!correct) return { session: next, entry, done: null };
   const { card: updated, promoted } = review(card, firstTry, today);
-  const entry: LogEntry = { day: today, formulaId: id, stage: card.stage, firstTry };
-  if (next.confusions[id]) entry.confusedWith = next.confusions[id];
-  if (card.source === "self") entry.extra = true;
-  return { session: { ...next, completed: [...next.completed, id] }, done: { card: updated, promoted, entry } };
+  return { session: { ...next, completed: [...next.completed, id] }, entry, done: { card: updated, promoted } };
 }
 
 /**

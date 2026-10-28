@@ -26,6 +26,16 @@ for (const f of FORMULAS) {
     if (!gradeNumber(p.answer, p.answer)) { fail++; console.log("PROB FAIL", p.id, p.answer); }
   }
 }
+// Setup lines and after-notes must have balanced, renderable math.
+for (const f of FORMULAS)
+  for (const [k, text] of [["setup", f.setup], ["after", f.after ?? ""]] as const) {
+    const spans = text.split("$");
+    if (spans.length % 2 === 0) { fail++; console.log("UNBALANCED $", f.id, k); continue; }
+    spans.forEach((m, i) => {
+      if (i % 2 === 0) return;
+      try { katex.renderToString(m, { throwOnError: true }); } catch (e) { fail++; console.log("BAD TEX", f.id, k, m, (e as Error).message.slice(0, 60)); }
+    });
+  }
 // The setup line sits above the answer boxes, so no piece of math in it may grade as an answer
 // (facts that would give one away go in `after`, shown once the card is answered).
 for (const f of FORMULAS) {
@@ -45,6 +55,11 @@ const cases: [string, number, string, boolean][] = [
  ["power-reduction", 0, "\\cos^2x", false], ["power-reduction", 0, "\\frac{1}{2}+\\frac{\\cos2x}{2}", true],
   ["common-derivatives", 0, "\\cos x", true], ["key-limits", 1, "e", true], ["exp-series", 0, "e^{x}", true],
   ["product-rule", 0, "uq+vp", true],
+  // The semiperimeter written out counts too.
+  ["heron", 0, "\\frac14\\sqrt{(a+b+c)(-a+b+c)(a-b+c)(a+b-c)}", true],
+  ["heron", 0, "\\sqrt{s(s-a)(s-b)(s-c)}", true],
+  ["heron", 0, "\\frac14\\sqrt{(a+b+c)(a+b-c)}", false],
+  ["brahmagupta", 0, "\\sqrt{\\left(\\frac{a+b+c+d}{2}-a\\right)(s-b)(s-c)(s-d)}", true],
 ];
 for (const [id, i, s, exp] of cases) if (g(id, i, s) !== exp) { fail++; console.log("CASE", id, s, "expected", exp); }
 // One-letter slips get a typo hint; real mistakes and right answers don't.

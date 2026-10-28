@@ -49,6 +49,7 @@ export function TeacherShell({
         { href: `${base}/leaderboard`, label: "Leaderboard" },
         { href: `${base}/settings`, label: "Class settings" },
         { href: "/plan", label: "Plan & billing" },
+        { href: "/account", label: "Account" },
       ]}
       footer={
         <>

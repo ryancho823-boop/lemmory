@@ -110,7 +110,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Quadrilateral Area from Diagonals",
     level: "AMC 10",
     statement: "K = \\frac12 pq\\sin\\theta",
-    setup: "$p$ and $q$ are the diagonals and $\\theta$ the angle between them. Works for any convex quadrilateral; with perpendicular diagonals it's $\\frac12pq$.",
+    setup: "$p$ and $q$ are the diagonals and $\\theta$ the angle between them. Works for any convex quadrilateral.",
+    after: "With perpendicular diagonals it's $\\frac12pq$.",
     whenToUse: "A quadrilateral's diagonals and the angle between them are known.",
     figure: quadDiag(2.2, 3.6, 2.8, 2.4, 55, [{ at: angleAt([0, 0], [1, 0], polar([0, 0], 1, 55), 0.7), text: "θ" }]),
     recall: [{ lhs: "K \\ (\\text{diagonals } p, q \\text{ at angle } x) =", answer: "\\frac12pq\\sin x", vars: { p: pos, q: pos, x: ang } }],
@@ -125,7 +126,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Triangles with the Same Height",
     level: "AMC 10",
     statement: "\\frac{[ABD]}{[ADC]} = \\frac{BD}{DC}",
-    setup: "$D$ is on $BC$. Both triangles have the same height from $A$, so their areas are in the ratio of their bases.",
+    setup: "$D$ is on $BC$, splitting triangle $ABC$ in two.",
+    after: "Both triangles have the same height from $A$, so their areas are in the ratio of their bases.",
     whenToUse: "Area ratios with cevians, medians and points dividing sides.",
     figure: sameHeight(0.4),
     recall: [{ lhs: "\\frac{[ABD]}{[ADC]} \\text{ with } BD=m,\\ DC=n:", answer: "\\frac mn", vars: { m: pos, n: pos } }],
@@ -140,7 +142,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Area of a Regular Polygon",
     level: "AMC 12",
     statement: "K = \\frac12 nR^2\\sin\\frac{2\\pi}{n} = \\frac12 \\cdot \\text{perimeter} \\cdot \\text{apothem}",
-    setup: "$R$ is the distance from the center to a vertex. The polygon splits into $n$ triangles with two sides $R$ and angle $\\frac{360^\\circ}{n}$.",
+    setup: "$R$ is the distance from the center to a vertex.",
+    after: "The polygon splits into $n$ triangles with two sides $R$ and angle $\\frac{360^\\circ}{n}$.",
     whenToUse: "Areas of regular octagons, dodecagons and other regular polygons.",
     figure: ngon(8),
     recall: [{ lhs: "\\text{Area of a regular } n\\text{-gon with circumradius } R:", answer: "\\frac12nR^2\\sin\\frac{2\\pi}{n}", vars: { n: int(3, 12), R: pos } }],
@@ -203,7 +206,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Tangent Line to a Circle",
     level: "AMC 12",
     statement: "\\text{At } (x_0, y_0) \\text{ on } x^2 + y^2 = r^2: \\quad x_0x + y_0y = r^2",
-    setup: "For a circle centered at $(a, b)$: $(x_0 - a)(x - a) + (y_0 - b)(y - b) = r^2$. The tangent is perpendicular to the radius.",
+    setup: "A circle centered at the origin.",
+    after: "The tangent is perpendicular to the radius. For a circle centered at $(a, b)$: $(x_0 - a)(x - a) + (y_0 - b)(y - b) = r^2$.",
     whenToUse: "The equation, slope or intercepts of a tangent line at a given point.",
     figure: (() => {
       const P: Pt = [3, 4], O: Pt = [0, 0], u: Pt = [-1, 7], v: Pt = [7, 1];
@@ -222,7 +226,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Power of a Point in Coordinates",
     level: "AIME",
     statement: "\\text{power of } (x_0, y_0) = x_0^2 + y_0^2 + Dx_0 + Ey_0 + F",
-    setup: "For the circle $x^2 + y^2 + Dx + Ey + F = 0$, plug the point into the left side. It equals $d^2 - r^2$: the tangent length squared from outside, or $PA \\cdot PB$ for any line through the point.",
+    setup: "The power of a point is $d^2 - r^2$, where $d$ is its distance from the center.",
+    after: "Plug the point into the left side of the circle's equation: it's the tangent length squared from outside, or $PA \\cdot PB$ for any line through the point.",
     whenToUse: "Tangent lengths or secant products from a point to a circle given by an equation.",
     figure: (() => {
       const c = { c: [1, -2] as Pt, r: 3 }, P: Pt = [7, 1];
@@ -242,7 +247,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Reflecting a Point over a Line",
     level: "AMC 12",
     statement: "(x_0, y_0) \\mapsto (x_0, y_0) - \\frac{2(Ax_0 + By_0 + C)}{A^2 + B^2}(A, B)",
-    setup: "Reflection over the line $Ax + By + C = 0$. Over $y = x$: $(p, q) \\mapsto (q, p)$. Over $y = x + c$: $(p, q) \\mapsto (q - c, p + c)$.",
+    setup: "Reflection over the line $Ax + By + C = 0$.",
+    after: "Over $y = x$: $(p, q) \\mapsto (q, p)$. Over $y = x + c$: $(p, q) \\mapsto (q - c, p + c)$.",
     whenToUse: "Mirror images, and shortest paths that bounce off a line.",
     figure: (() => {
       const u: Pt = [-1, -1], v: Pt = [5, 3], P: Pt = [1, 3];
@@ -336,7 +342,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Triangle Area from Vectors",
     level: "AMC 12",
     statement: "[\\triangle] = \\frac12|x_1y_2 - x_2y_1| \\ (2\\text{D}), \\qquad \\frac12|\\mathbf u \\times \\mathbf v| \\ (3\\text{D})",
-    setup: "$\\mathbf u = (x_1, y_1)$ and $\\mathbf v = (x_2, y_2)$ are two sides from the same corner. The determinant is the area of the parallelogram they span.",
+    setup: "$\\mathbf u = (x_1, y_1)$ and $\\mathbf v = (x_2, y_2)$ are two sides from the same corner.",
+    after: "The determinant is the area of the parallelogram they span; the triangle is half of it.",
     whenToUse: "Triangle areas from coordinates, in the plane or in space.",
     figure: (() => {
       const O: Pt = [0, 0], U: Pt = [4, 1], V: Pt = [1.5, 3], W: Pt = [5.5, 4];
@@ -354,7 +361,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Tetrahedron Volume from Coordinates",
     level: "AIME",
     statement: "V = \\frac16\\left|\\det\\begin{pmatrix} \\mathbf u & \\mathbf v & \\mathbf w \\end{pmatrix}\\right|",
-    setup: "$\\mathbf u$, $\\mathbf v$, $\\mathbf w$ are the three edges from one vertex. The determinant is the volume of the box they span; the tetrahedron is $\\frac16$ of it.",
+    setup: "$\\mathbf u$, $\\mathbf v$, $\\mathbf w$ are the three edges from one vertex.",
+    after: "The determinant is the volume of the box they span; the tetrahedron is $\\frac16$ of it.",
     whenToUse: "Volumes of tetrahedra with vertices given in coordinates.",
     figure: (() => {
       const pts = { O: proj([0, 0, 0]), A: proj([4, 0, 0]), B: proj([0, 5, 0]), C: proj([0, 0, 3.4]) };
@@ -427,7 +435,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Euler's Inequality",
     level: "AMC 12",
     statement: "R \\ge 2r",
-    setup: "The circumradius is at least twice the inradius, with equality only for an equilateral triangle. It follows from $OI^2 = R^2 - 2Rr \\ge 0$.",
+    setup: "$R$ is the circumradius and $r$ the inradius of a triangle.",
+    after: "The circumradius is at least twice the inradius, with equality only for an equilateral triangle. It follows from $OI^2 = R^2 - 2Rr \\ge 0$.",
     whenToUse: "Bounds relating the two radii of a triangle.",
     figure: (() => {
       const { A, B, C } = triangle(6, 5, 4.2);
@@ -515,7 +524,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Miquel's Theorem",
     level: "AIME",
     statement: "\\text{Circles } (AEF), (BFD), (CDE) \\text{ meet at one point } M",
-    setup: "$D$, $E$, $F$ are on sides $BC$, $CA$, $AB$. Since $AFME$ is cyclic, $\\angle EMF = 180^\\circ - A$ when $M$ is inside the triangle.",
+    setup: "$D$, $E$, $F$ are on sides $BC$, $CA$, $AB$, and the circles through $AFE$, $BDF$, $CED$ meet at $M$.",
+    after: "Since $AFME$ is cyclic, $\\angle EMF = 180^\\circ - A$ when $M$ is inside the triangle.",
     whenToUse: "Three circles through a vertex and points on the two sides beside it.",
     figure: (() => {
       const { A, B, C } = triangle(7, 6, 5.2);
@@ -561,7 +571,8 @@ export const GEOMETRY_V2B = defineTopic("Geometry", [
     name: "Barycentric Coordinates",
     level: "AIME",
     statement: "P = (x : y : z) \\iff P = \\frac{xA + yB + zC}{x + y + z}, \\qquad [PBC] : [PCA] : [PAB] = x : y : z",
-    setup: "Each weight is proportional to the area of the triangle opposite its vertex. The centroid is $(1 : 1 : 1)$ and the incenter $(a : b : c)$.",
+    setup: "A point $P$ in triangle $ABC$, written as weights $(x : y : z)$ on the vertices.",
+    after: "Each weight is proportional to the area of the triangle opposite its vertex. The centroid is $(1 : 1 : 1)$ and the incenter $(a : b : c)$.",
     whenToUse: "Points described by area ratios or weighted averages of the vertices.",
     figure: (() => {
       const { A, B, C } = triangle(7, 5.8, 5);

@@ -56,7 +56,8 @@ export function StudentShell({
         { href: "/stats", label: "My stats" },
         { href: "/leaderboard", label: "Leaderboard" },
         { href: "/class", label: classes.length > 1 ? "My classes" : classes.length ? "My class" : "Plan & classes" },
-      ].filter((item) => !locked || item.href === "/class")}
+        { href: "/account", label: "Account" },
+      ].filter((item) => !locked || item.href === "/class" || item.href === "/account")}
       footer={
         <>
           <p className="truncate font-semibold" title={current?.name}>

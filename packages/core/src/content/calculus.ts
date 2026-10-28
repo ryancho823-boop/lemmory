@@ -144,7 +144,8 @@ export const CALCULUS = defineTopic("Calculus", [
     name: "Key Limits",
     level: "Calculus",
     statement: "\\lim_{x\\to0}\\frac{\\sin x}{x} = 1, \\qquad \\lim_{n\\to\\infty}\\left(1 + \\frac{1}{n}\\right)^n = e",
-    setup: "More generally $\\lim_{n\\to\\infty}\\left(1 + \\frac{a}{n}\\right)^n = e^a$.",
+    setup: "Two limits behind much of calculus.",
+    after: "More generally $\\lim_{n\\to\\infty}\\left(1 + \\frac{a}{n}\\right)^n = e^a$.",
     whenToUse: "A limit has the form $\\frac{\\sin(\\cdot)}{(\\cdot)}$ near $0$, or $(1 + \\text{small})^{\\text{large}}$.",
     recall: [
       { lhs: "\\lim_{x\\to0}\\frac{\\sin x}{x} =", answer: "1", vars: {}, banned: ["\\lim", "\\sin"] },

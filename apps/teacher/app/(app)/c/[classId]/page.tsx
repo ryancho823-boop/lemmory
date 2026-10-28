@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
-import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
+import { classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
 import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
+
+/** Formulas under this first-try accuracy are listed under "What the class is forgetting". */
+const FORGETTING = 0.8;
 import { Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
@@ -22,16 +25,16 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
   ).filter((h) => h.n > 0);
   // Formulas are compared with this class's own average, not a fixed cutoff.
   const typical = average(health.map((h) => h.accuracy));
+  // Only formulas the class is actually getting wrong: a 100% formula isn't being forgotten.
+  const forgotten = health.filter((h) => (h.accuracy ?? 1) < FORGETTING);
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
   const attention = sums
-    .filter((x) => x.m.streak === 0 || (x.m.accuracy ?? 1) < 0.6)
+    .filter((x) => isBehind(x.s, today) || (x.m.reviews14 >= 3 && (x.m.accuracy ?? 1) < 0.6))
     .map(({ s, m }) => {
       const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
       const away = m.lastActive === null ? null : today - m.lastActive;
-      const weak = byTopic(recent(s.log, today, 28), topicOf)
-        .filter((t) => t.n >= 3)
-        .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
-      const behind = m.streak === 0;
+      const weak = weakestTopic(s, today, topicOf);
+      const behind = isBehind(s, today);
       return {
         s,
         tag: behind ? "Behind" : "Struggling",
@@ -80,15 +83,19 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
             }
           />
           <div className="px-5 pb-5 pt-4">
-            {health.length === 0 ? (
+            {forgotten.length === 0 ? (
               <p className="text-sm text-ink/50">
-                {assignments.length ? "Shows up once students start reviewing." : "Assign some formulas to get started."}
+                {!assignments.length
+                  ? "Assign some formulas to get started."
+                  : health.length
+                    ? "Nothing to reteach: every formula is above 80% right."
+                    : "Shows up once students start reviewing."}
               </p>
             ) : (
               <BarList
                 flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
                 unit="right"
-                rows={health.slice(0, 8).map((h) => ({
+                rows={forgotten.slice(0, 8).map((h) => ({
                   key: h.formulaId,
                   label: (
                     <Link href={`${base}/formulas/${h.formulaId}`} className="flex items-center gap-2 hover:underline">

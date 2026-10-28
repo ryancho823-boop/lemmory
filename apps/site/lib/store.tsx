@@ -175,9 +175,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       update((s, t) => {
         const c = s.cards[formulaId];
         if (!c) return s;
-        const { session: next, done } = recordCore(s.session, c, correct, t, confusedWith);
-        if (!done) return { ...s, session: next };
-        return { ...s, cards: { ...s.cards, [formulaId]: done.card }, log: [...s.log, done.entry], session: next };
+        const { session: next, entry, done } = recordCore(s.session, c, correct, t, confusedWith);
+        const log = entry ? [...s.log, entry] : s.log;
+        if (!done) return { ...s, log, session: next };
+        return { ...s, cards: { ...s.cards, [formulaId]: done.card }, log, session: next };
       });
       return { promoted };
     },

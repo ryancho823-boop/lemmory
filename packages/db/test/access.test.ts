@@ -118,3 +118,18 @@ test("a student on their own can start with a starter deck, and today's queue ha
   await student.addStarterDeck(solo, "AMC 10");
   assert.equal((await db.select().from(schema.cards).where(eq(schema.cards.studentId, solo))).length, deck.length, "picking again adds nothing");
 });
+
+test("wrong answers count in the stats right away, even if the student stops before getting them right", async () => {
+  const quitter = (await createStudent("Quit Test", "quitter", "correct-horse", "UTC"))!;
+  await student.joinClass(quitter, classA);
+  for (const id of ["law-of-cosines", "ptolemy", "inscribed-angle", "vieta-quadratic", "sfft"]) await assign(teacherA, classA, id);
+  const queue = (await student.loadStudentView({ id: quitter, name: "Q", username: "quitter" })).queue;
+  for (const [i, id] of queue.slice(0, 5).entries()) {
+    await student.promptFor(quitter, id, "review");
+    const answers = i < 2 ? FORMULA_BY_ID[id].recall.map((b) => b.answer) : FORMULA_BY_ID[id].recall.map(() => "x+1");
+    await student.answerRecall(quitter, id, answers, "review");
+  }
+  const log = (await student.loadStudentView({ id: quitter, name: "Q", username: "quitter" })).record.log;
+  assert.equal(log.length, 5);
+  assert.equal(log.filter((l) => l.firstTry).length, 2);
+});

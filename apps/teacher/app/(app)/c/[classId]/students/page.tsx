@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { TOPIC_COLOR } from "@lemmory/core/formulas";
-import { byTopic, recent, summary } from "@lemmory/core/analytics";
+import { summary, todayProgress, weakestTopic } from "@lemmory/core/analytics";
 import { PageHeader, Panel, cx, pct, relDay } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "../JoinCode";
@@ -15,10 +15,8 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
   const rows = students
     .map((s) => {
       const m = summary(s, today);
-      const weakTopic = byTopic(recent(s.log, today, 28), topicOf)
-        .filter((t) => t.n >= 3)
-        .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
-      return { s, m, weakTopic };
+      const weakTopic = weakestTopic(s, today, topicOf);
+      return { s, m, weakTopic, progress: todayProgress(s, today) };
     })
     .sort((a, b) => (a.m.accuracy ?? 1) - (b.m.accuracy ?? 1));
 
@@ -40,7 +38,7 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {rows.map(({ s, m, weakTopic }) => (
+              {rows.map(({ s, m, weakTopic, progress }) => (
                 <tr key={s.id} className="group hover:bg-canvas">
                   <td className="px-5 py-2.5">
                     <Link href={`/c/${classId}/students/${s.id}`} className="flex items-center gap-3">
@@ -51,7 +49,13 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
                     {m.doneToday ? (
                       <span className="font-semibold text-good">Done</span>
                     ) : (
-                      <span className="text-ink/40">{m.lastActive === null ? "Never" : `Last: ${relDay(m.lastActive, today).toLowerCase()}`}</span>
+                      <span className="text-ink/70">
+                      {progress.answered > 0
+                        ? `${progress.answered} of ${progress.total}`
+                        : m.lastActive === null
+                          ? "Not started"
+                          : `Last: ${relDay(m.lastActive, today).toLowerCase()}`}
+                    </span>
                     )}
                   </td>
                   <td className="px-3 py-2.5">

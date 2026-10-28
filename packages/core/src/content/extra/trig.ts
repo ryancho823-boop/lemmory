@@ -35,7 +35,8 @@ export const TRIG_3 = defineTopic("Trigonometry", [
     name: "Euler's Formula & De Moivre",
     level: "AMC 12",
     statement: "e^{i\\theta} = \\cos\\theta + i\\sin\\theta, \\qquad \\left(re^{i\\theta}\\right)^n = r^n e^{in\\theta}",
-    setup: "Write $z = r(\\cos t + i\\sin t) = re^{it}$. Raising to a power raises the length and multiplies the angle.",
+    setup: "Write $z = r(\\cos t + i\\sin t) = re^{it}$.",
+    after: "Raising to a power raises the length to that power and multiplies the angle.",
     whenToUse: "Powers or roots of complex numbers, or sums of cosines that turn into a geometric series.",
     recall: [
       { lhs: "|z^n| =", answer: "r^n", vars: { r: [1, 2], n: int(1, 5) } },
@@ -58,7 +59,8 @@ export const TRIG_3 = defineTopic("Trigonometry", [
     name: "Roots of Unity",
     level: "AMC 12",
     statement: "z^n = 1 \\iff z = e^{2\\pi i k/n}, \\quad k = 0, 1, \\dots, n-1",
-    setup: "The $n$ roots are evenly spaced around the unit circle, so for $n \\ge 2$ they add up to $0$.",
+    setup: "The $n$th roots of unity are the solutions of $z^n = 1$.",
+    after: "They're evenly spaced around the unit circle, so for $n \\ge 2$ they add up to $0$.",
     whenToUse: "Polynomials like $z^n - 1$, regular polygons in the complex plane, or sums of evenly spaced cosines.",
     recall: [
       { lhs: "\\text{Angle of the } k\\text{th root} =", answer: "\\frac{2\\pi k}{n}", vars: { k: int(0, 5), n: int(6, 12) } },
