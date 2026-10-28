@@ -8,19 +8,17 @@ import { ForgettingCurve, RESEARCH } from "@/components/site/research";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ProductTour } from "@/components/site/ProductTour";
 import { TRIAL_DAYS } from "@/lib/pricing";
-import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import { PRICES } from "@lemmory/core/plans";
 import { ACCENT_CYCLE } from "@/lib/accents";
 
 // The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
 const TEXT = {
   hero: {
-      body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend about five minutes a day, and each formula comes back right before it would be forgotten.",
+      body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend five minutes a day, and each formula returns right before it's forgotten.",
     button: "Try the student demo",
     second: "See the teacher view",
     note: <>Every plan starts with a {TRIAL_DAYS}-day free trial. Students in a paid class never pay.</>,
   },
-  bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
+  bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {
     title: "Courses move on. Memory fades.",
     body: "A formula taught in September has to last until the contest in November.",
@@ -40,30 +38,6 @@ const TEXT = {
   research: { title: "Built on how memory actually works" },
 };
 
-// Who it's for. Each side sees what they get and where to start.
-const AUDIENCES = [
-  {
-    title: "For teachers",
-    points: [
-      "Keep teaching your own course. Each week, assign the formulas you covered, and they go into every student's deck.",
-      "See what the class is forgetting and who is falling behind, so you know what to reteach.",
-      "Students in a paid class never pay.",
-    ],
-    cta: `Start a ${TRIAL_DAYS}-day free trial`,
-    href: SIGNUP_URL,
-  },
-  {
-    title: "For students",
-    points: [
-      "Each formula is a flashcard, and your flashcards are your deck. In a class, sign up with your teacher's code and their assignments join your deck.",
-      "On your own: pick your contest (AMC 8, AMC 10, AMC 12 or AIME) and start with its formulas.",
-      `$${PRICES.student.monthly} a month after a ${TRIAL_DAYS}-day free trial.`,
-    ],
-    cta: "Sign up on your own",
-    href: INDIVIDUAL_SIGNUP_URL,
-  },
-];
-
 const PROBLEMS = [
   {
     title: "Formulas get forgotten.",
@@ -77,14 +51,6 @@ const PROBLEMS = [
     title: "Reference is scattered.",
     body: "Formulas live across the AoPS Wiki, forum posts and random PDFs, with no single place organized by topic and contest level.",
   },
-];
-
-// Short ones from four topics, for the strip under the hero (they fit one line on a laptop).
-const STRIP = [
-  { name: "Vieta", tex: "r_1 + r_2 = -\\tfrac{b}{a}" },
-  { name: "Power of a Point", tex: "PA \\cdot PB = PC \\cdot PD" },
-  { name: "Fermat", tex: "a^{p-1} \\equiv 1 \\pmod p" },
-  { name: "Stars and Bars", tex: "\\binom{n+k-1}{k-1}" },
 ];
 
 // One well-known formula per topic, as a taste of the bank.
@@ -121,13 +87,13 @@ export default function Overview() {
   return (
     <div>
       <ScrollReveal />
-      <section className="bg-lemon">
+      <section className="border-b border-line bg-canvas">
         <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
-            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">
-              Remember every formula. Know when to <Inked>use it</Inked>.
+            <h1 className="font-display text-[44px] leading-[1.04] font-bold tracking-[-0.025em] sm:text-[64px]">
+              Remember every formula. Know when to use it.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed">{TEXT.hero.body}</p>
+            <p className="mt-6 max-w-xl text-[19px] leading-relaxed text-pretty text-ink/85">{TEXT.hero.body}</p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <CtaLink href="/student">{TEXT.hero.button}</CtaLink>
               <Link href="/teacher" className="font-semibold underline underline-offset-4 hover:no-underline">
@@ -137,42 +103,13 @@ export default function Overview() {
             <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
-          <div className="rise relative" style={{ animationDelay: "120ms" }}>
-            <MarginNote />
+          <div className="rise" style={{ animationDelay: "120ms" }}>
             <TryIt />
           </div>
         </Container>
       </section>
 
-      {/* A strip of real formulas from the bank, so the page shows its math right away. */}
-      <section className="bg-ink text-white" aria-label="Formulas from the bank">
-        <Container className="math-scroll flex items-center gap-10 py-5 whitespace-nowrap [scrollbar-width:none] lg:justify-between">
-          {STRIP.map((t) => (
-            <span key={t.name} className="flex shrink-0 items-baseline gap-3">
-              <span className="font-hand text-xl text-lemon">{t.name}</span>
-              <Tex math={t.tex} className="text-[15px] text-white/85" />
-            </span>
-          ))}
-        </Container>
-      </section>
 
-      <Container as="section" className="grid gap-x-12 gap-y-12 py-20 md:grid-cols-2">
-        {AUDIENCES.map((a, i) => (
-          <div key={a.title} data-reveal className="border-t-4 pt-5" style={{ borderColor: ACCENT_CYCLE[i] }}>
-            <h2 className="font-display text-3xl">{a.title}</h2>
-            <ul className="mt-4 border-t border-line">
-              {a.points.map((pt) => (
-                <li key={pt} className="border-b border-line py-3 leading-relaxed">
-                  {pt}
-                </li>
-              ))}
-            </ul>
-            <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 font-semibold underline underline-offset-4 hover:no-underline">
-              {a.cta} <ArrowRight size={16} />
-            </a>
-          </div>
-        ))}
-      </Container>
 
       <Container as="section" className="py-20">
         <SectionTitle reveal className="max-w-xl">
@@ -306,30 +243,5 @@ export default function Overview() {
 
       <DemoCTA />
     </div>
-  );
-}
-
-/** A word underlined by hand, in ink. */
-function Inked({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="relative inline-block">
-      {children}
-      <svg aria-hidden viewBox="0 0 200 14" preserveAspectRatio="none" className="absolute -bottom-2 left-0 h-[0.28em] w-full">
-        <path d="M3 9 C 40 3, 70 12, 105 7 S 165 3, 197 8" fill="none" stroke="var(--color-ink)" strokeWidth="4" strokeLinecap="round" />
-      </svg>
-    </span>
-  );
-}
-
-/** A note in the margin, the way a teacher would scribble one, pointing at the card. */
-function MarginNote() {
-  return (
-    <p aria-hidden className="mb-3 flex items-end justify-end gap-1 pr-8 font-hand text-2xl text-ink lg:absolute lg:-top-14 lg:right-0 lg:mb-0">
-      <span className="-rotate-3">try it, from memory</span>
-      <svg viewBox="0 0 40 40" className="mb-[-14px] size-9 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <path d="M6 6 C 22 8, 32 18, 30 34" />
-        <path d="M22 28 L 30 35 L 36 26" />
-      </svg>
-    </p>
   );
 }

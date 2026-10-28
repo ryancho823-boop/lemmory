@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "../../../packages/ui/src/theme.css";
 
+/* The main site's headings use its own serif (the apps keep theirs). */
+@theme {
+  --font-display: var(--font-site-serif), Georgia, serif;
+}
+
 /* Shared components live outside this app, so tell Tailwind to scan them too. */
 @source "../../../packages/ui/src";
 
