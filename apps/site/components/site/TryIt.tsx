@@ -40,7 +40,6 @@ export function TryIt() {
             { value: "apply", label: "2. Application" },
           ]}
         />
-        <span className="text-sm text-ink/60">The same card students see</span>
       </div>
       <div className="p-6">
         {result !== null ? (

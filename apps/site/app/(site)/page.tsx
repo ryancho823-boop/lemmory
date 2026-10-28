@@ -7,7 +7,6 @@ import { TryIt } from "@/components/site/TryIt";
 import { ForgettingCurve, RESEARCH } from "@/components/site/research";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ProductTour } from "@/components/site/ProductTour";
-import { TRIAL_DAYS } from "@/lib/pricing";
 import { ACCENT_CYCLE } from "@/lib/accents";
 
 // The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
@@ -16,7 +15,6 @@ const TEXT = {
       body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend five minutes a day, and each formula returns right before it's forgotten.",
     button: "Try the student demo",
     second: "See the teacher view",
-    note: <>Every plan starts with a {TRIAL_DAYS}-day free trial. Students in a paid class never pay.</>,
   },
   bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {
@@ -90,8 +88,10 @@ export default function Overview() {
       <section className="overflow-x-clip border-b-2 border-ink bg-lemon">
         <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
-            <h1 className="font-display text-[44px] leading-[1.04] font-bold tracking-[-0.025em] sm:text-[64px]">
-              Remember every formula. Know when to use it.
+            {/* Two lines, two voices: the upright promise, then the italic "and the harder part". */}
+            <h1 className="font-display text-[44px] leading-[1.04] tracking-[-0.025em] sm:text-[64px]">
+              <span className="block font-bold">Remember every formula.</span>
+              <span className="block font-medium italic">Know when to use it.</span>
             </h1>
             <p className="mt-6 max-w-xl text-[19px] leading-relaxed text-pretty text-ink/85">{TEXT.hero.body}</p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
@@ -100,7 +100,6 @@ export default function Overview() {
                 {TEXT.hero.second}
               </Link>
             </div>
-            <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
           {/* The card sits on top of a little deck: two more cards, askew, behind it. */}

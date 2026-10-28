@@ -5,7 +5,7 @@ import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 
 // Source Serif 4 (a classic textbook serif) for headings and big numbers, Source Sans 3 for body text.
-const serif = Source_Serif_4({ variable: "--font-site-serif", subsets: ["latin"], axes: ["opsz"] });
+const serif = Source_Serif_4({ variable: "--font-site-serif", subsets: ["latin"], style: ["normal", "italic"], axes: ["opsz"] });
 const sourceSans = Source_Sans_3({ variable: "--font-source-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
