@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CONTEST, contestLabel, YOU } from "@/lib/sim";
-import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
+import { streak, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -19,8 +19,6 @@ export default function StudentHome() {
   const queue = doneToday ? [] : buildQueue();
   const fresh = queue.filter((id) => isNew(state.cards[id])).length;
   const weak = weakest(you, today, 5);
-  // Finishing today continues the streak (or starts one), so the bonus is for streak + 1.
-  const bonus = streakBonus(doneToday ? s : s + 1);
 
   return (
     <div className="space-y-6">
@@ -47,9 +45,6 @@ export default function StudentHome() {
                 <InfoTip title="Today's cards" align="left">
                   About {Math.max(2, Math.round(queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>
-              </p>
-              <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                {s > 0 ? `Finish to keep your ${s}-day streak: +${bonus} bonus points` : `Finish to start a streak: +${bonus} bonus points`}
               </p>
             </div>
           )}
@@ -85,7 +80,7 @@ export default function StudentHome() {
                     </span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {pct(w.accuracy)} <span className="text-ink/70">right</span>
+                      {pct(w.accuracy)}
                     </span>
                   </Link>
                 </li>

@@ -68,7 +68,7 @@ function Row({ r }: { r: LeaderRow & { xp: number; label: string; rank: number }
     <li className={cx("flex items-center gap-3 px-3 py-2.5", r.you && "font-semibold")}>
       <span className="w-6 text-right tabular-nums">{r.rank}</span>
       <span className="min-w-0 flex-1 truncate">{r.label}</span>
-      <span className="tabular-nums">{r.xp} points</span>
+      <span className="tabular-nums">{r.xp}</span>
     </li>
   );
 }
