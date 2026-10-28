@@ -40,8 +40,31 @@ export function summary(s: Student, today: number) {
     mastered: cards.filter(isMastered).length,
     inApply: cards.filter((c) => c.stage === "apply").length,
     total: cards.length,
-    lastActive: s.doneDays.length ? Math.max(...s.doneDays) : null,
+    // The last day with any review, finished or not.
+    lastActive: s.doneDays.length || s.log.length ? Math.max(...s.doneDays, ...s.log.map((l) => l.day)) : null,
   };
+}
+
+/** Today so far: cards answered (first tries) and today's total, for "2 of 11". */
+export function todayProgress(s: Student, today: number) {
+  const answered = new Set(s.log.filter((l) => l.day === today).map((l) => l.formulaId));
+  const left = Object.values(s.cards).filter((c) => c.memory.due <= today && !answered.has(c.formulaId)).length;
+  return { answered: answered.size, total: answered.size + left };
+}
+
+/**
+ * Behind: no streak, and a day of homework actually missed in the last week. A student who just
+ * joined (nothing missed yet) isn't behind, even before finishing their first day.
+ */
+export function isBehind(s: Student, today: number) {
+  return streak(s.doneDays, today) === 0 && Object.entries(s.missed).some(([d, n]) => Number(d) >= today - 7 && n > 0);
+}
+
+/** The topic most in need of work: the lowest under NEEDS_WORK, last 4 weeks. None if every topic is fine. */
+export function weakestTopic(s: Student, today: number, topicOf: (formulaId: string) => Topic | undefined) {
+  return byTopic(recent(s.log, today, 28), topicOf)
+    .filter((t) => (t.accuracy ?? 1) < NEEDS_WORK)
+    .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
 }
 
 /** Accuracy per topic. `topicOf` looks formulas up in whichever bank the app has (the demo only has a slice). */
@@ -85,7 +108,7 @@ export const NEEDS_WORK = 0.7;
 /** Formulas under 70% first-try accuracy, lowest first (ties: the one fading fastest first). */
 export function weakest(s: Student, today: number, k = 5) {
   return byFormula(s, today)
-    .filter((f) => f.n >= 2 && (f.accuracy ?? 1) < NEEDS_WORK)
+    .filter((f) => f.n >= 1 && (f.accuracy ?? 1) < NEEDS_WORK)
     .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1) || (a.retention ?? 1) - (b.retention ?? 1))
     .slice(0, k);
 }

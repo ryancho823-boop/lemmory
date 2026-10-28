@@ -56,6 +56,11 @@ export interface RecallBlank {
   accept?: string[];
   /** Variables allowed in the answer. Anything else (like retyping the left side) is rejected. */
   vars: Record<string, VarRange>;
+  /**
+   * Variables defined by the others (LaTeX), like a semiperimeter s = (a+b+c)/2, so an answer with
+   * the definition written out counts too. They're allowed in answers but not sampled on their own.
+   */
+  defs?: Record<string, string>;
   /** Substrings that may not appear in the input, so the left side can't be retyped as the answer. */
   banned?: string[];
   /** Require a factored ("product") or expanded ("sum") answer for identities. */

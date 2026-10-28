@@ -16,10 +16,13 @@ export default function AssignPage() {
       <PageHeader
         title="Assign formulas"
         info="Assigned formulas join every student's deck. Scheduling is automatic."
+        // Only once this week has homework, so a new teacher can't skip an empty week by mistake.
         action={
-          <Button variant="outline" onClick={startNextWeek}>
-            Start week {state.currentWeek + 1}
-          </Button>
+          state.assignments.some((a) => a.week === state.currentWeek) && (
+            <Button variant="outline" onClick={startNextWeek}>
+              Start week {state.currentWeek + 1}
+            </Button>
+          )
         }
       />
 

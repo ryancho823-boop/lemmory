@@ -10,9 +10,11 @@ interface Props {
   problem: Problem;
   options: string[];
   onDone: (correct: boolean, confusedWith?: string[]) => void;
+  /** Runs as soon as the card is graded (before Continue), with whether it was right. */
+  onGraded?: (correct: boolean) => void;
 }
 
-export function ApplyCard({ problem, options, onDone }: Props) {
+export function ApplyCard({ problem, options, onDone, onGraded }: Props) {
   // The formulas picked in step 1, so a mix-up can be recorded when the card finishes.
   const picked = useRef<string[]>([]);
   return (
@@ -28,9 +30,15 @@ export function ApplyCard({ problem, options, onDone }: Props) {
       }}
       onPick={async (ids) => {
         picked.current = ids;
-        return checkPick(problem, ids, FORMULA_BY_ID);
+        const result = checkPick(problem, ids, FORMULA_BY_ID);
+        if (!result.right) onGraded?.(false);
+        return result;
       }}
-      onSolve={async (_, answer) => checkSolve(problem, answer)}
+      onSolve={async (_, answer) => {
+        const result = checkSolve(problem, answer);
+        onGraded?.(result.right);
+        return result;
+      }}
       onDone={(correct) => {
         const wrong = wrongPicks(problem, picked.current);
         onDone(correct, wrong.length ? wrong : undefined);

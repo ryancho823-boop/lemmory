@@ -5,8 +5,11 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR, topicOf } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
-import { byTopic, classFormulaHealth, recent, summary } from "@lemmory/core/analytics";
+import { classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
 import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
+
+/** Formulas under this first-try accuracy are listed under "What the class is forgetting". */
+const FORGETTING = 0.8;
 import { Button, PageHeader, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
 
 export default function TeacherOverview() {
@@ -18,16 +21,16 @@ export default function TeacherOverview() {
   const health = classFormulaHealth(students, state.assignments.map((a) => a.formulaId), today);
   // Formulas are compared with this class's own average, not a fixed cutoff.
   const typical = average(health.map((h) => h.accuracy));
+  // Only formulas the class is actually getting wrong: a 100% formula isn't being forgotten.
+  const forgotten = health.filter((h) => (h.accuracy ?? 1) < FORGETTING);
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
   const attention = sums
-    .filter((x) => x.m.streak === 0 || (x.m.accuracy ?? 1) < 0.6)
+    .filter((x) => isBehind(x.s, today) || (x.m.reviews14 >= 3 && (x.m.accuracy ?? 1) < 0.6))
     .map(({ s, m }) => {
       const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
       const away = m.lastActive === null ? null : today - m.lastActive;
-      const weak = byTopic(recent(s.log, today, 28), topicOf)
-        .filter((t) => t.n >= 3)
-        .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
-      const behind = m.streak === 0;
+      const weak = weakestTopic(s, today, topicOf);
+      const behind = isBehind(s, today);
       return {
         s,
         tag: behind ? "Behind" : "Struggling",
@@ -66,10 +69,13 @@ export default function TeacherOverview() {
             }
           />
           <div className="px-5 pb-5 pt-4">
+            {forgotten.length === 0 ? (
+              <p className="text-sm text-ink/50">Nothing to reteach: every formula is above 80% right.</p>
+            ) : (
             <BarList
               flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
               unit="right"
-              rows={health.slice(0, 8).map((h) => ({
+              rows={forgotten.slice(0, 8).map((h) => ({
                 key: h.formulaId,
                 label: (
                   <Link href={`/teacher/formulas/${h.formulaId}`} className="flex items-center gap-2 hover:underline">
@@ -81,6 +87,7 @@ export default function TeacherOverview() {
                 hint: `${h.struggling} students below 60%`,
               }))}
             />
+            )}
           </div>
         </Panel>
 

@@ -4,7 +4,7 @@ import type { Figure as FigureData, Pt } from "@lemmory/core/content/types";
 // INK and SHADE match --color-ink and --color-lemon-soft in theme.css.
 const INK = "#0f1121";
 const SHADE = "#fff7d1";
-const COLORS: Record<string, string> = { blue: "#2563eb", rose: "#e11d48" };
+const COLORS: Record<string, string> = { blue: "#2563eb", rose: "#e11d48", green: "#16a34a" };
 
 /** Draws a formula or problem diagram. Points are labeled in italics like the math. */
 export function Figure({ figure: f, className }: { figure: FigureData; className?: string }) {

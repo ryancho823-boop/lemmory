@@ -86,8 +86,8 @@ export default function Overview() {
     <div>
       <ScrollReveal />
       <section className="overflow-x-clip border-b-2 border-ink bg-lemon">
-        <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
-          <div className="rise">
+        <Container className="grid items-start gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
+          <div>
             {/* Two lines, two voices: the upright promise, then the italic "and the harder part". */}
             <h1 className="font-display text-[44px] leading-[1.04] tracking-[-0.025em] sm:text-[64px]">
               <span className="block font-bold">Remember every formula.</span>
@@ -103,7 +103,7 @@ export default function Overview() {
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
           {/* The card sits on top of a little deck: two more cards, askew, behind it. */}
-          <div className="rise relative" style={{ animationDelay: "120ms" }}>
+          <div className="relative">
             <div aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 rotate-[1.5deg] sm:translate-x-4 sm:translate-y-3 sm:rotate-[4deg] rounded-lg border-2 border-ink bg-white" />
             <div aria-hidden className="absolute inset-0 -translate-x-1 translate-y-1 -rotate-[1deg] sm:-translate-x-3 sm:translate-y-2 sm:-rotate-[2.5deg] rounded-lg border-2 border-ink bg-paper" />
             <div className="relative">

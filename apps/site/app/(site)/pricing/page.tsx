@@ -13,7 +13,7 @@ const INTRO = {
 };
 
 // How Lemmory compares with the other ways contest students and clubs study. Keep claims about
-// other tools conservative and recheck them now and then (last checked October 2026).
+// other tools conservative and recheck them now and then (last checked October 27, 2026).
 const COMPARE = {
   columns: ["Lemmory", "AoPS Alcumus", "Achievable AMC", "Podsie", "Quizlet", "Anki"],
   rows: [
@@ -23,7 +23,7 @@ const COMPARE = {
     { label: "Grades math in any equivalent form", cells: ["Yes", "Numbers only", "Multiple choice", "Partly", "No", "No"] },
     { label: "Ready to use on day one", cells: ["Yes", "Yes", "Yes", "Write your own", "Make your own", "Make your own"] },
     { label: "Shows what the class is forgetting", cells: ["Yes", "Reports", "No", "By standard", "Plus only", "No"] },
-    { label: "Price", cells: ["From $2/mo", "Free", "$99/yr", "Free", "Free, Plus $36/yr", "Free"] },
+    { label: "Price", cells: ["From $2/mo", "Free", "$99", "Free", "Free, Plus $36/yr", "Free"] },
   ],
 };
 

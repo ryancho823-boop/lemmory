@@ -170,11 +170,13 @@ export const FORMULA_FIGURES: Record<string, Figure> = {
   heron: tri(6, 5, 4, ["a", "b", "c"]),
   brahmagupta: quadFig(cyclicQuad([3, 4, 5, 6]), ["a", "b", "c", "d"]),
   "angle-bisector": bisector(6, 5, 4, [{ on: "A-B", text: "c" }, { on: "C-A", text: "b" }]),
+  // Both lines from the card (through A, B and through C, D) and the tangent PT, all from P outside.
   "power-of-a-point": (() => {
-    const circle = { c: [0, 0] as Pt, r: 2 }, P: Pt = [5, 1.2];
-    const [A, B] = lineCircle(P, [-2, -0.6], circle);
+    const circle = { c: [0, 0] as Pt, r: 2 }, P: Pt = [5, 0];
+    const [A, B] = lineCircle(P, [0, 0.3], circle);
+    const [C, D] = lineCircle(P, [0, -1.25], circle);
     const T = tangentPoints(P, circle)[0];
-    return fig({ pts: { P, A, B, T }, circles: [circle], lines: ["P-B:blue", "P-T:rose"] });
+    return fig({ pts: { P, A, B, C, D, T }, circles: [circle], lines: ["P-B:blue", "P-D:green", "P-T:rose"] });
   })(),
   stewart: cevianFig(7, 5.6, 4.6, 2.8, [{ on: "B-D", text: "m" }, { on: "D-C", text: "n" }, { on: "C-A", text: "b" }, { on: "A-B", text: "c" }, { on: "A-D", text: "d" }]),
   ptolemy: quadFig(cyclicQuad([3, 4.4, 3.6, 5.2]), ["a", "b", "c", "d"], true),

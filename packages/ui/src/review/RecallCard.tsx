@@ -97,8 +97,8 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
                 </p>
               )}
               {graded && !graded.results[i] && (
-                <p className="mt-1.5 text-sm text-ink/70">
-                  Answer: <Tex math={graded.answers[i]} />
+                <p className="math-scroll mt-1.5 text-[17px]">
+                  <span className="font-semibold text-bad">Answer:</span> <Tex math={`\\displaystyle ${graded.answers[i]}`} />
                 </p>
               )}
             </div>

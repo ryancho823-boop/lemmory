@@ -52,8 +52,8 @@ export function ReviewSession({
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  // Set when a card graduates; shown once the student moves on.
-  const promoted = useRef<string | null>(null);
+  // Set when the card on screen graduates, so the note shows with that card (and goes with it).
+  const [graduated, setGraduated] = useState<string | null>(null);
 
   const load = (id: string) =>
     getPrompt(id, "review").then(
@@ -76,8 +76,9 @@ export function ReviewSession({
     const firstTries = id in active.firstTries ? active.firstTries : { ...active.firstTries, [id]: correct };
     const rest = active.queue.slice(1);
     const queue = correct ? rest : [...rest, id];
-    setActive({ ...active, queue, firstTries, attempt: active.attempt + 1, prompt: null, toast: promoted.current });
-    promoted.current = null;
+    // Only the finish screen keeps the last card's note; otherwise it would sit over the next card.
+    setActive({ ...active, queue, firstTries, attempt: active.attempt + 1, prompt: null, toast: queue.length ? null : graduated });
+    setGraduated(null);
     if (queue.length) load(queue[0]);
   };
 
@@ -141,7 +142,7 @@ export function ReviewSession({
           {completed}/{active.total}
         </span>
       </div>
-      {active.toast && <Toast text={active.toast} />}
+      {graduated && <Toast text={graduated} />}
       {error ? (
         <Panel className="mt-4 p-8 text-center text-sm font-semibold text-bad">{error}</Panel>
       ) : active.prompt ? (
@@ -151,7 +152,7 @@ export function ReviewSession({
             mode="review"
             onDone={done}
             onOutcome={(o) => {
-              if (o.promoted) promoted.current = `${o.formulaName} graduated to application mode.`;
+              if (o.promoted) setGraduated(`${o.formulaName} graduated to application mode.`);
             }}
           />
         </Panel>

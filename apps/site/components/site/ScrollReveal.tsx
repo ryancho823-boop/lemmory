@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 /**
  * Fades and lifts every `[data-reveal]` element into place the first time it scrolls into view.
+ * Anything already on screen when the page loads shows right away, without the fade.
  * Stagger siblings with `style={{ "--d": "120ms" }}`. Without JS, nothing is ever hidden.
  */
 export function ScrollReveal() {
@@ -20,7 +21,10 @@ export function ScrollReveal() {
       },
       { rootMargin: "0px 0px -12% 0px", threshold: 0.1 },
     );
-    els.forEach((el) => io.observe(el));
+    for (const el of els) {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("is-revealed");
+      else io.observe(el);
+    }
     document.documentElement.classList.add("reveal-on");
     return () => io.disconnect();
   }, []);

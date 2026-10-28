@@ -36,7 +36,8 @@ export const GEOMETRY = defineTopic("Geometry", [
     name: "Inscribed Angle Theorem",
     level: "AMC 10",
     statement: "\\angle_{\\text{inscribed}} = \\tfrac12 \\cdot \\text{intercepted arc}",
-    setup: "An angle with its vertex on the circle is half its arc. So opposite angles of a cyclic quadrilateral sum to $180^\\circ$.",
+    setup: "An angle with its vertex on the circle, cutting off an arc.",
+    after: "An inscribed angle is half its arc. So opposite angles of a cyclic quadrilateral sum to $180^\\circ$.",
     whenToUse: "Angles with vertices on a circle, or a quadrilateral inscribed in a circle.",
     recall: [{ lhs: "\\text{Inscribed angle on a } d^\\circ \\text{ arc} =", answer: "\\frac{d}{2}", vars: { d: [10, 350] } }],
     related: ["power-of-a-point", "ptolemy"],
@@ -63,7 +64,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     setup: "Triangle with sides $a, b, c$ and semiperimeter $s$.",
     whenToUse: "You know all three side lengths of a triangle but no heights or angles.",
     recall: [
-      { lhs: "K =", answer: "\\sqrt{s(s-a)(s-b)(s-c)}", vars: { s: [3, 4], a: [1, 2], b: [1, 2], c: [1, 2] } },
+      { lhs: "K =", answer: "\\sqrt{s(s-a)(s-b)(s-c)}", vars: { a: [1, 2], b: [1, 2], c: [1, 2] }, defs: { s: "\\frac{a+b+c}{2}" } },
     ],
     related: ["brahmagupta", "area-sine", "inradius-circumradius"],
     problems: [
@@ -99,7 +100,8 @@ export const GEOMETRY = defineTopic("Geometry", [
       {
         lhs: "K =",
         answer: "\\sqrt{(s-a)(s-b)(s-c)(s-d)}",
-        vars: { s: [3, 4], a: [1, 2], b: [1, 2], c: [1, 2], d: [1, 2] },
+        vars: { a: [1, 2], b: [1, 2], c: [1, 2], d: [1, 2] },
+        defs: { s: "\\frac{a+b+c+d}{2}" },
       },
     ],
     related: ["heron", "ptolemy"],
@@ -150,7 +152,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     setup: "Lines through $P$ meet the circle at $A, B$ and $C, D$; $PT$ is tangent.",
     whenToUse: "Two chords cross, two secants come from one point, or a tangent and a secant share an endpoint.",
     recall: [
-      { lhs: "\\text{Chords: } PA\\cdot PB =", answer: "PC\\cdot PD", vars: { P: pos, A: pos, B: pos, C: pos, D: pos } },
+      { lhs: "\\text{Two lines through } P\\text{: } PA\\cdot PB =", answer: "PC\\cdot PD", vars: { P: pos, A: pos, B: pos, C: pos, D: pos } },
       { lhs: "\\text{Tangent: } PT^2 =", answer: "PA\\cdot PB", vars: { P: pos, A: pos, B: pos, T: pos } },
     ],
     related: ["inscribed-angle", "stewart", "ptolemy"],
@@ -174,7 +176,8 @@ export const GEOMETRY = defineTopic("Geometry", [
     name: "Stewart's Theorem",
     level: "AMC 12",
     statement: "b^2m + c^2n = a(d^2 + mn)",
-    setup: "Cevian $AD = d$ splits $BC = a$ into $BD = m$ and $DC = n$; $b = CA$, $c = AB$. (\"A man and his dad put a bomb in the sink.\")",
+    setup: "Cevian $AD = d$ splits $BC = a$ into $BD = m$ and $DC = n$; $b = CA$, $c = AB$.",
+    after: "Mnemonic: \\\"A man and his dad put a bomb in the sink\\\": $man + dad = bmb + cnc$.",
     whenToUse: "You need the length of a cevian (often a median) and know all three sides plus where it lands.",
     recall: [{ lhs: "b^2m + c^2n =", answer: "a(d^2+mn)", vars: { a: pos, b: pos, c: pos, d: pos, m: pos, n: pos } }],
     related: ["angle-bisector", "law-of-cosines", "power-of-a-point"],

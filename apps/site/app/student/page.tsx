@@ -73,7 +73,9 @@ export default function StudentHome() {
             }
           />
           <ul className="mt-3 divide-y divide-line">
-            {weak.length === 0 && <li className="px-5 py-6">Nothing under 70%. Nice work.</li>}
+            {weak.length === 0 && (
+              <li className="px-5 py-6">{you.log.length ? "Nothing under 70%. Nice work." : "Do your first review to see what needs work."}</li>
+            )}
             {weak.map((w) => {
               const f = FORMULA_BY_ID[w.formulaId];
               return (

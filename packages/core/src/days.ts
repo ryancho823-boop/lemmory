@@ -32,7 +32,7 @@ export const isoDate = (day: number) => new Date(day * DAY_MS).toISOString().sli
 export const fmtDay = (day: number, opts: Intl.DateTimeFormatOptions = { weekday: "short", month: "short", day: "numeric" }) =>
   new Date(day * DAY_MS).toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
 
-/** "AMC 10A · Nov 6 · 25 days away", or just the name when there's no date. */
+/** "AMC 10A · Nov 5 · 25 days away", or just the name when there's no date. */
 export function contestLabel(name: string | null, date: number | null, today: number) {
   if (!name) return null;
   if (date === null) return name;
