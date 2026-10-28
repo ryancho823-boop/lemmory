@@ -7,21 +7,16 @@ import { TryIt } from "@/components/site/TryIt";
 import { ForgettingCurve, RESEARCH } from "@/components/site/research";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { ProductTour } from "@/components/site/ProductTour";
-import { TRIAL_DAYS } from "@/lib/pricing";
-import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
-import { PRICES } from "@lemmory/core/plans";
 import { ACCENT_CYCLE } from "@/lib/accents";
 
 // The homepage's wording, top to bottom. Lists of items (problems, steps, topics) follow below.
 const TEXT = {
   hero: {
-    title: "Remember every formula. Know when to use it.",
-    body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend about five minutes a day, and each formula comes back right before it would be forgotten.",
+      body: "Flashcards with spaced repetition, built for competition math. Teachers assign the formulas they teach, students spend five minutes a day, and each formula returns right before it's forgotten.",
     button: "Try the student demo",
     second: "See the teacher view",
-    note: <>Every plan starts with a {TRIAL_DAYS}-day free trial. Students in a paid class never pay.</>,
   },
-  bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME</>, link: "See the formula bank", linkNote: "Open it in the demo" },
+  bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   problem: {
     title: "Courses move on. Memory fades.",
     body: "A formula taught in September has to last until the contest in November.",
@@ -39,32 +34,7 @@ const TEXT = {
     fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews.",
   },
   research: { title: "Built on how memory actually works" },
-  terms: "Each formula is a flashcard (a card for short), and a student's cards are their deck.",
 };
-
-// Who it's for. Each side sees what they get and where to start.
-const AUDIENCES = [
-  {
-    title: "For teachers",
-    points: [
-      "Keep teaching your own course. Each week, assign the formulas you covered, and they go into every student's deck.",
-      "See what the class is forgetting and who is falling behind, so you know what to reteach.",
-      "Students in a paid class never pay.",
-    ],
-    cta: `Start a ${TRIAL_DAYS}-day free trial`,
-    href: SIGNUP_URL,
-  },
-  {
-    title: "For students",
-    points: [
-      "In a class: sign up with the code your teacher gives you, and their assignments show up in your deck.",
-      "On your own: pick your contest (AMC 8, AMC 10, AMC 12 or AIME) and start with its formulas.",
-      `$${PRICES.student.monthly} a month after a ${TRIAL_DAYS}-day free trial.`,
-    ],
-    cta: "Sign up on your own",
-    href: INDIVIDUAL_SIGNUP_URL,
-  },
-];
 
 const PROBLEMS = [
   {
@@ -115,44 +85,35 @@ export default function Overview() {
   return (
     <div>
       <ScrollReveal />
-      <section className="bg-lemon">
-        <Container className="grid items-center gap-12 pb-20 pt-14 sm:pt-20 lg:grid-cols-[1.05fr_1fr]">
+      <section className="overflow-x-clip border-b-2 border-ink bg-lemon">
+        <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
-            <h1 className="text-[42px] font-extrabold leading-[1.05] tracking-[-0.02em] sm:text-[58px]">{TEXT.hero.title}</h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed">{TEXT.hero.body}</p>
+            {/* Two lines, two voices: the upright promise, then the italic "and the harder part". */}
+            <h1 className="font-display text-[44px] leading-[1.04] tracking-[-0.025em] sm:text-[64px]">
+              <span className="block font-bold">Remember every formula.</span>
+              <span className="block font-medium italic">Know when to use it.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-[19px] leading-relaxed text-pretty text-ink/85">{TEXT.hero.body}</p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <CtaLink href="/student">{TEXT.hero.button}</CtaLink>
               <Link href="/teacher" className="font-semibold underline underline-offset-4 hover:no-underline">
                 {TEXT.hero.second}
               </Link>
             </div>
-            <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
-          <div className="rise" style={{ animationDelay: "120ms" }}>
-            <TryIt />
+          {/* The card sits on top of a little deck: two more cards, askew, behind it. */}
+          <div className="rise relative" style={{ animationDelay: "120ms" }}>
+            <div aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 rotate-[1.5deg] sm:translate-x-4 sm:translate-y-3 sm:rotate-[4deg] rounded-lg border-2 border-ink bg-white" />
+            <div aria-hidden className="absolute inset-0 -translate-x-1 translate-y-1 -rotate-[1deg] sm:-translate-x-3 sm:translate-y-2 sm:-rotate-[2.5deg] rounded-lg border-2 border-ink bg-paper" />
+            <div className="relative">
+              <TryIt />
+            </div>
           </div>
         </Container>
       </section>
 
-      <Container as="section" className="grid gap-x-12 gap-y-12 py-20 md:grid-cols-2">
-        {AUDIENCES.map((a, i) => (
-          <div key={a.title} data-reveal className="border-t-4 pt-5" style={{ borderColor: ACCENT_CYCLE[i] }}>
-            <h2 className="font-display text-3xl">{a.title}</h2>
-            <ul className="mt-4 border-t border-line">
-              {a.points.map((pt) => (
-                <li key={pt} className="border-b border-line py-3 leading-relaxed">
-                  {pt}
-                </li>
-              ))}
-            </ul>
-            <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 font-semibold underline underline-offset-4 hover:no-underline">
-              {a.cta} <ArrowRight size={16} />
-            </a>
-          </div>
-        ))}
-        <p data-reveal className="md:col-span-2">{TEXT.terms}</p>
-      </Container>
+
 
       <Container as="section" className="py-20">
         <SectionTitle reveal className="max-w-xl">
