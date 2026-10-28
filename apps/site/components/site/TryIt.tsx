@@ -31,7 +31,7 @@ export function TryIt() {
 
   return (
     <div className="rounded-lg border-2 border-ink bg-white shadow-[6px_6px_0_var(--color-ink)]">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-t-[6px] border-b-2 border-ink bg-lemon px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink px-5 py-3">
         <Segmented
           value={mode}
           onChange={(m) => reset(m)}

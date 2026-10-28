@@ -87,7 +87,7 @@ export default function Overview() {
   return (
     <div>
       <ScrollReveal />
-      <section className="border-b border-line bg-canvas">
+      <section className="overflow-x-clip border-b-2 border-ink bg-lemon">
         <Container className="grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,500px)] lg:gap-16 lg:py-24">
           <div className="rise">
             <h1 className="font-display text-[44px] leading-[1.04] font-bold tracking-[-0.025em] sm:text-[64px]">
@@ -103,8 +103,13 @@ export default function Overview() {
             <p className="mt-8 text-[15px]">{TEXT.hero.note}</p>
           </div>
           {/* The real card, recall then application, right where the product needs explaining. */}
-          <div className="rise" style={{ animationDelay: "120ms" }}>
-            <TryIt />
+          {/* The card sits on top of a little deck: two more cards, askew, behind it. */}
+          <div className="rise relative" style={{ animationDelay: "120ms" }}>
+            <div aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 rotate-[1.5deg] sm:translate-x-4 sm:translate-y-3 sm:rotate-[4deg] rounded-lg border-2 border-ink bg-white" />
+            <div aria-hidden className="absolute inset-0 -translate-x-1 translate-y-1 -rotate-[1deg] sm:-translate-x-3 sm:translate-y-2 sm:-rotate-[2.5deg] rounded-lg border-2 border-ink bg-paper" />
+            <div className="relative">
+              <TryIt />
+            </div>
           </div>
         </Container>
       </section>
