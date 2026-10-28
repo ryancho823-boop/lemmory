@@ -165,7 +165,18 @@ export function menelausBy(af: number, bd: number, texts: Text[] = []) {
 
 export const FORMULA_FIGURES: Record<string, Figure> = {
   ...TRIG_FORMULA_FIGURES,
-  shoelace: onAxes([[0, 0], [4, 0], [5, 3], [1, 4]], [-0.6, 6, -0.6, 4.8]),
+  // The card asks for a triangle's area from (x₁, y₁), (x₂, y₂), (x₃, y₃), so the picture is that triangle.
+  shoelace: (() => {
+    const P1: Pt = [1.7, 0.9], P2: Pt = [5, 1.8], P3: Pt = [2.6, 4.6];
+    const ax = axes(-0.6, 6.6, -0.6, 5.6);
+    return fig({
+      pts: { P1, P2, P3, ...ax.pts },
+      hide: ["P1", "P2", "P3", ...ax.hide],
+      shapes: ["P1-P2-P3"],
+      lines: [...ax.lines, "P1-P2", "P2-P3", "P3-P1"],
+      texts: [...ax.texts, { at: [1.7, 0.3], text: "(x₁, y₁)" }, { at: [5.2, 1.3], text: "(x₂, y₂)" }, { at: [2.6, 5.0], text: "(x₃, y₃)" }],
+    });
+  })(),
   "inscribed-angle": inscribed({ A: 215, B: 325, C: 100 }),
   heron: tri(6, 5, 4, ["a", "b", "c"]),
   brahmagupta: quadFig(cyclicQuad([3, 4, 5, 6]), ["a", "b", "c", "d"]),
@@ -252,7 +263,7 @@ export const FORMULA_FIGURES: Record<string, Figure> = {
 export const PROBLEM_FIGURES: Record<string, Figure> = {
   ...TRIG_PROBLEM_FIGURES,
   sh1: onAxes([[1, 1], [5, 2], [3, 6]], [-0.6, 6, -0.6, 6.6]),
-  sh2: FORMULA_FIGURES.shoelace,
+  sh2: onAxes([[0, 0], [4, 0], [5, 3], [1, 4]], [-0.6, 6, -0.6, 4.8]),
   ia1: inscribed({ A: 215, B: 325, C: 100 }),
   ia2: (() => {
     const O: Pt = [0, 0];

@@ -94,7 +94,7 @@ export const TIERS: Tier[] = [
         items: [
           `Add any of the ${TOTAL_FORMULAS} formulas to your own deck`,
           "A short daily review that brings each formula back before you forget it",
-          "Your own stats, and Practice all to go through your whole deck before a contest",
+          "Your own stats, and Practice to go back over your reviewed cards before a contest",
         ],
       },
       {

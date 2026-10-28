@@ -185,11 +185,11 @@ export const ALGEBRA = defineTopic("Algebra", [
     id: "telescoping",
     name: "Telescoping Fractions",
     level: "AMC 10",
-    statement: "\\frac{1}{n(n+1)} = \\frac{1}{n} - \\frac{1}{n+1}",
-    setup: "Split each term so that neighboring terms cancel.",
-    after: "More generally $\\frac{1}{n(n+k)} = \\frac1k\\left(\\frac1n - \\frac1{n+k}\\right)$.",
+    statement: "\\sum_{i=1}^{n} \\frac{1}{i(i+1)} = 1 - \\frac{1}{n+1} = \\frac{n}{n+1}",
+    setup: "Each term splits into two fractions, and neighboring terms cancel.",
+    after: "Each term is $\\frac{1}{i(i+1)} = \\frac1i - \\frac1{i+1}$, so everything cancels except $1 - \\frac1{n+1}$. For $\\frac{1}{i(i+k)}$ see Partial Fractions.",
     whenToUse: "A long sum of fractions whose denominators are products of nearby numbers.",
-    recall: [{ lhs: "\\frac{1}{n(n+1)} =", answer: "\\frac{1}{n}-\\frac{1}{n+1}", vars: { n: [1, 9] }, form: "sum" }],
+    recall: [{ lhs: "\\frac{1}{1\\cdot2} + \\frac{1}{2\\cdot3} + \\cdots + \\frac{1}{n(n+1)} =", answer: "\\frac{n}{n+1}", vars: { n: [2, 9] } }],
     related: ["arithmetic-series", "geometric-series"],
     problems: [
       {
@@ -200,9 +200,9 @@ export const ALGEBRA = defineTopic("Algebra", [
       },
       {
         id: "te2",
-        text: "Evaluate $\\frac{1}{1\\cdot3} + \\frac{1}{3\\cdot5} + \\cdots + \\frac{1}{19\\cdot21}$.",
-        answer: "\\frac{10}{21}",
-        solution: "Each term is $\\frac12\\left(\\frac1n - \\frac1{n+2}\\right)$, so the sum is $\\frac12\\left(1 - \\frac1{21}\\right) = \\frac{10}{21}$.",
+        text: "Evaluate $\\frac{1}{\\sqrt1+\\sqrt2} + \\frac{1}{\\sqrt2+\\sqrt3} + \\cdots + \\frac{1}{\\sqrt{99}+\\sqrt{100}}$.",
+        answer: "9",
+        solution: "Multiplying each term by its conjugate gives $\\sqrt{n+1} - \\sqrt n$, so the sum telescopes to $\\sqrt{100} - \\sqrt1 = 9$.",
       },
     ],
   },

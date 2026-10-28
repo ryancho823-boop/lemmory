@@ -3,7 +3,7 @@ import { isNew } from "@lemmory/core/srs";
 import { getUnlockedView } from "@/lib/session";
 import { Practice } from "./Practice";
 
-export const metadata = { title: "Practice all · Lemmory" };
+export const metadata = { title: "Practice · Lemmory" };
 
 export default async function PracticePage() {
   const v = await getUnlockedView();

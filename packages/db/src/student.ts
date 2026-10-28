@@ -412,6 +412,25 @@ export async function findClassByCode(code: string) {
     .get();
 }
 
+/**
+ * Leave a class. The student's deck and history stay theirs; the class just stops counting them.
+ * Leaving the last one hands the days still to record to the student's own clock.
+ */
+export async function leaveClass(studentId: string, classId: string) {
+  await db.transaction(async (q) => {
+    const row = await q
+      .select({ settledThrough: enrollments.settledThrough })
+      .from(enrollments)
+      .where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)))
+      .get();
+    if (!row) return;
+    await q.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
+    if (!(await q.select({ c: enrollments.classId }).from(enrollments).where(eq(enrollments.studentId, studentId)).get())) {
+      await q.update(users).set({ settledThrough: row.settledThrough }).where(eq(users.id, studentId));
+    }
+  });
+}
+
 /** Join another class (students can be in several). Its assigned formulas join the student's deck. */
 export async function joinClass(studentId: string, classId: string) {
   await db.transaction(async (q) => {

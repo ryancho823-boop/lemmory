@@ -114,7 +114,7 @@ export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
   const deckTopics = TOPICS.filter((t) => deck.some((c) => c.topic === t));
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title="Practice all" info="Run through your whole deck right before a contest to sharpen short-term memory." />
+      <PageHeader title="Practice" info="Run through the cards you have already reviewed, right before a contest. Cards that are new today or still waiting in today's review are left out, since practice shows the answers." />
       <Panel className="p-6 sm:p-8">
         <div className="flex items-start gap-3 rounded-2xl bg-canvas p-4 text-sm text-ink/70">
           <Zap size={18} className="mt-0.5 shrink-0 text-lemon-deep" />
@@ -126,7 +126,7 @@ export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
         <p className="mt-6 text-sm font-bold">Topics</p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Chip active={topics.length === 0} onClick={() => setTopics([])}>
-            Everything
+            All my cards
           </Chip>
           {deckTopics.map((t) => (
             <Chip key={t} active={topics.includes(t)} onClick={() => toggle(t)} color={TOPIC_COLOR[t]}>
@@ -135,7 +135,7 @@ export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
           ))}
         </div>
         <Button size="lg" className="mt-8 w-full" onClick={start} disabled={!chosen.length}>
-          Practice {chosen.length} cards <ArrowRight size={18} />
+          Practice {chosen.length} {chosen.length === 1 ? "card" : "cards"} <ArrowRight size={18} />
         </Button>
         {deck.length === 0 && <p className="mt-3 text-center text-sm text-ink/50">Cards show up here once you&apos;ve reviewed them at least once.</p>}
       </Panel>

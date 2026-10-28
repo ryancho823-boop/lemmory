@@ -18,16 +18,19 @@ export default async function ClassPage() {
   const inClass = v.classes.length > 0;
   // A class covers the student unless its teacher's trial ended unpaid.
   const classEnded = inClass && !covered;
-  const planPanel = (
-    <Panel className="p-5">
-      <h2 className="text-[17px] font-semibold">{covered ? "Your plan" : "Individual plan"}</h2>
-      {covered && state !== "active" && state !== "trial" ? (
-        <p className="mt-1 text-ink/75">Your class covers you, so there&apos;s nothing to pay.</p>
-      ) : (
+  // A class covers the student: they never see the individual plan unless they were already paying for it.
+  const planPanel =
+    covered && state !== "active" ? (
+      <Panel className="p-5">
+        <h2 className="text-[17px] font-semibold">Covered by your teacher</h2>
+        <p className="mt-1 text-ink/75">There&apos;s nothing for you to pay.</p>
+      </Panel>
+    ) : (
+      <Panel className="p-5">
+        <h2 className="text-[17px] font-semibold">{covered ? "Your plan" : "Individual plan"}</h2>
         <StudentPlan price={PRICES.student.monthly} body={PRICES.student.body} trialDays={TRIAL_DAYS} state={state} endsOn={fmt(endsAt)} />
-      )}
-    </Panel>
-  );
+      </Panel>
+    );
   const joinPanel = (
     <Panel className="p-5">
       <h2 className="text-[17px] font-semibold">{inClass ? "Join another class" : "Have a class code?"}</h2>

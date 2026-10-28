@@ -78,7 +78,7 @@ The demo only includes 22 of the formulas (`DEMO_IDS` in `apps/site/lib/demo.ts`
 
 ## The student site (`apps/student`)
 
-- Sign up with a class code. Pages: Home (today's cards), Review, My deck, Practice all (cram mode, not recorded), Formula bank, My stats, Leaderboard, My classes.
+- Sign up with a class code. Pages: Home (today's cards), Review, My deck, Practice (cram mode, not recorded), Formula bank, My stats, Leaderboard, My classes.
 - A student can be in several classes (switch from the sidebar). Their deck is shared across all of them.
 - **Recall cards:** type the formula with Desmos-style input; any equivalent form counts, and a one-letter typo gets one free retry.
 - **Application cards:** pick the formula(s) a problem needs, then solve it. A wrong pick ends the card, and it comes back later.
