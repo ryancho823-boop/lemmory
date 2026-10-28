@@ -9,7 +9,7 @@ import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@/components/Leaderboard";
-import { Button, Meter, Panel, PanelHeader, Skeleton, pct } from "@lemmory/ui/ui";
+import { Button, Meter, Panel, PanelHeader, Skeleton, tries } from "@lemmory/ui/ui";
 
 export default function StudentHome() {
   const { ready, you, today, doneToday, nothingDue, buildQueue, state } = useStore();
@@ -87,7 +87,7 @@ export default function StudentHome() {
                     </span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {pct(w.accuracy)} <span className="text-ink/70">right</span>
+                      {tries(w.n, w.accuracy)}{w.n >= 3 && <span className="text-ink/70"> right</span>}
                     </span>
                   </Link>
                 </li>

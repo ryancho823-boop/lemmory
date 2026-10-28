@@ -45,6 +45,8 @@ function keepAboveKeyboard() {
 export interface MathInputHandle {
   focus: () => void;
   clear: () => void;
+  /** Types a toolbar symbol into the field, as if its button had been clicked. */
+  insert: (latex: string) => void;
 }
 
 const TOOLS: { label: string; latex: string; insert: string }[] = [
@@ -125,8 +127,14 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
     if (mf.current) mf.current.readOnly = !!disabled;
   }, [disabled, loaded]);
 
+  const insert = (latex: string) => {
+    mf.current?.insert(latex, { focus: true, selectionMode: "placeholder" });
+    if (mf.current) onChange(mf.current.value);
+  };
+
   useImperativeHandle(ref, () => ({
     focus: () => mf.current?.focus(),
+    insert,
     clear: () => {
       if (mf.current) mf.current.value = "";
       onChange("");
@@ -151,26 +159,28 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
           <div className="h-9 animate-pulse rounded-lg bg-ink/5" />
         )}
       </div>
-      {tools && !disabled && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {TOOLS.map((t) => (
-            <button
-              key={t.label}
-              type="button"
-              title={t.label}
-              aria-label={`Insert ${t.label}`}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                mf.current?.insert(t.insert, { focus: true, selectionMode: "placeholder" });
-                if (mf.current) onChange(mf.current.value);
-              }}
-              className="h-8 min-w-9 rounded-lg border border-line bg-white px-2 text-[13px] text-ink/75 transition-colors hover:border-ink/30 hover:bg-canvas"
-            >
-              <Tex math={t.latex} />
-            </button>
-          ))}
-        </div>
-      )}
+      {tools && !disabled && <MathToolbar onInsert={insert} />}
     </div>
   );
 });
+
+/** The symbol buttons. Cards with several boxes show one, in a fixed place below all of them. */
+export function MathToolbar({ onInsert }: { onInsert: (latex: string) => void }) {
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {TOOLS.map((t) => (
+        <button
+          key={t.label}
+          type="button"
+          title={t.label}
+          aria-label={`Insert ${t.label}`}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => onInsert(t.insert)}
+          className="h-8 min-w-9 rounded-lg border border-line bg-white px-2 text-[13px] text-ink/75 transition-colors hover:border-ink/30 hover:bg-canvas"
+        >
+          <Tex math={t.latex} />
+        </button>
+      ))}
+    </div>
+  );
+}

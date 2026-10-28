@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { Check, X } from "lucide-react";
 import type { RecallPrompt, RecallResult } from "@lemmory/core/check";
-import { MathInput, type MathInputHandle } from "../MathInput";
+import { MathInput, MathToolbar, type MathInputHandle } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, TopicTag } from "../ui";
 import { Figure } from "../Figure";
@@ -27,7 +27,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
   const [typos, setTypos] = useState<boolean[] | null>(null);
   const [error, setError] = useState(false);
   const [pending, start] = useTransition();
-  // The toolbar stays under the last-focused box so the layout never jumps mid-click. A card that
+  // One toolbar sits below all the boxes and types into the last-focused one, so nothing moves mid-click. A card that
   // doesn't take focus (the homepage) keeps it hidden until the box is clicked.
   const [active, setActive] = useState(autoFocus ? 0 : -1);
   const inputs = useRef<(MathInputHandle | null)[]>([]);
@@ -74,14 +74,14 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
             <div className="shrink-0 pt-3 text-lg sm:min-w-40 sm:text-right">
               <Tex math={`\\displaystyle ${b.lhs}`} />
             </div>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <MathInput
                 ref={(h) => {
                   inputs.current[i] = h;
                 }}
                 autoFocus={autoFocus && i === 0}
                 disabled={!!results}
-                tools={!results && active === i}
+                tools={false}
                 onFocus={() => setActive(i)}
                 state={results ? (results[i] ? "right" : "wrong") : typos?.[i] ? "typo" : "idle"}
                 onChange={(v) => setValues((vs) => vs.map((x, j) => (j === i ? v : x)))}
@@ -104,6 +104,11 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
             </div>
           </div>
         ))}
+        {!results && active >= 0 && (
+          <div className="sm:pl-44">
+            <MathToolbar onInsert={(latex) => inputs.current[active]?.insert(latex)} />
+          </div>
+        )}
       </div>
 
       {graded && (

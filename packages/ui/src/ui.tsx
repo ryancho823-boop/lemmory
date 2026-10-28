@@ -99,6 +99,9 @@ export function Stat({ label, value, hint, icon }: { label: string; value: React
   );
 }
 
+/** A first-try rate for a formula; with only a few tries the counts say more than a percentage. */
+export const tries = (n: number, accuracy: number | null) =>
+  accuracy === null ? "–" : n < 3 ? `Missed ${n - Math.round(accuracy * n)} of ${n}` : pct(accuracy);
 export const pct = (x: number | null | undefined) => (x === null || x === undefined ? "–" : `${Math.round(x * 100)}%`);
 
 export function Meter({ value, className }: { value: number | null; className?: string }) {

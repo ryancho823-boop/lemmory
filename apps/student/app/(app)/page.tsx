@@ -5,7 +5,7 @@ import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
-import { Button, Meter, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
+import { Button, Meter, Panel, PanelHeader, tries } from "@lemmory/ui/ui";
 import { getUnlockedView } from "@/lib/session";
 import { StarterDeck } from "./StarterDeck";
 
@@ -106,7 +106,7 @@ function Today({ v, s, bonus, fresh, weak }: { v: Awaited<ReturnType<typeof getU
                     </span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {pct(w.accuracy)} <span className="text-ink/70">right</span>
+                      {tries(w.n, w.accuracy)}{w.n >= 3 && <span className="text-ink/70"> right</span>}
                     </span>
                   </Link>
                 </li>

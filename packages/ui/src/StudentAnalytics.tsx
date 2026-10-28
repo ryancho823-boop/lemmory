@@ -10,7 +10,7 @@ import {
   weakest,
 } from "@lemmory/core/analytics";
 import { BarList, WeekGrid } from "./charts";
-import { Meter, Panel, PanelHeader, StatStrip, pct } from "./ui";
+import { Meter, Panel, PanelHeader, StatStrip, pct, tries } from "./ui";
 
 /** A student's analytics: used for "My stats" and the teacher's per-student page. */
 export function StudentAnalytics({
@@ -82,7 +82,7 @@ export function StudentAnalytics({
                     />
                     <span className="min-w-0 flex-1 truncate font-semibold">{f.name}</span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
-                    <span className="w-10 text-right tabular-nums">{pct(w.accuracy)}</span>
+                    <span className="shrink-0 text-right tabular-nums">{tries(w.n, w.accuracy)}</span>
                   </Link>
                 </li>
               );

@@ -44,7 +44,7 @@ export function TryIt() {
       {/* A fixed minimum height (step 2 with its feedback), so the card doesn't jump as it changes. */}
       <div className="min-h-[430px] p-6">
         {result !== null ? (
-          <div className="py-10 text-center">
+          <div className="flex min-h-[380px] flex-col items-center justify-center text-center">
             <CheckCircle2 size={44} className="mx-auto text-good" />
             <p className="mt-3 text-xl font-extrabold">{result ? "That's the whole card: recalled, then used." : "That one's done. You'll get it next time."}</p>
             <p className="mt-1 text-ink/55">In the app, FSRS now picks the day it comes back.</p>

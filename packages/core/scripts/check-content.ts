@@ -47,7 +47,7 @@ for (const f of FORMULAS) {
 const g = (id: string, i: number, s: string) => gradeRecall(FORMULA_BY_ID[id].recall[i], s);
 const cases: [string, number, string, boolean][] = [
   ["sum-of-cubes", 0, "a^3+b^3", false], ["sum-of-cubes", 0, "(a+b)\\left(a^2-ab+b^2\\right)", true],
-  ["sfft", 0, "xy+ax+by+ab", false], ["telescoping", 0, "\\frac{1}{n(n+1)}", false], ["telescoping", 0, "\\frac1n-\\frac{1}{n+1}", true],
+  ["sfft", 0, "xy+ax+by+ab", false], ["telescoping", 0, "\\frac{1}{n(n+1)}", false], ["telescoping", 0, "\\frac{n}{n+1}", true], ["telescoping", 0, "1-\\frac{1}{n+1}", true],
   ["change-of-base", 0, "\\frac{\\log a}{\\log b}", true], ["change-of-base", 0, "\\log_{b}a", false],
   ["double-angle", 0, "\\sin2x", false], ["double-angle", 1, "1-2\\sin^2x", true], ["double-angle", 1, "2\\cos^2x-1", true],
   ["wilson", 0, "p-1", true], ["wilson", 0, "-1", true],

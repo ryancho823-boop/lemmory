@@ -16,7 +16,7 @@ const NAV: Record<Role, { href: string; label: string; exact?: boolean }[]> = {
   student: [
     { href: "/student", label: "Home", exact: true },
     { href: "/student/deck", label: "My deck" },
-    { href: "/student/practice", label: "Practice all" },
+    { href: "/student/practice", label: "Practice" },
     { href: "/student/bank", label: "Formula bank" },
     { href: "/student/stats", label: "My stats" },
     { href: "/student/leaderboard", label: "Leaderboard" },

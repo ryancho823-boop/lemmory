@@ -133,3 +133,18 @@ test("wrong answers count in the stats right away, even if the student stops bef
   assert.equal(log.length, 5);
   assert.equal(log.filter((l) => l.firstTry).length, 2);
 });
+
+test("leaving a class keeps the deck, and leaving the last one makes the student a solo student", async () => {
+  const leaver = (await createStudent("Leave Test", "leaver", "correct-horse", "UTC"))!;
+  await student.joinClass(leaver, classA);
+  await student.joinClass(leaver, classB);
+  const deckSize = async () => (await db.select().from(schema.cards).where(eq(schema.cards.studentId, leaver))).length;
+  const before = await deckSize();
+  await student.leaveClass(leaver, classA);
+  assert.deepEqual((await student.studentClasses(leaver)).map((c) => c.id), [classB]);
+  await student.leaveClass(leaver, classB);
+  assert.equal((await student.studentClasses(leaver)).length, 0);
+  assert.equal(await deckSize(), before, "the cards stay");
+  assert.equal(await student.canStudentReview(leaver), false, "nothing covers them any more");
+  await student.leaveClass(leaver, classB);
+});

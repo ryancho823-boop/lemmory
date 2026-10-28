@@ -51,7 +51,7 @@ export function StudentShell({
       nav={[
         { href: "/", label: "Home", exact: true, also: ["/review"], dot: !doneToday },
         { href: "/deck", label: "My deck" },
-        { href: "/practice", label: "Practice all" },
+        { href: "/practice", label: "Practice" },
         { href: "/bank", label: "Formula bank" },
         { href: "/stats", label: "My stats" },
         { href: "/leaderboard", label: "Leaderboard" },

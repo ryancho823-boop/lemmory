@@ -23,6 +23,7 @@ import {
   findClassByCode,
   finishIfEmpty,
   joinClass,
+  leaveClass,
   studentClasses,
   promptFor,
   removeFromDeck,
@@ -155,6 +156,15 @@ export async function switchClass(classId: unknown) {
   if (!(await studentClasses(studentId)).some((c) => c.id === id)) throw new ReviewError("Not in that class");
   await showClass(id);
   refresh();
+}
+
+/** Leave one of the student's classes. Their deck and progress stay. */
+export async function leaveClassAction(classId: unknown) {
+  const studentId = await me();
+  await leaveClass(studentId, str(classId));
+  (await cookies()).delete(CLASS_COOKIE);
+  revalidatePath("/", "layout");
+  redirect("/class");
 }
 
 /** Start the free trial of the individual plan. One per person: see trialProblem in billing. */
