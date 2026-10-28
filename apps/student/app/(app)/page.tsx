@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
-import { streak, streakBonus, weakest } from "@lemmory/core/analytics";
+import { streak, weakest } from "@lemmory/core/analytics";
 import { isNew } from "@lemmory/core/srs";
 import { InfoTip } from "@lemmory/ui/InfoTip";
 import { Leaderboard } from "@lemmory/ui/Leaderboard";
@@ -15,8 +15,6 @@ export default async function StudentHome() {
   const s = streak(v.record.doneDays, v.today);
   const fresh = v.queue.filter((id) => isNew(v.record.cards[id])).length;
   const weak = weakest(me, v.today, 5);
-  // Finishing today continues the streak (or starts one), so the bonus is for streak + 1.
-  const bonus = streakBonus(v.doneToday ? s : s + 1);
   const emptyDeck = Object.keys(v.record.cards).length === 0;
 
   return (
@@ -38,12 +36,12 @@ export default async function StudentHome() {
       )}
 
       {/* Nothing to review until there's a deck: the starter deck picker above comes first. */}
-      {!(emptyDeck && !v.klass) && <Today v={v} s={s} bonus={bonus} fresh={fresh} weak={weak} />}
+      {!(emptyDeck && !v.klass) && <Today v={v} s={s} fresh={fresh} weak={weak} />}
     </div>
   );
 }
 
-function Today({ v, s, bonus, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlockedView>>; s: number; bonus: number; fresh: number; weak: ReturnType<typeof weakest> }) {
+function Today({ v, s, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlockedView>>; s: number; fresh: number; weak: ReturnType<typeof weakest> }) {
   return (
     <>
       {/* Do your cards */}
@@ -65,11 +63,6 @@ function Today({ v, s, bonus, fresh, weak }: { v: Awaited<ReturnType<typeof getU
                   About {Math.max(2, Math.round(v.queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>
               </p>
-              {v.klass && (
-                <p className="mt-1.5 flex items-center gap-1 text-ink/75">
-                  {s > 0 ? `Finish to keep your ${s}-day streak: +${bonus} bonus points` : `Finish to start a streak: +${bonus} bonus points`}
-                </p>
-              )}
             </div>
           )}
           {!v.doneToday && (
