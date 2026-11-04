@@ -33,7 +33,7 @@ export function ClassList({ classes, current }: { classes: { id: string; name: s
           </div>
           {leaving === c.id && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 bg-canvas px-5 py-3 text-sm">
-              <span className="flex-1">Leave {c.name}? Your deck and progress stay with you.</span>
+              <span className="flex-1">Leave {c.name}? Your deck and progress stay with you.{classes.length === 1 && " Without a class or your own plan, reviews will lock."}</span>
               <button disabled={pending} onClick={() => start(() => leaveClassAction(c.id))} className="font-semibold text-bad hover:underline">
                 {pending ? "Leaving…" : "Yes, leave"}
               </button>

@@ -33,8 +33,8 @@ function evaluate(latex: string, values: Record<string, number>): number | null 
   }
 }
 
-function close(a: number, b: number) {
-  return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b));
+function close(a: number, b: number, tolerance = 1e-6) {
+  return Math.abs(a - b) <= tolerance * Math.max(1, Math.abs(a), Math.abs(b));
 }
 
 /** Symbols in the student's answer that aren't allowed variables (catches typos like `ab\sin c`). */
@@ -130,7 +130,8 @@ function number(answer: string, input: string): boolean {
   if (strayUnknowns(input, []).length) return false;
   const want = evaluate(answer, {});
   const got = evaluate(input, {});
-  return want !== null && got !== null && close(want, got);
+  // Tight, so a big answer like 10,077,696 doesn't accept 10,077,690.
+  return want !== null && got !== null && close(want, got, 1e-10);
 }
 
 /** Shortest input (ignoring spaces) that is checked for typos, so a lone wrong letter isn't hinted. */

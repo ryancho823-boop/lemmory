@@ -18,11 +18,12 @@ export default async function Students({ params }: PageProps<"/c/[classId]/stude
       const weakTopic = weakestTopic(s, today, topicOf);
       return { s, m, weakTopic, progress: todayProgress(s, today) };
     })
-    .sort((a, b) => (a.m.accuracy ?? 1) - (b.m.accuracy ?? 1));
+    // Who needs a nudge first: students who haven't finished today (never started, then lowest accuracy), then the rest.
+    .sort((a, b) => Number(a.m.doneToday) - Number(b.m.doneToday) || (a.m.accuracy ?? -1) - (b.m.accuracy ?? -1));
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Students" sub={`${students.length} in ${klass.name}`} info="Sorted by lowest accuracy first. Click a student for their full analytics." />
+      <PageHeader title="Students" sub={`${students.length} in ${klass.name}`} info="Students who haven't finished today come first, lowest accuracy first, then everyone who has. Click a student for their full analytics." />
       {students.length > 0 && (
         <Panel className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">

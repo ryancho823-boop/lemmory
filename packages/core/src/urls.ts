@@ -5,5 +5,6 @@
 const dev = process.env.NODE_ENV === "development";
 const url = (value: string | undefined, local: string, live: string) => (value ?? (dev ? local : live)).replace(/\/$/, "");
 
+export const SITE_URL = url(process.env.NEXT_PUBLIC_SITE_URL, "http://localhost:3000", "https://lemmory-chi.vercel.app");
 export const STUDENT_URL = url(process.env.NEXT_PUBLIC_STUDENT_URL, "http://localhost:3001", "https://lemmory-student.vercel.app");
 export const TEACHER_URL = url(process.env.NEXT_PUBLIC_TEACHER_URL, "http://localhost:3002", "https://lemmory-teacher.vercel.app");

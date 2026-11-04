@@ -89,8 +89,8 @@ export function review(card: Card, firstTryCorrect: boolean, day: number): { car
   const next = scheduler.next(toFsrs(card.memory), toDate(day), firstTryCorrect ? Rating.Good : Rating.Again);
   const memory = fromFsrs(next.card, day);
   if (card.stage === "recall" && memory.stability >= PROMOTE_STABILITY) {
-    // Knows it cold: start training recognition, with its own fresh memory model.
-    return { card: { ...card, stage: "apply", memory: { ...freshMemory(day), due: day + 1 } }, promoted: true };
+    // Knows it cold: start training recognition, with its own fresh memory model (still a reviewed card).
+    return { card: { ...card, stage: "apply", memory: { ...freshMemory(day), due: day + 1, last: day } }, promoted: true };
   }
   return { card: { ...card, memory }, promoted: false };
 }
@@ -101,7 +101,8 @@ export function retrievability(card: Card, day: number): number | null {
   return scheduler.get_retrievability(toFsrs(card.memory), toDate(day), false);
 }
 
-export const isNew = (c: Card) => c.memory.last === null;
+/** Never reviewed. A card that graduated to application was reviewed (older saves left its `last` empty). */
+export const isNew = (c: Card) => c.stage === "recall" && c.memory.last === null;
 export const isDue = (c: Card, day: number) => c.memory.due <= day;
 export const isMastered = (c: Card) => c.stage === "apply" && c.memory.stability >= MASTERED_STABILITY;
 

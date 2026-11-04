@@ -37,5 +37,6 @@ test("a recall card that's known cold moves to application mode with a fresh sch
   }
   assert.ok(promoted, `never promoted (stability needs ${PROMOTE_STABILITY})`);
   assert.equal(card.stage, "apply");
+  assert.ok(!isNew(card), "a graduated card was reviewed, so it is not a new card");
   assert.equal(card.memory.reps, 0);
 });

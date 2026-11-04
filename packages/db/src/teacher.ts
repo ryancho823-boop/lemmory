@@ -6,7 +6,7 @@ import { dayInZone } from "@lemmory/core/days";
 import { isNew } from "@lemmory/core/srs";
 import { db } from "./client";
 import { hashPassword, newId, newJoinCode } from "./password";
-import { addAssignedCards, classToday, loadClass, loadRecords, toCard } from "./records";
+import { addAssignedCards, handDaysToStudents, classToday, loadClass, loadRecords, toCard } from "./records";
 import { assignments, cards, classes, enrollments, sessions, users } from "./schema";
 
 export class NotFound extends Error {}
@@ -167,7 +167,10 @@ export const studentInfo = enrolled;
 /** Remove a student from the class. Their account and history stay. */
 export async function removeStudent(teacherId: string, classId: string, studentId: string) {
   await enrolled(teacherId, classId, studentId);
-  await db.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
+  await db.transaction(async (q) => {
+    await handDaysToStudents(q, classId, studentId);
+    await q.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
+  });
 }
 
 /** Students forget passwords. The teacher can set a new one and signs them out everywhere. */
@@ -185,6 +188,7 @@ export async function deleteClass(teacherId: string, classId: string, typedName:
   const klass = await owned(teacherId, classId);
   if (typedName.trim().toLowerCase() !== klass.name.trim().toLowerCase()) return false;
   await db.transaction(async (q) => {
+    await handDaysToStudents(q, classId);
     await q.delete(enrollments).where(eq(enrollments.classId, classId));
     await q.delete(assignments).where(eq(assignments.classId, classId));
     await q.delete(classes).where(eq(classes.id, classId));

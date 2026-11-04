@@ -56,7 +56,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
           students.length > 0 && (
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 size={16} className="text-good" />
-              {done} of {students.length} students finished today&apos;s review
+              {done} of {students.length} {students.length === 1 ? "student" : "students"} finished today&apos;s review
             </span>
           )
         }

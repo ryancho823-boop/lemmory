@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Check, Plus, X } from "lucide-react";
 import type { BankEntry } from "@lemmory/core/bank";
 import { FormulaBrowser } from "@lemmory/ui/FormulaBrowser";
@@ -46,16 +46,7 @@ export function Assign({
         meta={(f) => (weekOf.has(f.id) ? `Week ${weekOf.get(f.id)}` : "")}
         action={(f) =>
           weekOf.has(f.id) ? (
-            <button
-              onClick={() => unassign(f.id)}
-              disabled={pending}
-              className="group inline-flex h-8 items-center gap-1.5 rounded-xl bg-good/10 px-3 text-sm font-semibold text-good hover:bg-bad/10 hover:text-bad"
-            >
-              <Check size={14} strokeWidth={3} className="group-hover:hidden" />
-              <X size={14} strokeWidth={3} className="hidden group-hover:block" />
-              <span className="group-hover:hidden">Assigned</span>
-              <span className="hidden group-hover:inline">Unassign</span>
-            </button>
+            <UnassignButton pending={pending} onUnassign={() => unassign(f.id)} />
           ) : (
             <Button size="sm" disabled={pending} onClick={() => assign(f.id)}>
               <Plus size={14} strokeWidth={3} /> Assign
@@ -64,5 +55,25 @@ export function Assign({
         }
       />
     </div>
+  );
+}
+
+/** "Assigned", and two taps to take it back: a tap on a touch screen has no hover to warn first. */
+function UnassignButton({ pending, onUnassign }: { pending: boolean; onUnassign: () => void }) {
+  const [sure, setSure] = useState(false);
+  useEffect(() => {
+    if (!sure) return;
+    const t = setTimeout(() => setSure(false), 4000);
+    return () => clearTimeout(t);
+  }, [sure]);
+  return (
+    <button
+      onClick={() => (sure ? onUnassign() : setSure(true))}
+      disabled={pending}
+      className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 text-sm font-semibold ${sure ? "bg-bad/10 text-bad" : "bg-good/10 text-good"}`}
+    >
+      {sure ? <X size={14} strokeWidth={3} /> : <Check size={14} strokeWidth={3} />}
+      {sure ? "Unassign?" : "Assigned"}
+    </button>
   );
 }

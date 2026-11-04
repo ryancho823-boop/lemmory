@@ -22,7 +22,7 @@ import { isNew } from "@lemmory/core/srs";
 import { type StarterLevel, starterDeck } from "@lemmory/core/starter";
 import { getStudentPlan, isOpen, planState, studentPlanState } from "./billing";
 import { db, type Tx } from "./client";
-import { addAssignedCards, classToday, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday, studentZones } from "./records";
+import { addAssignedCards, classToday, handDaysToStudents, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday, studentZones } from "./records";
 import { dayInZone } from "@lemmory/core/days";
 import { assignments, cards, classes, dailyScores, days, enrollments, plans, reviewSessions, reviews, users } from "./schema";
 
@@ -223,6 +223,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
   const nothing = { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
   // The first try is logged as it happens, right or wrong, so the stats include a miss even if
   // the student stops before getting the card right.
+  let logged = true;
   if (entry) {
     const inserted = await q
       .insert(reviews)
@@ -237,9 +238,9 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
       })
       .onConflictDoNothing()
       .returning({ id: reviews.id });
-    // Already answered today by another request sent at the same moment (a double click, a second
-    // tab): that one counts, this one changes nothing, so the card isn't logged or scored twice.
-    if (!inserted.length) return nothing;
+    // Today already has this card's first try (a day recorded under another time zone, say): it
+    // isn't logged or scored twice, but the card still moves on, or it could never be finished.
+    logged = inserted.length > 0;
   }
   if (!result) {
     await saveSession(q, studentId, done);
@@ -251,6 +252,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
   await Promise.all([
     // Points come from these daily totals, so keep them in step with the log (self-added cards earn none).
     card.source !== "self" &&
+      logged &&
       q
         .insert(dailyScores)
         .values({ studentId, day: today, n: 1 })
@@ -412,22 +414,19 @@ export async function findClassByCode(code: string) {
     .get();
 }
 
+/** Change the name teachers and classmates see (a typo at sign-up). */
+export async function renameStudent(studentId: string, name: string) {
+  await db.update(users).set({ name }).where(and(eq(users.id, studentId), eq(users.role, "student")));
+}
+
 /**
  * Leave a class. The student's deck and history stay theirs; the class just stops counting them.
  * Leaving the last one hands the days still to record to the student's own clock.
  */
 export async function leaveClass(studentId: string, classId: string) {
   await db.transaction(async (q) => {
-    const row = await q
-      .select({ settledThrough: enrollments.settledThrough })
-      .from(enrollments)
-      .where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)))
-      .get();
-    if (!row) return;
+    await handDaysToStudents(q, classId, studentId);
     await q.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
-    if (!(await q.select({ c: enrollments.classId }).from(enrollments).where(eq(enrollments.studentId, studentId)).get())) {
-      await q.update(users).set({ settledThrough: row.settledThrough }).where(eq(users.id, studentId));
-    }
   });
 }
 

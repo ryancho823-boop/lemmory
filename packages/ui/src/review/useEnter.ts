@@ -17,7 +17,8 @@ export function useEnter(on: boolean, fn: () => void) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Enter" || e.repeat || e.isComposing || e.defaultPrevented) return;
       const t = e.target as HTMLElement | null;
-      if (t?.closest("input, textarea, select, a")) return;
+      // Formula options are toggles: Enter on one picks it, the way Space does.
+      if (t?.closest("input, textarea, select, a, [aria-pressed]")) return;
       // A focused button would also be clicked by Enter; this runs instead, once.
       e.preventDefault();
       latest.current();

@@ -97,7 +97,18 @@ export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
           </button>
         </div>
         {error ? (
-          <Panel className="p-8 text-center text-sm font-semibold text-bad">Couldn&apos;t load the next card. Try again.</Panel>
+          <Panel className="p-8 text-center text-sm font-semibold text-bad">
+            Couldn&apos;t load the next card.{" "}
+            <button
+              className="underline"
+              onClick={() => {
+                setError(false);
+                load(run.queue[0]);
+              }}
+            >
+              Try again
+            </button>
+          </Panel>
         ) : run.prompt ? (
           <Panel key={run.attempt} className="rise p-6 sm:p-9">
             <CardView prompt={run.prompt} mode="practice" onDone={done} />
