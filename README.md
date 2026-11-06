@@ -110,8 +110,6 @@ See [DEPLOY.md](DEPLOY.md). Each site has a `/health` page (student and teacher)
 
 - Real payments in place of the simulated checkout
 - An admin page for approving school clubs (it's a command for now)
-- Teacher password reset by email (a signed-in teacher can change their password; students can ask their teacher to reset theirs)
 - Academy accounts with several teachers
 - Teacher-made formulas and problems
-- A weekly email to teachers and a daily reminder to students
 - A privacy and COPPA review before onboarding students under 13

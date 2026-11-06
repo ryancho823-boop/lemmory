@@ -5,9 +5,9 @@ import { pointsBetween } from "@lemmory/core/analytics";
 import { dayInZone } from "@lemmory/core/days";
 import { isNew } from "@lemmory/core/srs";
 import { db } from "./client";
-import { hashPassword, newId, newJoinCode } from "./password";
+import { newId, newJoinCode } from "./password";
 import { addAssignedCards, handDaysToStudents, classToday, loadClass, loadRecords, toCard } from "./records";
-import { assignments, cards, classes, enrollments, sessions, users } from "./schema";
+import { assignments, cards, classes, enrollments, users } from "./schema";
 
 export class NotFound extends Error {}
 
@@ -171,16 +171,6 @@ export async function removeStudent(teacherId: string, classId: string, studentI
     await handDaysToStudents(q, classId, studentId);
     await q.delete(enrollments).where(and(eq(enrollments.studentId, studentId), eq(enrollments.classId, classId)));
   });
-}
-
-/** Students forget passwords. The teacher can set a new one and signs them out everywhere. */
-export async function resetStudentPassword(teacherId: string, classId: string, studentId: string, password: string) {
-  await enrolled(teacherId, classId, studentId);
-  await db
-    .update(users)
-    .set({ passwordHash: await hashPassword(password) })
-    .where(eq(users.id, studentId));
-  await db.delete(sessions).where(eq(sessions.userId, studentId));
 }
 
 /** Delete a class: its roster and assignments go with it. Students keep their accounts and decks. */

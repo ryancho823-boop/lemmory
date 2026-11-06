@@ -20,6 +20,7 @@ export const requirePlan = cache(async () => {
   const user = await requireTeacher();
   const { state } = planState(await getPlan(user.id));
   if (state === "none" || state === "expired") redirect("/plan");
+  if (user.emailOverdue) redirect("/account");
   return user;
 });
 

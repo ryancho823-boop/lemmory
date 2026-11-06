@@ -20,6 +20,12 @@ export const LIMITS = {
   classCode: { max: 20, minutes: 60 },
   /** Wrong class codes from one network: a whole school shares one. */
   classCodeNetwork: { max: 150, minutes: 60 },
+  /** Confirmation emails asked for by one account. */
+  emailSend: { max: 6, minutes: 60 },
+  /** Password reset emails for one login. */
+  resetLogin: { max: 5, minutes: 60 },
+  /** Password reset requests from one network: a whole school shares one. */
+  resetNetwork: { max: 60, minutes: 60 },
   /** New accounts from one browser. */
   signup: { max: 10, minutes: 60 },
   /** New accounts from one network: a classroom signs up together. */
@@ -34,6 +40,9 @@ export const LIMIT_MESSAGE: Record<LimitKind, string> = {
   loginNetwork: "Too many wrong passwords from this network. Wait 15 minutes and try again.",
   classCode: "Too many wrong class codes. Wait an hour and try again, or check the code with your teacher.",
   classCodeNetwork: "Too many wrong class codes from this network. Wait an hour and try again, or check the code with your teacher.",
+  emailSend: "We've sent a few already. Check your spam folder, or try again in an hour.",
+  resetLogin: "We've sent a few already. Check your spam folder, or try again in an hour.",
+  resetNetwork: "Too many reset requests from this network. Try again in an hour.",
   signup: "Too many new accounts from here. Wait an hour and try again.",
   signupNetwork: "Too many new accounts from this network. Wait an hour and try again.",
 };

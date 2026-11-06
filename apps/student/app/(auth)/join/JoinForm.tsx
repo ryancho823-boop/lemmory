@@ -32,6 +32,7 @@ export function JoinForm({ code, onOwn }: { code: string; onOwn?: boolean }) {
         <Field label="Last name" name="lastName" required autoComplete="family-name" defaultValue={v?.lastName} />
       </div>
       <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username} />
+      <Field label="Email" name="email" type="email" required autoComplete="email" defaultValue={v?.email} hint="Yours or a parent's. We only use it for password resets." />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
       <p className="text-xs text-ink/70">

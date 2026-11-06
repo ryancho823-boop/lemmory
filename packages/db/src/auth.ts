@@ -13,6 +13,7 @@ export type Role = "teacher" | "student";
 /** Separate cookies per app, so both can be signed in on the same browser (and on localhost). */
 const COOKIE: Record<Role, string> = { teacher: "lemmory_teacher", student: "lemmory_student" };
 const SESSION_DAYS = 30;
+const EMAIL_GRACE_DAYS = 7;
 
 export async function startSession(userId: string, role: Role) {
   const token = randomBytes(32).toString("base64url");
@@ -41,13 +42,34 @@ export const currentUser = cache(async (role: Role) => {
   const token = (await cookies()).get(COOKIE[role])?.value;
   if (!token) return null;
   const row = await db
-    .select({ id: users.id, name: users.name, role: users.role, email: users.email, username: users.username, expiresAt: sessions.expiresAt })
+    .select({
+      id: users.id,
+      name: users.name,
+      role: users.role,
+      email: users.email,
+      username: users.username,
+      recoveryEmail: users.recoveryEmail,
+      emailConfirmedAt: users.emailConfirmedAt,
+      emailAddedAt: users.emailAddedAt,
+      expiresAt: sessions.expiresAt,
+    })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
     .where(eq(sessions.id, sha256(token)))
     .get();
   if (!row || row.role !== role || row.expiresAt < new Date()) return null;
-  return { id: row.id, name: row.name, email: row.email, username: row.username };
+  const contactEmail = role === "teacher" ? row.email : row.recoveryEmail;
+  const confirmed = row.emailConfirmedAt !== null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    username: row.username,
+    contactEmail,
+    emailConfirmed: confirmed,
+    // Everyone gets a week to click the link, so a class isn't held up waiting on inboxes.
+    emailOverdue: !contactEmail || (!confirmed && Date.now() - (row.emailAddedAt?.getTime() ?? 0) > EMAIL_GRACE_DAYS * 86_400_000),
+  };
 });
 
 export type SessionUser = NonNullable<Awaited<ReturnType<typeof currentUser>>>;

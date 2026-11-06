@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { isTimeZone, parseDate } from "@lemmory/core/days";
-import { changePassword, checkLogin, createTeacher, deleteAccount } from "@lemmory/db/accounts";
+import { changeEmail, changePassword, checkLogin, createTeacher, deleteAccount, requestPasswordReset, resetPasswordWithToken, sendConfirmation } from "@lemmory/db/accounts";
+import { setWeeklyReport, unsubscribe } from "@lemmory/db/report";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
 import { LIMIT_MESSAGE, isLimited, noteAttempt } from "@lemmory/db/limits";
 import { PASSWORD_MIN } from "@lemmory/db/password";
@@ -16,7 +17,6 @@ import {
   newClassCode,
   newGame,
   removeStudent,
-  resetStudentPassword,
   startNextWeek,
   unassign,
   updateClass,
@@ -81,8 +81,65 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   if (!id) return fail("There's already an account with that email. Log in instead.");
   await noteAttempt("signup", device);
   await noteAttempt("signupNetwork", ip);
+  await sendConfirmation(id, "teacher", values.email);
   await startSession(id, "teacher");
   redirect("/plan");
+}
+
+/** Change the email, which is also the login. Nothing changes until the link sent to the new address is clicked. */
+export async function changeMyEmail(_: FormState, fd: FormData): Promise<FormState> {
+  const id = await me();
+  if (await isLimited("emailSend", id)) return { error: LIMIT_MESSAGE.emailSend };
+  const email = field(fd, "email");
+  if (!EMAIL.test(email) || email.length > 200) return { error: "Enter a valid email." };
+  await noteAttempt("emailSend", id);
+  const error = await changeEmail(id, "teacher", email, String(fd.get("password") ?? ""));
+  if (error) return { error };
+  revalidatePath("/", "layout");
+  return { ok: "Link sent. Check that inbox, and its spam folder." };
+}
+
+/** Send the confirmation link again. */
+export async function resendConfirmation(): Promise<FormState> {
+  const user = await currentUser("teacher");
+  if (!user?.contactEmail) redirect("/login");
+  if (await isLimited("emailSend", user.id)) return { error: LIMIT_MESSAGE.emailSend };
+  await noteAttempt("emailSend", user.id);
+  await sendConfirmation(user.id, "teacher", user.contactEmail);
+  return { ok: "Sent." };
+}
+
+/** Email a reset link. The answer is the same whether or not the account exists. */
+export async function forgotPassword(_: FormState, fd: FormData): Promise<FormState> {
+  const login = field(fd, "login");
+  const { ip } = await requester();
+  if ((await isLimited("resetLogin", `teacher:${login}`)) || (await isLimited("resetNetwork", ip))) return { error: LIMIT_MESSAGE.resetLogin, values: { login } };
+  await noteAttempt("resetLogin", `teacher:${login}`);
+  await noteAttempt("resetNetwork", ip);
+  await requestPasswordReset("teacher", login);
+  return { ok: "If that matches an account with a confirmed email, a link is on its way. Check your spam folder too." };
+}
+
+/** Set a new password from an emailed link, then log in. */
+export async function resetPassword(token: string, _: FormState, fd: FormData): Promise<FormState> {
+  const password = String(fd.get("password") ?? "");
+  if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
+  if (password !== String(fd.get("confirm") ?? "")) return { error: "Those two passwords don't match." };
+  const id = await resetPasswordWithToken(str(token), "teacher", password);
+  if (!id) return { error: "This link doesn't work anymore. Ask for a new one." };
+  await startSession(id, "teacher");
+  redirect("/");
+}
+
+/** The weekly report switch on the Account page. */
+export async function setWeeklyReportAction(on: unknown) {
+  await setWeeklyReport(await me(), on === true);
+  refresh();
+}
+
+/** The button on the unsubscribe page, reached from the report without logging in. */
+export async function unsubscribeAction(token: string): Promise<FormState> {
+  return (await unsubscribe(str(token))) ? { ok: "You're unsubscribed." } : { error: "This link doesn't work. Turn the email off on your Account page." };
 }
 
 /** Change the signed-in user's password (the current one is needed); other devices are signed out. */
@@ -238,12 +295,4 @@ export async function newGameAction(classId: unknown) {
 export async function removeStudentAction(classId: unknown, studentId: unknown) {
   await removeStudent(await active(), str(classId), str(studentId));
   redirect(`/c/${str(classId)}/students`);
-}
-
-export async function resetPasswordAction(classId: string, studentId: string, _: FormState, fd: FormData): Promise<FormState> {
-  const teacherId = await active();
-  const password = String(fd.get("password") ?? "");
-  if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
-  await resetStudentPassword(teacherId, str(classId), str(studentId), password);
-  return { ok: "Password changed. Give it to the student; they've been signed out everywhere." };
 }
