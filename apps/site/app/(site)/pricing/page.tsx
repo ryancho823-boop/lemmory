@@ -84,7 +84,7 @@ export default function Pricing() {
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
           <p className="mt-3 max-w-2xl text-lg">Flashcard apps aren&apos;t built for contests. Contest courses are mostly practice.</p>
-          <div className="mt-14 grid items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 xl:gap-14">
+          <div className="mt-14 grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 xl:gap-14">
             <CompetitorMap />
             <div>
               <div className="overflow-x-auto">
