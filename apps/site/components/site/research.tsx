@@ -39,10 +39,10 @@ export const RESEARCH = [
   },
 ];
 
-// The chart's colors: ink for the axes and the no-review curve, blue for the spaced-review curve.
+// The chart's colors: ink for everything, with the no-review curve dashed and faded.
 const CHART_INK = "#0f1121";
-const CHART_BLUE = "#2a78d6";
-const CHART_BLUE_DARK = "#1c5cab";
+const CHART_LINE = "#0f1121";
+const CHART_LABEL = "#0f1121";
 
 /** Illustration: FSRS forgetting curve with and without spaced reviews. */
 export function ForgettingCurve() {
@@ -67,7 +67,7 @@ export function ForgettingCurve() {
   });
 
   return (
-    <figure className="rounded-3xl border border-line p-5">
+    <figure>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Forgetting curve with and without spaced reviews">
         {[0.25, 0.5, 0.75, 1].map((g) => (
           <g key={g}>
@@ -83,14 +83,14 @@ export function ForgettingCurve() {
           </text>
         ))}
         <polyline points={noReview.join(" ")} fill="none" stroke={CHART_INK} strokeOpacity={0.3} strokeWidth={2} strokeDasharray="5 5" />
-        <polyline points={spaced.join(" ")} fill="none" stroke={CHART_BLUE} strokeWidth={2.5} strokeLinejoin="round" />
+        <polyline points={spaced.join(" ")} fill="none" stroke={CHART_LINE} strokeWidth={2.5} strokeLinejoin="round" />
         {reviews.slice(1).map((rv) => (
-          <circle key={rv.at} cx={x(rv.at)} cy={y(1)} r={5} fill={CHART_BLUE} stroke="white" strokeWidth={2} />
+          <circle key={rv.at} cx={x(rv.at)} cy={y(1)} r={5} fill={CHART_LINE} stroke="white" strokeWidth={2} />
         ))}
         <text x={x(31)} y={y(R(31, 1)) + 18} fontSize={12} fill={CHART_INK} fillOpacity={0.55}>
           No review
         </text>
-        <text x={x(22)} y={y(0.97) - 8} fontSize={12} fontWeight={700} fill={CHART_BLUE_DARK}>
+        <text x={x(22)} y={y(0.97) - 8} fontSize={12} fontWeight={700} fill={CHART_LABEL}>
           With Lemmory reviews
         </text>
       </svg>
