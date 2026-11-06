@@ -3,6 +3,7 @@
 
 import { simulate as run } from "@lemmory/core/sim";
 import type { Assignment, StudentRecord } from "@lemmory/core/records";
+import { contestLabel as label } from "@lemmory/core/days";
 import { BANK } from "./bank";
 
 export { CLASSMATES, YOU, seedAssignments } from "@lemmory/core/sim";
@@ -17,15 +18,17 @@ export const simulate = (
 ): StudentRecord => run(profile, assignments, until, BANK, opts);
 
 export const CLASS_NAME = "Long-Term AMC 10 Course";
-// The 2026 AMC 10A is on November 5 (maa.org/AMC).
-export const CONTEST = "AMC 10A · Nov 5";
+// The real contests, in order (maa.org/AMC and maa.org/maa-invitational-competitions). Add the next
+// season's dates when the MAA publishes them.
+const CONTESTS = [
+  { name: "AMC 10A", date: Date.UTC(2026, 10, 5) },
+  { name: "AMC 10B", date: Date.UTC(2026, 10, 13) },
+  { name: "AIME", date: Date.UTC(2027, 1, 5) },
+];
+export const CONTEST = "AMC 10";
 
-/** The contest label with a countdown from `today` (a local day number) to the next Nov 5. */
+/** The next contest on or after `today` (a local day number), with its countdown. */
 export function contestLabel(today: number) {
-  const DAY = 86_400_000;
-  const year = new Date(today * DAY).getUTCFullYear();
-  let contest = Date.UTC(year, 10, 5) / DAY;
-  if (contest < today) contest = Date.UTC(year + 1, 10, 5) / DAY;
-  const n = contest - today;
-  return `${CONTEST} · ${n === 0 ? "today" : n === 1 ? "tomorrow" : `${n} days away`}`;
+  const next = CONTESTS.find((c) => c.date / 86_400_000 >= today);
+  return next ? label(next.name, next.date / 86_400_000, today) : CONTEST;
 }
