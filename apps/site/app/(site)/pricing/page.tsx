@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { Container, PageIntro } from "@/components/site/blocks";
+import { CompetitorMap } from "@/components/site/CompetitorMap";
 import { INDIVIDUAL_SIGNUP_URL, SIGNUP_URL } from "@/lib/links";
 import { TIER_ACCENT, TRIAL_DAYS, TIERS } from "@/lib/pricing";
 import { TOTAL_FORMULAS } from "@/lib/bank";
@@ -27,10 +29,26 @@ const COMPARE = {
   ],
 };
 
+// The same comparison at a glance, in the two groups the chart shows. The full table above is what
+// these cells summarize, so change them together.
+const GLANCE = {
+  columns: ["Lemmory", "Contest practice", "Flashcard apps"],
+  note: "Contest practice: Alcumus, Achievable. Flashcard apps: Anki, Quizlet, Podsie.",
+  rows: [
+    { label: "Built for contests", cells: ["Yes", "Yes", "No"] },
+    { label: "Long-term memory", cells: ["Yes", "Partly", "Yes"] },
+    { label: "Teaches when to use it", cells: ["Yes", "Problems only", "Make your own"] },
+    { label: "Grades any equivalent form", cells: ["Yes", "Partly", "Mostly no"] },
+    { label: "Ready on day one", cells: ["Yes", "Yes", "Make your own"] },
+    { label: "Shows what the class forgets", cells: ["Yes", "Partly", "Partly"] },
+    { label: "Price", cells: ["From $2/mo", "Free to $99", "Free to $36/yr"] },
+  ],
+};
+
 export default function Pricing() {
   return (
     <div>
-      <section className="bg-lemon">
+      <section className="border-b-2 border-ink bg-lemon">
         <Container className="pb-16 pt-14 sm:pt-20">
           <PageIntro title={INTRO.title} sub={INTRO.sub} />
         </Container>
@@ -65,8 +83,49 @@ export default function Pricing() {
       <section className="border-t border-line bg-white py-20">
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
-          <p className="mt-3 max-w-2xl text-lg">Alcumus trains solving. Lemmory makes sure the formulas from your course are still there in November.</p>
-          <div className="mt-8 overflow-x-auto rounded-lg border border-line">
+          <p className="mt-3 max-w-2xl text-lg">Flashcard apps aren&apos;t built for contests. Contest courses are mostly practice.</p>
+          <div className="mt-14 grid items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 xl:gap-14">
+            <CompetitorMap />
+            <div>
+              <div className="overflow-x-auto">
+                <table className="w-full whitespace-nowrap text-left">
+                  <thead>
+                    <tr className="text-sm">
+                      <th className="pb-3 pr-3" />
+                      {GLANCE.columns.map((c, i) => (
+                        <th key={c} className={i === 0 ? "rounded-t-lg bg-lemon-soft px-3 pb-3 pt-3 font-bold" : "px-3 pb-3 pt-3 font-semibold text-ink/70"}>
+                          {c}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {GLANCE.rows.map((r) => (
+                      <tr key={r.label}>
+                        <td className="border-t border-line py-3.5 pr-3 text-[15px]">{r.label}</td>
+                        {r.cells.map((c, i) => (
+                          <td key={i} className={i === 0 ? "border-t border-lemon bg-lemon-soft px-3 py-3.5 font-semibold" : "border-t border-line px-3 py-3.5 text-sm text-ink/70"}>
+                            {c === "Yes" ? (
+                              <>
+                                <Check size={17} strokeWidth={3} aria-hidden className="text-good" />
+                                <span className="sr-only">Yes</span>
+                              </>
+                            ) : (
+                              c
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-4 text-sm text-ink/60">{GLANCE.note}</p>
+            </div>
+          </div>
+          <details className="mt-14">
+            <summary className="cursor-pointer font-semibold hover:underline">See every tool, one by one</summary>
+          <div className="mt-4 overflow-x-auto rounded-lg border border-line">
             <table className="w-full min-w-[880px] text-left">
               <thead className="border-b border-line bg-canvas">
                 <tr>
@@ -92,6 +151,7 @@ export default function Pricing() {
               </tbody>
             </table>
           </div>
+          </details>
         </Container>
       </section>
     </div>

@@ -76,7 +76,9 @@ export function checkRecall(f: Formula, inputs: string[], allowTypo: boolean): R
 
 export function checkPick(problem: Problem, picked: string[], formulaById: Record<string, Formula>): PickResult {
   const want = new Set(problem.uses);
-  const right = picked.length === want.size && picked.every((id) => want.has(id));
+  // Picking the same formula twice is still one pick, so it can't stand in for a second formula.
+  const got = new Set(picked);
+  const right = got.size === want.size && [...got].every((id) => want.has(id));
   const shown = [...new Set([...problem.uses, ...picked])].filter((id) => formulaById[id]);
   return {
     right,
@@ -91,4 +93,4 @@ export function checkSolve(problem: Problem, input: string): SolveResult {
 }
 
 /** Formulas picked that the problem didn't need (recorded as mix-ups). */
-export const wrongPicks = (problem: Problem, picked: string[]) => picked.filter((id) => !problem.uses.includes(id));
+export const wrongPicks = (problem: Problem, picked: string[]) => [...new Set(picked)].filter((id) => !problem.uses.includes(id));

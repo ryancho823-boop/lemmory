@@ -32,7 +32,7 @@ export default function DeckPage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="My deck"
-        sub={`${cards.length} formulas`}
+        sub={`${cards.length} ${cards.length === 1 ? "formula" : "formulas"}`}
         action={
           !doneToday && (
             <Button href="/student/review" size="sm">

@@ -52,7 +52,7 @@ Other commands:
 
 - **Log in.** The main site's only button is **Log in** (`/login`), which asks "teacher or student?" and opens that site's login page: "Teacher log in" (email) or "Student log in" (username). Each has a **New? Sign up** link.
 - **Sign up.** One page with a **Teacher | Student** switch at the top. Teacher (`apps/teacher` at `/signup`): name, email, password. Student (`apps/student` at `/join`): class code, first and last name, username, password. The switch links between the two sites.
-- **Students on their own.** `/join?own=1` (linked as "No class code? Sign up on your own", and from the pricing pages) skips the class code. They land on **Plan & classes** to get the individual plan; without a class or that plan they can browse the bank but not review.
+- **Students on their own.** `/join?own=1` (linked as "No class code? Sign up on your own", and from the pricing pages) skips the class code. They land on **Plan & classes** to get the individual plan; without a class or that plan only Plan & classes and Account open: no bank, no review.
 - **Wrong details.** A wrong password and an unknown username or email get the same message ("That username and password don't match an account."), so logging in can't be used to find out who has an account. Sign-up does say when a teacher email or student username is taken: it has to, and sign-ups are rate-limited.
 - Already-logged-in visitors skip the login page. Sessions last 30 days.
 

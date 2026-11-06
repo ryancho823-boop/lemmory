@@ -29,3 +29,9 @@ test("long answers are refused at once instead of being worked on", () => {
 test("every real formula fits within the answer limit", () => {
   for (const f of Object.values(FORMULA_BY_ID)) for (const b of f.recall) assert.ok(b.answer.length <= MAX_TYPO_LENGTH, f.id);
 });
+
+test("a big answer doesn't accept a near miss", () => {
+  assert.ok(gradeNumber("10077696", "10077696"));
+  assert.ok(!gradeNumber("10077696", "10077690"));
+  assert.ok(gradeNumber("\\frac{\\sqrt{154}}{3}", "\\sqrt{\\frac{154}{9}}"));
+});

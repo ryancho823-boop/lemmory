@@ -7,6 +7,7 @@ import { MathInput, MathToolbar, type MathInputHandle } from "../MathInput";
 import { Rich, Tex } from "../Tex";
 import { Button, StageTag, TopicTag } from "../ui";
 import { Figure } from "../Figure";
+import { FailNote } from "./FailNote";
 import { useEnter } from "./useEnter";
 
 type Graded = Extract<RecallResult, { status: "graded" }>;
@@ -26,6 +27,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
   // Boxes that look one letter off. The server allows one free retry per card to fix a slip.
   const [typos, setTypos] = useState<boolean[] | null>(null);
   const [error, setError] = useState(false);
+  const [empty, setEmpty] = useState(false);
   const [pending, start] = useTransition();
   // One toolbar sits below all the boxes and types into the last-focused one, so nothing moves mid-click. A card that
   // doesn't take focus (the homepage) keeps it hidden until the box is clicked.
@@ -34,9 +36,16 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
   const results = graded?.results ?? null;
   const allRight = results?.every(Boolean) ?? false;
 
-  const check = (latest = values) => {
+  const check = (latest = values, giveUp = false) => {
     if (graded) return onDone(allRight);
     if (pending) return;
+    // An empty Check isn't an answer: say so instead of counting a miss ("I don't remember" is the way to give up).
+    if (!giveUp && latest.every((v) => !v.trim())) {
+      setEmpty(true);
+      inputs.current[Math.max(active, 0)]?.focus();
+      return;
+    }
+    setEmpty(false);
     start(async () => {
       try {
         const r = await onCheck(latest);
@@ -127,14 +136,19 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
           )}
         </Feedback>
       )}
-      {error && <p className="mt-4 text-sm font-semibold text-bad">Couldn&apos;t reach the server. Check your connection and try again.</p>}
+      {empty && !graded && (
+        <p role="status" className="mt-4 text-sm font-semibold text-bad">
+          Type your answer first, or press &quot;I don&apos;t remember&quot;.
+        </p>
+      )}
+      {error && <FailNote onRetry={() => setError(false)} />}
 
       <div className="mt-7 flex flex-wrap items-center gap-2">
         <Button size="lg" onClick={() => check()} disabled={pending}>
           {graded ? "Continue" : pending ? "Checking…" : "Check"}
         </Button>
         {!graded && (
-          <Button variant="ghost" size="lg" disabled={pending} onClick={() => check(prompt.blanks.map(() => ""))}>
+          <Button variant="ghost" size="lg" disabled={pending} onClick={() => check(prompt.blanks.map(() => ""), true)}>
             I don&apos;t remember
           </Button>
         )}

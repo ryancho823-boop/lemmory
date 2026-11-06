@@ -17,6 +17,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       sub={deleted ? "Your account and everything in it were deleted." : "Log in with your username."}
       foot={
         <>
+          <p>Forgot your password? Ask your teacher to reset it.</p>
           <p>
             New?{" "}
             <Link href="/join" className="font-semibold text-ink underline">

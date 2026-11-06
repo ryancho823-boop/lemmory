@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { SITE_URL } from "@lemmory/core/urls";
 import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
 import { TimeZoneField } from "../TimeZoneField";
@@ -33,6 +34,17 @@ export function JoinForm({ code, onOwn }: { code: string; onOwn?: boolean }) {
       <Field label="Username" name="username" required autoComplete="username" autoCapitalize="none" defaultValue={v?.username} />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
+      <p className="text-xs text-ink/70">
+        By signing up you agree to the{" "}
+        <a href={`${SITE_URL}/terms`} className="underline">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href={`${SITE_URL}/privacy`} className="underline">
+          Privacy Policy
+        </a>
+        . Under 13? Sign up through your teacher or with a parent or guardian.
+      </p>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Signing up…" : "Sign up"}
       </Button>

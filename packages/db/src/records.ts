@@ -205,3 +205,21 @@ export async function addAssignedCards(q: Tx, studentIds: string[], formulaIds: 
   }
   if (fresh.length) await q.insert(cards).values(fresh);
 }
+
+/**
+ * Take students out of a class (one of them, or all) without losing their days: a student left
+ * in no class continues on their own clock from where the class had recorded them.
+ * Run this before deleting the enrollments.
+ */
+export async function handDaysToStudents(q: Tx, classId: string, studentId?: string) {
+  const rows = await q
+    .select({ studentId: enrollments.studentId, settledThrough: enrollments.settledThrough })
+    .from(enrollments)
+    .where(studentId ? and(eq(enrollments.classId, classId), eq(enrollments.studentId, studentId)) : eq(enrollments.classId, classId));
+  if (!rows.length) return;
+  const count = new Map<string, number>();
+  const all = await q.select({ studentId: enrollments.studentId }).from(enrollments).where(inArray(enrollments.studentId, rows.map((r) => r.studentId)));
+  for (const r of all) count.set(r.studentId, (count.get(r.studentId) ?? 0) + 1);
+  // A student whose only class this is has nothing else holding their days.
+  for (const r of rows) if ((count.get(r.studentId) ?? 0) <= 1) await q.update(users).set({ settledThrough: r.settledThrough }).where(eq(users.id, r.studentId));
+}

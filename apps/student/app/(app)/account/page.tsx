@@ -3,15 +3,17 @@ import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
 import { PageHeader } from "@lemmory/ui/ui";
 import { changeMyPassword, deleteMyAccount } from "../../actions";
 import { getView } from "@/lib/session";
+import { RenameForm } from "./RenameForm";
 
 export const metadata = { title: "Account · Lemmory" };
 
 // Open even when nothing covers the student, like Plan & classes: they can always change or delete their account.
 export default async function AccountPage() {
-  await getView();
+  const v = await getView();
   return (
     <div className="mx-auto max-w-lg space-y-6">
       <PageHeader title="Account" />
+      <RenameForm name={v.me.name} username={v.me.username} />
       <ChangePasswordForm action={changeMyPassword} />
       <ConfirmForm
         title="Delete your account"

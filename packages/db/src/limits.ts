@@ -10,23 +10,32 @@ import { attempts } from "./schema";
  * class for free, or make accounts endlessly.
  */
 export const LIMITS = {
-  /** Wrong passwords for one account. */
+  /** Wrong passwords for one account (or, at login, for one account from one network). */
   loginAccount: { max: 10, minutes: 15 },
+  /** Wrong passwords for one account from anywhere, so guessing from many networks still stops. */
+  loginAccountAny: { max: 100, minutes: 15 },
   /** Wrong passwords from one network, across accounts. */
-  loginNetwork: { max: 50, minutes: 15 },
-  /** Wrong class codes from one network, browser or student. */
+  loginNetwork: { max: 150, minutes: 15 },
+  /** Wrong class codes from one browser or student. */
   classCode: { max: 20, minutes: 60 },
-  /** New accounts from one network or browser. */
+  /** Wrong class codes from one network: a whole school shares one. */
+  classCodeNetwork: { max: 150, minutes: 60 },
+  /** New accounts from one browser. */
   signup: { max: 10, minutes: 60 },
+  /** New accounts from one network: a classroom signs up together. */
+  signupNetwork: { max: 150, minutes: 60 },
 } as const;
 
 export type LimitKind = keyof typeof LIMITS;
 
 export const LIMIT_MESSAGE: Record<LimitKind, string> = {
   loginAccount: "Too many wrong passwords. Wait 15 minutes and try again.",
+  loginAccountAny: "Too many wrong passwords. Wait 15 minutes and try again.",
   loginNetwork: "Too many wrong passwords from this network. Wait 15 minutes and try again.",
   classCode: "Too many wrong class codes. Wait an hour and try again, or check the code with your teacher.",
+  classCodeNetwork: "Too many wrong class codes from this network. Wait an hour and try again, or check the code with your teacher.",
   signup: "Too many new accounts from here. Wait an hour and try again.",
+  signupNetwork: "Too many new accounts from this network. Wait an hour and try again.",
 };
 
 const keyOf = (kind: LimitKind, id: string) => sha256(`lemmory-limit:${kind}:${id.trim().toLowerCase()}`);

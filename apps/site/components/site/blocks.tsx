@@ -43,7 +43,7 @@ export function PageIntro({ title, sub }: { title: React.ReactNode; sub?: React.
 /** The closing band on a page: one line of pitch and the demo button. */
 export function DemoCTA({ title = "See it for yourself", sub = "Do a review as a student, then switch to the teacher view and watch your results show up." }) {
   return (
-    <section className="bg-lemon-soft">
+    <section className="border-t-2 border-ink bg-lemon">
       <Container className="flex flex-wrap items-end justify-between gap-8 py-20">
         <div className="max-w-xl">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h2>

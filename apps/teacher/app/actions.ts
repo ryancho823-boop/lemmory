@@ -53,11 +53,13 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const email = field(fd, "email");
   const { ip } = await requester();
-  if (await isLimited("loginAccount", `teacher:${email}`)) return { error: LIMIT_MESSAGE.loginAccount, values: { email } };
+  // Counted per account and network, so a stranger can't lock a teacher out of their own account.
+  if ((await isLimited("loginAccount", `teacher:${email}:${ip}`)) || (await isLimited("loginAccountAny", `teacher:${email}`))) return { error: LIMIT_MESSAGE.loginAccount, values: { email } };
   if (await isLimited("loginNetwork", ip)) return { error: LIMIT_MESSAGE.loginNetwork, values: { email } };
   const id = await checkLogin("teacher", email, String(fd.get("password") ?? ""));
   if (!id) {
-    await noteAttempt("loginAccount", `teacher:${email}`);
+    await noteAttempt("loginAccount", `teacher:${email}:${ip}`);
+    await noteAttempt("loginAccountAny", `teacher:${email}`);
     await noteAttempt("loginNetwork", ip);
     // The same answer whether or not the email has an account, so logging in can't be used to find out.
     return { error: "That email and password don't match an account.", values: { email } };
@@ -71,13 +73,14 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
   const { ip, device } = await requester();
-  if (await isLimited("signup", ip, device)) return fail(LIMIT_MESSAGE.signup);
+  if ((await isLimited("signup", device)) || (await isLimited("signupNetwork", ip))) return fail(LIMIT_MESSAGE.signup);
   if (values.name.length < 2 || values.name.length > 60) return fail("Enter the name students know you by, like Ms. Chen.");
   if (!EMAIL.test(values.email) || values.email.length > 200) return fail("Enter a valid email.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
   const id = await createTeacher(values.name, values.email, password);
   if (!id) return fail("There's already an account with that email. Log in instead.");
-  await noteAttempt("signup", ip, device);
+  await noteAttempt("signup", device);
+  await noteAttempt("signupNetwork", ip);
   await startSession(id, "teacher");
   redirect("/plan");
 }

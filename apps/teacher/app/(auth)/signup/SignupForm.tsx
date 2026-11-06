@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Field } from "@lemmory/ui/Shell";
+import { SITE_URL } from "@lemmory/core/urls";
 import { Button } from "@lemmory/ui/ui";
 import { signup } from "../../actions";
 
@@ -13,6 +14,17 @@ export function SignupForm() {
       <Field label="Email" name="email" type="email" required autoComplete="email" defaultValue={state?.values?.email} />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
+      <p className="text-xs text-ink/70">
+        By signing up you agree to the{" "}
+        <a href={`${SITE_URL}/terms`} className="underline">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href={`${SITE_URL}/privacy`} className="underline">
+          Privacy Policy
+        </a>
+        .
+      </p>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Signing up…" : "Sign up"}
       </Button>

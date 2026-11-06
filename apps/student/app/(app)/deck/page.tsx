@@ -25,7 +25,7 @@ export default async function DeckPage({ searchParams }: PageProps<"/deck">) {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="My deck"
-        sub={`${cards.length} formulas`}
+        sub={`${cards.length} ${cards.length === 1 ? "formula" : "formulas"}`}
         action={
           !v.doneToday && (
             <Button href="/review" size="sm">

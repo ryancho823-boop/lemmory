@@ -120,7 +120,7 @@ export function StudentAnalytics({
                     </span>
                   ),
                   value: t.accuracy,
-                  hint: `${t.n} reviews`,
+                  hint: `${t.n} ${t.n === 1 ? "review" : "reviews"}`,
                 }))}
               />
             </div>

@@ -8,6 +8,7 @@ import { Rich, Tex } from "../Tex";
 import { Button, StageTag, cx } from "../ui";
 import { Feedback } from "./RecallCard";
 import { Figure } from "../Figure";
+import { FailNote } from "./FailNote";
 import { useEnter } from "./useEnter";
 
 interface Props {
@@ -77,7 +78,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
                 ? "border-bad bg-bad/5"
                 : "border-line bg-white opacity-50";
           return (
-            <button key={o.id} onClick={() => toggle(o.id)} aria-pressed={on} className={cx("rounded-2xl border-2 px-4 py-3 text-left transition-all", tone)}>
+            <button key={o.id} type="button" onClick={() => toggle(o.id)} aria-pressed={on} className={cx("rounded-2xl border-2 px-4 py-3 text-left transition-all", tone)}>
               <span className="flex items-center justify-between gap-2 font-semibold">
                 {o.name}
                 {pick && needed && <Check size={16} strokeWidth={3} className="text-good" />}
@@ -140,7 +141,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
           </Button>
         </div>
       )}
-      {error && <p className="mt-4 text-sm font-semibold text-bad">Couldn&apos;t reach the server. Check your connection and try again.</p>}
+      {error && <FailNote onRetry={() => setError(false)} />}
     </div>
   );
 }

@@ -24,6 +24,7 @@ import {
   finishIfEmpty,
   joinClass,
   leaveClass,
+  renameStudent,
   studentClasses,
   promptFor,
   removeFromDeck,
@@ -80,11 +81,13 @@ const zoneField = (fd: FormData) => {
 export async function login(_: FormState, fd: FormData): Promise<FormState> {
   const username = field(fd, "username");
   const { ip } = await requester();
-  if (await isLimited("loginAccount", `student:${username}`)) return { error: LIMIT_MESSAGE.loginAccount, values: { username } };
+  // Counted per account and network, so a stranger can't lock a student out of their own account.
+  if (await isLimited("loginAccount", `student:${username}:${ip}`) || (await isLimited("loginAccountAny", `student:${username}`))) return { error: LIMIT_MESSAGE.loginAccount, values: { username } };
   if (await isLimited("loginNetwork", ip)) return { error: LIMIT_MESSAGE.loginNetwork, values: { username } };
   const id = await checkLogin("student", username, String(fd.get("password") ?? ""));
   if (!id) {
-    await noteAttempt("loginAccount", `student:${username}`);
+    await noteAttempt("loginAccount", `student:${username}:${ip}`);
+    await noteAttempt("loginAccountAny", `student:${username}`);
     await noteAttempt("loginNetwork", ip);
     // The same answer whether or not the username exists, so logging in can't be used to find out.
     return { error: "That username and password don't match an account.", values: { username } };
@@ -111,11 +114,12 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
   const { ip, device } = await requester();
-  if (await isLimited("signup", ip, device)) return fail(LIMIT_MESSAGE.signup);
-  if (!onOwn && (await isLimited("classCode", ip, device))) return fail(LIMIT_MESSAGE.classCode);
+  if ((await isLimited("signup", device)) || (await isLimited("signupNetwork", ip))) return fail(LIMIT_MESSAGE.signup);
+  if (!onOwn && ((await isLimited("classCode", device)) || (await isLimited("classCodeNetwork", ip)))) return fail(LIMIT_MESSAGE.classCode);
   const klass = onOwn ? null : await findClassByCode(values.code);
   if (!onOwn && !klass) {
-    await noteAttempt("classCode", ip, device);
+    await noteAttempt("classCode", device);
+    await noteAttempt("classCodeNetwork", ip);
     return fail("No class has that code. Check with your teacher.");
   }
   if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
@@ -123,7 +127,8 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
   const id = await createStudent(name, values.username, password, zoneField(fd));
   if (!id) return fail("That username is taken. Try another.");
-  await noteAttempt("signup", ip, device);
+  await noteAttempt("signup", device);
+  await noteAttempt("signupNetwork", ip);
   if (klass) await joinClass(id, klass.id);
   await startSession(id, "student");
   redirect(klass ? "/" : "/class");
@@ -131,17 +136,18 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
 
 const CLASS_COOKIE = "lemmory_class";
 const showClass = async (classId: string) =>
-  (await cookies()).set(CLASS_COOKIE, classId, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 365 * 86_400 });
+  (await cookies()).set(CLASS_COOKIE, classId, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 365 * 86_400 });
 
 /** A signed-in student joins another class, and the app switches to it. */
 export async function joinWithCode(_: FormState, fd: FormData): Promise<FormState> {
   const studentId = await me();
   const code = field(fd, "code").toUpperCase();
   const { ip, device } = await requester();
-  if (await isLimited("classCode", studentId, ip, device)) return { error: LIMIT_MESSAGE.classCode, values: { code } };
+  if ((await isLimited("classCode", studentId, device)) || (await isLimited("classCodeNetwork", ip))) return { error: LIMIT_MESSAGE.classCode, values: { code } };
   const klass = await findClassByCode(code);
   if (!klass) {
-    await noteAttempt("classCode", studentId, ip, device);
+    await noteAttempt("classCode", studentId, device);
+    await noteAttempt("classCodeNetwork", ip);
     return { error: "No class has that code. Check with your teacher.", values: { code } };
   }
   await joinClass(studentId, klass.id);
@@ -185,6 +191,16 @@ export async function buyStudentPlan(_: FormState, fd: FormData): Promise<FormSt
   await checkoutStudent(await me(), values.billingName, values.billingEmail);
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+/** Fix the name shown to teachers and classmates. */
+export async function renameMe(_: FormState, fd: FormData): Promise<FormState> {
+  const id = await me();
+  const name = field(fd, "name");
+  if (name.length < 2 || name.length > 60) return { error: "Enter your first and last name." };
+  await renameStudent(id, name);
+  revalidatePath("/", "layout");
+  return { ok: "Saved." };
 }
 
 /** Change the signed-in user's password (the current one is needed); other devices are signed out. */
