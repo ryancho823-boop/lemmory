@@ -14,7 +14,7 @@ const { migrate } = await import("drizzle-orm/libsql/migrator");
 const { and, eq } = await import("drizzle-orm");
 const { db } = await import("../src/client");
 const schema = await import("../src/schema");
-const { createStudent, createTeacher } = await import("../src/accounts");
+const { checkLogin, createStudent, createTeacher } = await import("../src/accounts");
 const { checkoutStudent, startStudentTrial, startTrial } = await import("../src/billing");
 const { assign, createClass, unassign } = await import("../src/teacher");
 const student = await import("../src/student");
@@ -147,4 +147,37 @@ test("leaving a class keeps the deck, and leaving the last one makes the student
   assert.equal(await deckSize(), before, "the cards stay");
   assert.equal(await student.canStudentReview(leaver), false, "nothing covers them any more");
   await student.leaveClass(leaver, classB);
+});
+
+test("a teacher can't see or change another teacher's class or students", async () => {
+  const { NotFound, deleteClass, loadTeacherClass, newClassCode, newGame, removeStudent, resetStudentPassword, startNextWeek, studentInfo, updateClass } = await import("../src/teacher");
+  const target = (await createStudent("Target Test", "target", "correct-horse", "UTC"))!;
+  await student.joinClass(target, classA);
+  const before = await db.select().from(schema.classes).where(eq(schema.classes.id, classA)).get();
+  const attempts = [
+    () => loadTeacherClass(teacherB, classA),
+    () => updateClass(teacherB, classA, settings("Stolen")),
+    () => newClassCode(teacherB, classA),
+    () => assign(teacherB, classA, "heron"),
+    () => unassign(teacherB, classA, "heron"),
+    () => startNextWeek(teacherB, classA),
+    () => newGame(teacherB, classA),
+    () => studentInfo(teacherB, classA, target),
+    () => removeStudent(teacherB, classA, target),
+    () => resetStudentPassword(teacherB, classA, target, "hijacked-password"),
+    // Their own class doesn't help: the student has to be in it.
+    () => studentInfo(teacherB, classB, target),
+    () => resetStudentPassword(teacherB, classB, target, "hijacked-password"),
+    () => deleteClass(teacherB, classA, before!.name),
+  ];
+  for (const attempt of attempts) await assert.rejects(attempt, NotFound);
+  assert.deepEqual(await db.select().from(schema.classes).where(eq(schema.classes.id, classA)).get(), before);
+  assert.equal((await student.studentClasses(target)).length, 1);
+  assert.ok(await checkLogin("student", "target", "correct-horse"), "the password still works");
+});
+
+test("a login with an absurdly long password is refused", async () => {
+  await createStudent("Long Test", "longpw", "correct-horse", "UTC");
+  assert.equal(await checkLogin("student", "longpw", "correct-horse".padEnd(5000, "x")), null);
+  assert.ok(await checkLogin("student", "longpw", "correct-horse"));
 });

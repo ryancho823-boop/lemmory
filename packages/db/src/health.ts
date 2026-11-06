@@ -23,13 +23,14 @@ export async function databaseHealth() {
     // Whether every migration in the code has been applied (deploys apply them before building).
     return { database: "connected", schema: describeMigrations(await migrationStatus(db)) };
   } catch (e) {
-    const err = e as Error & { cause?: Error };
+    // The details go to the logs: this page is public, and a driver's message can name the host.
+    console.error("Database check failed:", e);
     const { DATABASE_URL: url, DATABASE_AUTH_TOKEN: token, IS_PREVIEW } = await import("./client");
     // Previews read their own variables (see client.ts).
     const name = (v: string) => (IS_PREVIEW ? `PREVIEW_${v}` : v);
     // No host name or account count: this page is public, and neither helps fix a setup.
     return {
-      database: `ERROR: ${(err.cause?.message ?? err.message).slice(0, 300)}`,
+      database: "ERROR: see the deployment's logs",
       [name("DATABASE_URL")]: describe(process.env[name("DATABASE_URL")]),
       url_starts_with: url ? url.split(":")[0] + ":" : "-",
       [name("DATABASE_AUTH_TOKEN")]: describe(process.env[name("DATABASE_AUTH_TOKEN")]),
