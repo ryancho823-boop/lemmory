@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { pendingEmail } from "@lemmory/db/accounts";
+import { getWeeklyReport } from "@lemmory/db/report";
 import { TopBar } from "@lemmory/ui/Shell";
+import { ChangeEmailForm } from "@lemmory/ui/ChangeEmailForm";
 import { ChangePasswordForm } from "@lemmory/ui/ChangePasswordForm";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
-import { changeMyPassword, deleteMyAccount } from "../../actions";
+import { changeMyEmail, changeMyPassword, deleteMyAccount } from "../../actions";
 import { requireTeacher } from "@/lib/session";
 import { LogoutButton } from "../LogoutButton";
+import { WeeklyReportSwitch } from "./WeeklyReportSwitch";
 
 export const metadata = { title: "Account · Lemmory for teachers" };
 
 // Open even when the trial has ended, like Plan & billing: a teacher can always change or delete their account.
-export default async function AccountPage() {
-  await requireTeacher();
+export default async function AccountPage({ searchParams }: PageProps<"/account">) {
+  const [user, { confirmed, expired }] = await Promise.all([requireTeacher(), searchParams]);
+  const [waiting, weekly] = await Promise.all([pendingEmail(user.id, user.contactEmail), getWeeklyReport(user.id)]);
   return (
     <div className="product min-h-screen bg-canvas">
       <TopBar tag="Teacher" width="max-w-5xl">
@@ -23,6 +28,11 @@ export default async function AccountPage() {
         </Link>
         <h1 className="text-[32px] font-extrabold">Account</h1>
         <div className="mt-6 space-y-6">
+          {confirmed && <p role="status" className="font-semibold text-good">Your email is confirmed.</p>}
+          {expired && !user.emailConfirmed && <p role="status" className="font-semibold text-bad">That link doesn&apos;t work anymore. Send a new one below.</p>}
+          {user.emailOverdue && <p className="font-semibold">Confirm your email to keep using Lemmory.</p>}
+          <ChangeEmailForm email={user.contactEmail} confirmed={user.emailConfirmed} pending={waiting} hint="This is also how you log in." action={changeMyEmail} />
+          <WeeklyReportSwitch on={weekly} />
           <ChangePasswordForm action={changeMyPassword} />
           <ConfirmForm
             title="Delete your account"

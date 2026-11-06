@@ -11,13 +11,21 @@ const createdAt = () =>
 // rows with it ("cascade"), so nothing is left pointing at someone who's gone.
 const user = (name: string) => text(name).notNull().references(() => users.id, { onDelete: "cascade" });
 
-/** Teachers sign in with an email; students with a username (no email needed for under-13s). */
+/**
+ * Teachers sign in with an email; students with a username, and give a contact email (theirs or a
+ * parent's) for password resets. Siblings can share one, so `recoveryEmail` isn't unique.
+ */
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
   role: text("role", { enum: ["teacher", "student"] }).notNull(),
   name: text("name").notNull(),
   email: text("email").unique(),
   username: text("username").unique(),
+  recoveryEmail: text("recovery_email"),
+  /** Set once the owner clicks the link. Password resets only go to a confirmed address. */
+  emailConfirmedAt: integer("email_confirmed_at", { mode: "timestamp_ms" }),
+  /** When the current address was added, which starts the time they have to confirm it. */
+  emailAddedAt: integer("email_added_at", { mode: "timestamp_ms" }),
   passwordHash: text("password_hash").notNull(),
   /** Students on their own have no class time zone, so "today" uses their browser's (IANA name). */
   timezone: text("timezone"),
@@ -39,6 +47,28 @@ export const sessions = sqliteTable(
   },
   (t) => [index("sessions_user").on(t.userId)],
 );
+
+/** A link in an email. `id` is a SHA-256 of the token, like sessions. `email` is the address a "confirm" link confirms. */
+export const emailTokens = sqliteTable(
+  "email_tokens",
+  {
+    id: text("id").primaryKey(),
+    userId: user("user_id"),
+    kind: text("kind", { enum: ["confirm", "reset"] }).notNull(),
+    email: text("email"),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (t) => [index("email_tokens_user").on(t.userId, t.kind)],
+);
+
+/** What a teacher wants emailed. No row means the defaults: the weekly report is on. */
+export const teacherSettings = sqliteTable("teacher_settings", {
+  teacherId: user("teacher_id").primaryKey(),
+  weeklyReport: integer("weekly_report", { mode: "boolean" }).notNull().default(true),
+  lastWeeklyReportAt: integer("last_weekly_report_at", { mode: "timestamp_ms" }),
+  /** In the report's unsubscribe link, which has to work without logging in. */
+  unsubscribeToken: text("unsubscribe_token").notNull().unique(),
+});
 
 export const classes = sqliteTable(
   "classes",

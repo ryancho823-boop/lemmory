@@ -67,6 +67,30 @@ export function weakestTopic(s: Student, today: number, topicOf: (formulaId: str
     .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
 }
 
+/** Who a teacher should look at: behind on reviews, or under 60% on the first try. The furthest behind come first. */
+export function needsAttention(students: Student[], today: number, topicOf: (formulaId: string) => Topic | undefined, limit = 8) {
+  const pct = (x: number | null) => `${Math.round((x ?? 0) * 100)}%`;
+  return students
+    .map((s) => ({ s, m: summary(s, today) }))
+    .filter(({ s, m }) => isBehind(s, today) || (m.reviews14 >= 3 && (m.accuracy ?? 1) < 0.6))
+    .map(({ s, m }) => {
+      const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
+      const away = m.lastActive === null ? null : today - m.lastActive;
+      const weak = weakestTopic(s, today, topicOf);
+      const behind = isBehind(s, today);
+      return {
+        student: s,
+        tag: behind ? "Behind" : "Struggling",
+        detail: behind
+          ? `${away === null ? "Never reviewed" : `No review in ${away} ${away === 1 ? "day" : "days"}`}, ${waiting} ${waiting === 1 ? "card" : "cards"} waiting`
+          : `${pct(m.accuracy)} right on the first try${weak ? `, weakest in ${weak.topic}` : ""}`,
+        score: behind ? -waiting : (m.accuracy ?? 1),
+      };
+    })
+    .sort((a, b) => a.score - b.score)
+    .slice(0, limit);
+}
+
 /** Accuracy per topic. `topicOf` looks formulas up in whichever bank the app has (the demo only has a slice). */
 export function byTopic(log: LogEntry[], topicOf: (formulaId: string) => Topic | undefined) {
   return TOPICS.map((topic) => {

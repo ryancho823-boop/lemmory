@@ -15,7 +15,7 @@ export default function Privacy() {
         <p>
           <b>Students:</b> first and last name, a username, a password (stored only as a one-way hash, never readable), the time zone of their device,
           the classes they join, and their practice: which formulas are in their deck, each answer marked right or wrong, which formulas they mixed up,
-          and their points and streak. We don&apos;t ask students for an email address, and we don&apos;t keep the answers they type.
+          and their points and streak. We ask for a contact email, theirs or a parent&apos;s, and use it only for confirming the account and resetting passwords. We don&apos;t keep the answers they type.
         </p>
         <p>
           <b>Teachers:</b> name, email address and password (hashed the same way), their classes and assignments, and the plan they chose. Paid plans

@@ -18,6 +18,11 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       foot={
         <>
           <p>
+            <Link href="/forgot" className="font-semibold text-ink underline">
+              Forgot your password?
+            </Link>
+          </p>
+          <p>
             New?{" "}
             <Link href="/signup" className="font-semibold text-ink underline">
               Sign up

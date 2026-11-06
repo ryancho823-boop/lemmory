@@ -41,7 +41,7 @@ async function main() {
 
   const hash = await hashPassword(PASSWORD);
   const teacherId = "teacher-chen";
-  await db.insert(t.users).values({ id: teacherId, role: "teacher", name: "Ms. Chen", email: "teacher@lemmory.test", passwordHash: hash });
+  await db.insert(t.users).values({ id: teacherId, role: "teacher", name: "Ms. Chen", email: "teacher@lemmory.test", emailConfirmedAt: new Date(), passwordHash: hash });
 
   await db.insert(t.plans).values({ teacherId, kind: "academy", orgName: "Lemmory Sample Academy", paidAt: new Date() });
 
@@ -64,7 +64,7 @@ async function main() {
   for (const p of [YOU, ...CLASSMATES]) {
     const studentId = `student-${p.id}`;
     const username = p.name.split(" ")[0].toLowerCase();
-    await db.insert(t.users).values({ id: studentId, role: "student", name: p.name, username, passwordHash: hash });
+    await db.insert(t.users).values({ id: studentId, role: "student", name: p.name, username, recoveryEmail: `${username}@lemmory.test`, emailConfirmedAt: new Date(), passwordHash: hash });
     await db.insert(t.enrollments).values({ studentId, classId, joinedDay: first, settledThrough: today - 1 });
 
     // Alex gets a 9-day streak going into today, like the demo.

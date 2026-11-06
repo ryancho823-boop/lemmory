@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { changePassword, checkLogin, createStudent, deleteAccount, setTimezone } from "@lemmory/db/accounts";
+import { changeEmail, changePassword, checkLogin, createStudent, deleteAccount, requestPasswordReset, resetPasswordWithToken, sendConfirmation, setTimezone } from "@lemmory/db/accounts";
 import { isTimeZone } from "@lemmory/core/days";
 import { STARTER_LEVELS, type StarterLevel } from "@lemmory/core/starter";
 import { MAX_ANSWER_LENGTH } from "@lemmory/core/grade";
@@ -70,6 +70,7 @@ const mode = (v: unknown): Mode => {
   return v;
 };
 const field = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
+const validEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) && v.length <= 200;
 /** The browser's time zone from the sign-up or login form, if it's a real one. */
 const zoneField = (fd: FormData) => {
   const tz = field(fd, "timezone");
@@ -109,6 +110,7 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
     firstName: field(fd, "firstName"),
     lastName: field(fd, "lastName"),
     username: field(fd, "username").toLowerCase(),
+    email: field(fd, "email").toLowerCase(),
   };
   const name = `${values.firstName} ${values.lastName}`.trim();
   const password = String(fd.get("password") ?? "");
@@ -124,9 +126,11 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   }
   if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
+  if (!validEmail(values.email)) return fail("Enter a valid email. A parent's works.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
-  const id = await createStudent(name, values.username, password, zoneField(fd));
+  const id = await createStudent(name, values.username, password, zoneField(fd), values.email);
   if (!id) return fail("That username is taken. Try another.");
+  await sendConfirmation(id, "student", values.email);
   await noteAttempt("signup", device);
   await noteAttempt("signupNetwork", ip);
   if (klass) await joinClass(id, klass.id);
@@ -201,6 +205,51 @@ export async function renameMe(_: FormState, fd: FormData): Promise<FormState> {
   await renameStudent(id, name);
   revalidatePath("/", "layout");
   return { ok: "Saved." };
+}
+
+/** Add or change the contact email. It's confirmed by a link, so nothing changes until that's clicked. */
+export async function changeMyEmail(_: FormState, fd: FormData): Promise<FormState> {
+  const id = await me();
+  if (await isLimited("emailSend", id)) return { error: LIMIT_MESSAGE.emailSend };
+  const email = field(fd, "email");
+  if (!validEmail(email)) return { error: "Enter a valid email. A parent's works." };
+  await noteAttempt("emailSend", id);
+  const error = await changeEmail(id, "student", email, String(fd.get("password") ?? ""));
+  if (error) return { error };
+  revalidatePath("/", "layout");
+  return { ok: "Link sent. Check that inbox, and its spam folder." };
+}
+
+/** Send the confirmation link again. */
+export async function resendConfirmation(): Promise<FormState> {
+  const user = await currentUser("student");
+  if (!user?.contactEmail) return { error: "Add your email on the Account page." };
+  if (await isLimited("emailSend", user.id)) return { error: LIMIT_MESSAGE.emailSend };
+  await noteAttempt("emailSend", user.id);
+  await sendConfirmation(user.id, "student", user.contactEmail);
+  return { ok: "Sent." };
+}
+
+/** Email a reset link. The answer is the same whether or not the account exists. */
+export async function forgotPassword(_: FormState, fd: FormData): Promise<FormState> {
+  const login = field(fd, "login");
+  const { ip } = await requester();
+  if ((await isLimited("resetLogin", `student:${login}`)) || (await isLimited("resetNetwork", ip))) return { error: LIMIT_MESSAGE.resetLogin, values: { login } };
+  await noteAttempt("resetLogin", `student:${login}`);
+  await noteAttempt("resetNetwork", ip);
+  await requestPasswordReset("student", login);
+  return { ok: "If that matches an account with a confirmed email, a link is on its way. Check your spam folder too." };
+}
+
+/** Set a new password from an emailed link, then log in. */
+export async function resetPassword(token: string, _: FormState, fd: FormData): Promise<FormState> {
+  const password = String(fd.get("password") ?? "");
+  if (password.length < PASSWORD_MIN || password.length > 200) return { error: `Passwords need at least ${PASSWORD_MIN} characters.` };
+  if (password !== String(fd.get("confirm") ?? "")) return { error: "Those two passwords don't match." };
+  const id = await resetPasswordWithToken(str(token), "student", password);
+  if (!id) return { error: "This link doesn't work anymore. Ask for a new one." };
+  await startSession(id, "student");
+  redirect("/");
 }
 
 /** Change the signed-in user's password (the current one is needed); other devices are signed out. */
