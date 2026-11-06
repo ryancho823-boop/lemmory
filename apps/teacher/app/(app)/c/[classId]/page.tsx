@@ -66,7 +66,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
       {students.length < 3 && (
         <Panel className="p-5">
           <h2 className="text-[15px] font-bold">{students.length ? "Invite the rest of your class" : "Invite your students"}</h2>
-          <p className="mb-4 mt-0.5">They sign up with a username and password. No email needed.</p>
+          <p className="mb-4 mt-0.5">They sign up with a username, a password, and an email, theirs or a parent&apos;s.</p>
           <JoinCode code={klass.joinCode} url={studentUrl} />
         </Panel>
       )}

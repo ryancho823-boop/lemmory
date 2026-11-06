@@ -21,18 +21,18 @@ export default async function ClassPage() {
   // A class covers the student: they never see the individual plan unless they were already paying for it.
   const planPanel =
     covered && state !== "active" ? (
-      <Panel className="p-5">
+      <Panel className="border-t-4 border-t-good p-5">
         <h2 className="text-[17px] font-semibold">Covered by your teacher</h2>
         <p className="mt-1 text-ink/75">There&apos;s nothing for you to pay.</p>
       </Panel>
     ) : (
-      <Panel className="p-5">
+      <Panel className="border-t-4 border-t-good p-5">
         <h2 className="text-[17px] font-semibold">{covered ? "Your plan" : "Individual plan"}</h2>
         <StudentPlan price={PRICES.student.monthly} body={PRICES.student.body} trialDays={TRIAL_DAYS} state={state} endsOn={fmt(endsAt)} />
       </Panel>
     );
   const joinPanel = (
-    <Panel className="p-5">
+    <Panel className="border-t-4 border-t-seq-400 p-5">
       <h2 className="text-[17px] font-semibold">{inClass ? "Join another class" : "Have a class code?"}</h2>
       <p className="mt-1 text-ink/75">Enter the code your teacher gave you. Your deck is shared across all your classes.</p>
       <JoinClassForm />

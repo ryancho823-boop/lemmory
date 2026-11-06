@@ -10,7 +10,7 @@ type State = { error?: string; ok?: string } | undefined;
 export function ChangePasswordForm({ action }: { action: (state: State, fd: FormData) => Promise<State> }) {
   const [state, run, pending] = useActionState(action, undefined);
   return (
-    <Panel className="p-6">
+    <Panel className="border-t-4 border-t-lemon-deep p-6">
       <h2 className="text-[15px] font-bold">Change your password</h2>
       <p className="mt-1 text-sm text-ink/60">This signs you out on every other device.</p>
       <form action={run} className="mt-4 space-y-3">

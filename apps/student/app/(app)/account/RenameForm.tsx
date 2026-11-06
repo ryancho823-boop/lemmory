@@ -9,7 +9,7 @@ import { renameMe } from "../../actions";
 export function RenameForm({ name, username }: { name: string; username: string | null }) {
   const [state, run, pending] = useActionState(renameMe, undefined);
   return (
-    <Panel className="p-6">
+    <Panel className="border-t-4 border-t-good p-6">
       <h2 className="text-[15px] font-bold">Your details</h2>
       <p className="mt-1 text-sm text-ink/60">
         You log in with your username: <span className="font-mono font-semibold text-ink">{username}</span>

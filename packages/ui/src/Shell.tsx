@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cx } from "./ui";
@@ -256,10 +257,14 @@ export function Field({
   error?: string;
   hint?: string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "name" | "type" | "defaultValue">) {
+  const id = useId();
   return (
-    <label className="block">
-      <span className="text-sm font-semibold">{label}</span>
+    <div>
+      <label htmlFor={id} className="block text-sm font-semibold">
+        {label}
+      </label>
       <input
+        id={id}
         name={name}
         type={type}
         defaultValue={defaultValue}
@@ -272,6 +277,6 @@ export function Field({
         {...rest}
       />
       {error ? <span className="mt-1 block text-xs font-semibold text-bad">{error}</span> : hint && <span className="mt-1 block text-xs text-ink/45">{hint}</span>}
-    </label>
+    </div>
   );
 }

@@ -12,24 +12,37 @@ export interface ClassValues {
   timezone: string;
 }
 
-// Common zones by their everyday names. A class's day starts at midnight in its zone.
+// Common zones by place, west to east. No abbreviations: "PST" is wrong half the year, and CST
+// means two places. The clock itself comes from the zone, so daylight saving is handled.
 const ZONES: [string, string][] = [
-  ["Pacific/Honolulu", "HST (Hawaii)"],
-  ["America/Anchorage", "AKST (Alaska)"],
-  ["America/Los_Angeles", "PST (Pacific)"],
-  ["America/Phoenix", "MST (Arizona)"],
-  ["America/Denver", "MST (Mountain)"],
-  ["America/Chicago", "CST (Central)"],
-  ["America/New_York", "EST (Eastern)"],
-  ["America/Halifax", "AST (Atlantic)"],
-  ["Europe/London", "GMT (UK)"],
-  ["Europe/Paris", "CET (Central Europe)"],
-  ["Asia/Kolkata", "IST (India)"],
-  ["Asia/Shanghai", "CST (China)"],
-  ["Asia/Singapore", "SGT (Singapore)"],
-  ["Asia/Seoul", "KST (Korea)"],
-  ["Asia/Tokyo", "JST (Japan)"],
-  ["Australia/Sydney", "AEST (Sydney)"],
+  ["Pacific/Honolulu", "US: Hawaii"],
+  ["America/Anchorage", "US: Alaska"],
+  ["America/Los_Angeles", "US: Pacific (Los Angeles)"],
+  ["America/Phoenix", "US: Arizona"],
+  ["America/Denver", "US: Mountain (Denver)"],
+  ["America/Chicago", "US: Central (Chicago)"],
+  ["America/New_York", "US: Eastern (New York)"],
+  ["America/Vancouver", "Canada: Vancouver"],
+  ["America/Toronto", "Canada: Toronto"],
+  ["America/Halifax", "Canada: Halifax"],
+  ["America/Mexico_City", "Mexico City"],
+  ["America/Sao_Paulo", "Brazil: Sao Paulo"],
+  ["Europe/London", "UK and Ireland"],
+  ["Europe/Paris", "Central Europe (Paris)"],
+  ["Europe/Athens", "Eastern Europe (Athens)"],
+  ["Africa/Johannesburg", "South Africa"],
+  ["Asia/Dubai", "UAE: Dubai"],
+  ["Asia/Kolkata", "India"],
+  ["Asia/Bangkok", "Thailand and Vietnam"],
+  ["Asia/Shanghai", "China"],
+  ["Asia/Hong_Kong", "Hong Kong"],
+  ["Asia/Taipei", "Taiwan"],
+  ["Asia/Singapore", "Singapore"],
+  ["Asia/Seoul", "South Korea"],
+  ["Asia/Tokyo", "Japan"],
+  ["Australia/Perth", "Australia: Perth"],
+  ["Australia/Sydney", "Australia: Sydney"],
+  ["Pacific/Auckland", "New Zealand"],
 ];
 
 /** A zone that isn't in the list, by its short name (like "EST" or "GMT+3"). */

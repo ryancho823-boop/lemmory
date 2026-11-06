@@ -23,7 +23,7 @@ export function ChangeEmailForm({
 }) {
   const [state, run, saving] = useActionState(action, undefined);
   return (
-    <Panel className="p-6">
+    <Panel className="border-t-4 border-t-seq-400 p-6">
       <h2 className="text-[15px] font-bold">{email ? "Your email" : "Add your email"}</h2>
       <p className="mt-1 text-sm text-ink/60">{hint}</p>
       {email && (

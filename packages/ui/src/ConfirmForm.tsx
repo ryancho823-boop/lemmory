@@ -25,7 +25,7 @@ export function ConfirmForm({
 }) {
   const [state, run, pending] = useActionState(action, undefined);
   return (
-    <Panel className="p-6">
+    <Panel className="border-t-4 border-t-bad p-6">
       <h2 className="text-[15px] font-bold">{title}</h2>
       <div className="mt-1 text-sm text-ink/60">{body}</div>
       <form action={run} className="mt-4 flex items-end gap-2">

@@ -5,20 +5,20 @@ export const metadata = { title: "Privacy · Lemmory" };
 // Keep this in step with what the code actually stores (packages/db/src/schema.ts).
 export default function Privacy() {
   return (
-    <DocPage title="Privacy" updated="October 22, 2026">
+    <DocPage title="Privacy" updated="November 5, 2026">
       <p>
         Lemmory is daily formula practice for math competition classes. This page says what we keep, why, who can see it, and how to have it deleted.
-        The short version: we keep only what the app needs to work, we don&apos;t show ads, and we don&apos;t sell or share anyone&apos;s information.
+        The short version: we keep only what the app needs to work, we don&apos;t show ads, and we don&apos;t sell anyone&apos;s information.
       </p>
 
       <DocSection title="What we keep">
         <p>
           <b>Students:</b> first and last name, a username, a password (stored only as a one-way hash, never readable), the time zone of their device,
           the classes they join, and their practice: which formulas are in their deck, each answer marked right or wrong, which formulas they mixed up,
-          and their points and streak. We ask for a contact email, theirs or a parent&apos;s, and use it only for confirming the account and resetting passwords. We don&apos;t keep the answers they type.
+          and their points and streak. We ask for a contact email, theirs or a parent&apos;s, and use it only for account emails: confirming the address, changing it, and resetting passwords. We don&apos;t keep the answers they type.
         </p>
         <p>
-          <b>Teachers:</b> name, email address and password (hashed the same way), their classes and assignments, and the plan they chose. Paid plans
+          <b>Teachers:</b> name, email address and password (hashed the same way), their classes and assignments, the plan they chose, and whether they want the weekly report. Paid plans
           also keep the organization&apos;s name and location and who receives the bills; a school club gives a school email so we can confirm the club.
         </p>
         <p>
@@ -32,15 +32,24 @@ export default function Privacy() {
         <p>Payments aren&apos;t connected yet, so no card details are collected anywhere on Lemmory.</p>
       </DocSection>
 
+      <DocSection title="Emails we send">
+        <p>
+          Everyone gets account emails: a link to confirm an address, a link when changing it, and password reset links. Teachers also get a weekly
+          report on Mondays about how their classes are doing, including students who need attention. They can turn it off on their Account page or
+          with the link in the email. Students don&apos;t get reminders or marketing email.
+        </p>
+      </DocSection>
+
       <DocSection title="Who can see it">
         <ul>
           <li>A student&apos;s teachers see that student&apos;s practice results in their classes.</li>
           <li>Classmates see each other&apos;s names and points on the class leaderboard, never anyone&apos;s answers or results.</li>
-          <li>Nobody else. There are no ads, no analytics or tracking scripts, and nothing is sold or shared with other companies.</li>
+          <li>No one else using Lemmory. There are no ads, no analytics or tracking scripts, and nothing is sold.</li>
         </ul>
         <p>
-          The data is stored in a database run by Turso and served by Vercel, both in the United States. They host it for us and don&apos;t use it for
-          anything else.
+          A few companies run parts of Lemmory for us and only handle what that job needs: Turso (the database) and Vercel (hosting), Resend (sends
+          our emails, so it receives the address and the message), and ImprovMX (forwards mail sent to our support address). Our support inbox is
+          on Gmail. They work for us and we don&apos;t give them information for their own use.
         </p>
       </DocSection>
 

@@ -18,7 +18,7 @@ const TEXT = {
     button: "Try the student demo",
     second: "See the teacher view",
   },
-  bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
+  bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME and calculus rounds that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   mission: {
     quote: "Every formula a student learns should still be there on contest day.",
     body: "We make review part of the course, so every student keeps what they're taught, not just the ones with perfect study habits.",

@@ -39,14 +39,15 @@ export function PlanPicker({ formulaCount, trialDays, academy, club, current, st
 
   return (
     <>
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <Card title="Academy" price={`$${academy.perStudent}`} per="per student / month" body={academy.body} active={current === "academy"} action={action("academy")} />
+      <div className={cx("grid gap-4 md:grid-cols-2", state === "none" ? "" : "mt-4")}>
+        <Card title="Academy" price={`$${academy.perStudent}`} per="per student / month" body={academy.body} top="border-t-seq-400" active={current === "academy"} action={action("academy")} />
         <Card
           title="School math club"
           price={`$${club.perStudent}`}
           per="per student / month"
           note={`Never over $${club.classCap} a month per class`}
           body="For free clubs run at a school. We confirm the club with your school."
+          top="border-t-good"
           active={current === "club"}
           action={action("club")}
         />
@@ -129,7 +130,7 @@ function Checkout({ kind, perStudent, classCap, students }: { kind: Kind; perStu
       </div>
       {students > 0 && (
         <p>
-          With your {students} students now: <b>${students * perStudent} a month</b>
+          With your {students} {students === 1 ? "student" : "students"} now: <b>${students * perStudent} a month</b>
           {kind === "club" && " until the club is confirmed"}.
         </p>
       )}
@@ -151,6 +152,7 @@ function Card({
   per,
   note,
   body,
+  top,
   active,
   action,
 }: {
@@ -159,12 +161,17 @@ function Card({
   per: string;
   note?: string;
   body: string;
+  /** The color along the top of the card. */
+  top: string;
   active: boolean;
   action: React.ReactNode;
 }) {
   return (
-    <Panel className={cx("flex flex-col p-6", active && "ring-2 ring-lemon")}>
-      <h3 className="text-lg font-semibold">{title}</h3>
+    <Panel className={cx("flex flex-col border-t-4 p-6", top)}>
+      <h3 className="flex items-center justify-between gap-2 text-lg font-semibold">
+        {title}
+        {active && <span className="text-sm font-semibold text-good">Your plan</span>}
+      </h3>
       <p className="mt-3">
         <span className="text-3xl font-extrabold">{price}</span> <span className="text-ink/70">{per}</span>
       </p>

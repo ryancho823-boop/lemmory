@@ -33,7 +33,7 @@ const COMPARE = {
 // these cells summarize, so change them together.
 const GLANCE = {
   columns: ["Lemmory", "Contest practice", "Flashcard apps"],
-  note: "Contest practice: Alcumus, Achievable. Flashcard apps: Anki, Quizlet, Podsie.",
+  note: "Contest practice here means the tools Alcumus and Achievable. Live academy courses cost much more. Flashcard apps: Anki, Quizlet, Podsie.",
   rows: [
     { label: "Built for contests", cells: ["Yes", "Yes", "No"] },
     { label: "Long-term memory", cells: ["Yes", "Partly", "Yes"] },
