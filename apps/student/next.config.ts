@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 import { securityHeaders } from "@lemmory/core/headers";
 
 const nextConfig: NextConfig = {
-  headers: async () => [{ source: "/:path*", headers: securityHeaders() }],
+  poweredByHeader: false,
+  // The content security policy comes from proxy.ts, with a fresh nonce per request.
+  headers: async () => [{ source: "/:path*", headers: securityHeaders({ csp: false }) }],
   turbopack: {
     rules: {
       "*.css": {

@@ -53,8 +53,9 @@ export async function checkLogin(role: "teacher" | "student", login: string, pas
     .from(users)
     .where(role === "teacher" ? eq(users.email, key) : eq(users.username, key))
     .get();
-  const ok = await verifyPassword(password, user?.hash ?? (await DUMMY));
-  if (!(ok && user && user.role === role)) return null;
+  // Sign-up caps passwords at 200, so a longer one can't match and isn't worth hashing.
+  const ok = await verifyPassword(password.slice(0, 201), user?.hash ?? (await DUMMY));
+  if (!(ok && password.length <= 200 && user && user.role === role)) return null;
   // An account made with weaker hashing settings is upgraded now that we have the password.
   if (needsRehash(user.hash)) await db.update(users).set({ passwordHash: await hashPassword(password) }).where(eq(users.id, user.id));
   return user.id;

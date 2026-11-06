@@ -7,7 +7,7 @@ Three websites on Vercel, all from this one GitHub repo, plus one Turso database
 | Main site + demo | `apps/site` | https://lemmory-chi.vercel.app |
 | Teacher site | `apps/teacher` | https://lemmory-teacher.vercel.app |
 | Student site | `apps/student` | https://lemmory-student.vercel.app |
-| Database | Turso | `libsql://lemmory-ryancho823-boop.aws-us-east-2.turso.io` |
+| Database | Turso | In `.env.turso` and Vercel, never in the repo |
 
 The sites already know these addresses (`packages/core/src/urls.ts`), so the links between them work with no extra settings. Pushing to GitHub's `main` branch redeploys all three.
 

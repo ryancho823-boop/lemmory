@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   headers: async () => [{ source: "/:path*", headers: securityHeaders() }],
   /* config options here */
   cacheComponents: true,
+  poweredByHeader: false,
   // The pricing page used to be "For academies", then "For users".
   redirects: async () => [
     { source: "/academies", destination: "/pricing", permanent: true },
