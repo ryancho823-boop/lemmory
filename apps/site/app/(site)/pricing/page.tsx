@@ -106,10 +106,7 @@ export default function Pricing() {
                         {r.cells.map((c, i) => (
                           <td key={i} className={i === 0 ? "border-t border-lemon bg-lemon-soft px-3 py-3.5 font-semibold" : "border-t border-line px-3 py-3.5 text-sm text-ink/70"}>
                             {c === "Yes" ? (
-                              <>
-                                <Check size={17} strokeWidth={3} aria-hidden className="text-good" />
-                                <span className="sr-only">Yes</span>
-                              </>
+                              <Check size={17} strokeWidth={3} role="img" aria-label="Yes" className="text-good" />
                             ) : (
                               c
                             )}
