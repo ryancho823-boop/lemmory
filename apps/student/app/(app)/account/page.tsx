@@ -24,7 +24,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
         email={user.contactEmail}
         confirmed={user.emailConfirmed}
         pending={waiting}
-        hint="Yours or a parent's. We only use it for password resets."
+        hint="Yours or a parent's. We use it to confirm your account and reset your password."
         action={changeMyEmail}
       />
       <ChangePasswordForm action={changeMyPassword} />

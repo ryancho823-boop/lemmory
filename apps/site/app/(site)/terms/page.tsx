@@ -6,7 +6,7 @@ export const metadata = { title: "Terms · Lemmory" };
 
 export default function Terms() {
   return (
-    <DocPage title="Terms" updated="October 22, 2026">
+    <DocPage title="Terms" updated="November 5, 2026">
       <p>These are the rules for using Lemmory. By making an account, you agree to them.</p>
 
       <DocSection title="Accounts">
@@ -20,7 +20,7 @@ export default function Terms() {
       <DocSection title="Plans and trials">
         <p>
           Every plan starts with a {TRIAL_DAYS}-day free trial. The prices are on the <Link href="/pricing">pricing page</Link>. When a trial ends
-          without a paid plan, reviewing pauses until one starts; nothing is deleted. Students in a class on a paid plan never pay.
+          without a paid plan, reviewing pauses until one starts; nothing is deleted. Students in a class on a paid plan never pay. Payments aren&apos;t connected yet, so choosing a plan doesn&apos;t charge you anything for now. We&apos;ll tell you before that changes.
         </p>
       </DocSection>
 

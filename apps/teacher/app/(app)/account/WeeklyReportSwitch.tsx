@@ -8,7 +8,7 @@ import { setWeeklyReportAction } from "../../actions";
 export function WeeklyReportSwitch({ on }: { on: boolean }) {
   const [pending, start] = useTransition();
   return (
-    <Panel className="p-6">
+    <Panel className="border-t-4 border-t-good p-6">
       <h2 className="text-[15px] font-bold">Notifications</h2>
       <label className="mt-3 flex items-start gap-3">
         <input type="checkbox" className="mt-1 size-4 accent-ink" checked={on} disabled={pending} onChange={(e) => start(() => setWeeklyReportAction(e.target.checked))} />

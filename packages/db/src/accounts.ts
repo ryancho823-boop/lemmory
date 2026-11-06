@@ -146,7 +146,7 @@ const liveToken = (token: string, kind: "confirm" | "reset") =>
 export async function sendConfirmation(userId: string, role: Role, email: string) {
   const token = await issueToken(userId, "confirm", CONFIRM_HOURS * 60, email);
   const href = `${siteOf(role)}/confirm?token=${token}`;
-  const intro = "Click the button to confirm this email for your Lemmory account. We use it for password resets.";
+  const intro = "Click the button to confirm this email for your Lemmory account. We use it to help you get back in if you forget your password.";
   return sendMail({
     to: email,
     subject: "Confirm your email for Lemmory",

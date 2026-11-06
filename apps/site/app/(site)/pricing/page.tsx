@@ -33,7 +33,7 @@ const COMPARE = {
 // these cells summarize, so change them together.
 const GLANCE = {
   columns: ["Lemmory", "Contest practice", "Flashcard apps"],
-  note: "Contest practice: Alcumus, Achievable. Flashcard apps: Anki, Quizlet, Podsie.",
+  note: "Contest practice here means the tools Alcumus and Achievable. Live academy courses cost much more. Flashcard apps: Anki, Quizlet, Podsie.",
   rows: [
     { label: "Built for contests", cells: ["Yes", "Yes", "No"] },
     { label: "Long-term memory", cells: ["Yes", "Partly", "Yes"] },
@@ -84,7 +84,7 @@ export default function Pricing() {
         <Container>
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">How Lemmory compares</h2>
           <p className="mt-3 max-w-2xl text-lg">Flashcard apps aren&apos;t built for contests. Contest courses are mostly practice.</p>
-          <div className="mt-14 grid items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 xl:gap-14">
+          <div className="mt-14 grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 xl:gap-14">
             <CompetitorMap />
             <div>
               <div className="overflow-x-auto">
@@ -106,10 +106,7 @@ export default function Pricing() {
                         {r.cells.map((c, i) => (
                           <td key={i} className={i === 0 ? "border-t border-lemon bg-lemon-soft px-3 py-3.5 font-semibold" : "border-t border-line px-3 py-3.5 text-sm text-ink/70"}>
                             {c === "Yes" ? (
-                              <>
-                                <Check size={17} strokeWidth={3} aria-hidden className="text-good" />
-                                <span className="sr-only">Yes</span>
-                              </>
+                              <Check size={17} strokeWidth={3} role="img" aria-label="Yes" className="text-good" />
                             ) : (
                               c
                             )}
