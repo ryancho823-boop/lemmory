@@ -153,7 +153,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     whenToUse: "Two chords cross, two secants come from one point, or a tangent and a secant share an endpoint.",
     recall: [
       { lhs: "\\text{Two lines through } P\\text{: } PA\\cdot PB =", answer: "PC\\cdot PD", vars: { P: pos, A: pos, B: pos, C: pos, D: pos } },
-      { lhs: "\\text{Tangent: } PT^2 =", answer: "PA\\cdot PB", vars: { P: pos, A: pos, B: pos, T: pos } },
+      { lhs: "\\text{Tangent: } PT^2 =", answer: "PA\\cdot PB", accept: ["PC\\cdot PD"], vars: { P: pos, A: pos, B: pos, C: pos, D: pos, T: pos } },
     ],
     related: ["inscribed-angle", "stewart", "ptolemy"],
     problems: [

@@ -24,7 +24,7 @@ export const PROBABILITY_2 = defineTopic("Probability", [
     statement: "\\operatorname{Var}(X) = E[X^2] - E[X]^2",
     setup: "Write $s = E[X^2]$ and $m = E[X]$. For a yes/no variable, $\\operatorname{Var} = p(1-p)$.",
     whenToUse: "How spread out a random quantity is.",
-    recall: [{ lhs: "\\operatorname{Var}(X) =", answer: "s-m^2", vars: { s: [5, 9], m: [1, 2] } }],
+    recall: [{ lhs: "\\operatorname{Var}(X) =", answer: "s-m^2", vars: { s: [5, 9], m: [1, 2] }, aliases: { "E[X^2]": "s", "E[X]": "m" } }],
     related: ["expected-value"],
     problems: [
       { id: "var1", text: "Find the variance of one roll of a fair six-sided die.", answer: "\\frac{35}{12}", solution: "$\\frac{91}{6} - \\frac{49}{4} = \\frac{35}{12}$." },
@@ -101,7 +101,7 @@ export const PROBABILITY_2 = defineTopic("Probability", [
     statement: "P(X > Y) = \\frac{1 - P(X = Y)}{2}",
     setup: "For identically distributed $X$ and $Y$. Write $e = P(X = Y)$.",
     whenToUse: "Two players or dice in the same situation: \"who gets more?\"",
-    recall: [{ lhs: "P(X>Y) =", answer: "\\frac{1-e}{2}", vars: { e: prob } }],
+    recall: [{ lhs: "P(X>Y) =", answer: "\\frac{1-e}{2}", vars: { e: prob }, aliases: { "P(X=Y)": "e" } }],
     related: [],
     problems: [
       { id: "sym1", text: "Two fair dice are rolled. What is the probability the first is larger than the second?", answer: "\\frac{5}{12}", solution: "$\\frac{1 - \\frac16}{2}$." },

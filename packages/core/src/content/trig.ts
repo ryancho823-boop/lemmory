@@ -67,7 +67,7 @@ export const TRIG = defineTopic("Trigonometry", [
     statement: "\\tan(a+b) = \\frac{\\tan a + \\tan b}{1 - \\tan a\\tan b}",
     setup: "Write $p = \\tan a$ and $q = \\tan b$.",
     whenToUse: "Two angles are known by their tangents (slopes, grid triangles) and you need their sum.",
-    recall: [{ lhs: "\\tan(a+b) =", answer: "\\frac{p+q}{1-pq}", vars: { p: [0.1, 0.5], q: [0.1, 0.5] } }],
+    recall: [{ lhs: "\\tan(a+b) =", answer: "\\frac{p+q}{1-pq}", vars: { p: [0.1, 0.5], q: [0.1, 0.5] }, aliases: { "\\tan a": "p", "\\tan b": "q" } }],
     related: ["angle-addition", "double-angle"],
     problems: [
       {

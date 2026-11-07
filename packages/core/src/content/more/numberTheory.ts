@@ -38,7 +38,7 @@ export const NUMBER_THEORY_2 = defineTopic("Number Theory", [
     setup: "Write $t = d(n)$ for the number of divisors of $n$.",
     after: "Divisors pair up as $d$ and $\\frac nd$.",
     whenToUse: "The product of all divisors of a number.",
-    recall: [{ lhs: "\\text{Product of divisors} =", answer: "n^{\\frac{t}{2}}", vars: { n: [2, 9], t: int(2, 8) } }],
+    recall: [{ lhs: "\\text{Product of divisors} =", answer: "n^{\\frac{t}{2}}", vars: { n: [2, 9], t: int(2, 8) }, aliases: { "d(n)": "t" } }],
     related: ["num-divisors", "sum-divisors"],
     problems: [
       { id: "pod1", text: "Find the product of all positive divisors of $12$.", answer: "1728", solution: "$12$ has $6$ divisors, so $12^3$." },

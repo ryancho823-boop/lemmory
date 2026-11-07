@@ -51,6 +51,8 @@ export interface Outcome {
   formulaName: string;
   /** The card graduated from recall to application mode. */
   promoted: boolean;
+  /** Two application reviews in a row were missed, so the card went back to recall. */
+  demoted: boolean;
   /** That was the last card today. */
   finished: boolean;
 }

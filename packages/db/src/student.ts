@@ -220,7 +220,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
   const { today, record: rec, session: ses } = ctx;
   const card = rec.cards[formulaId];
   const { session: done, entry, done: result } = recordAttempt(ses, card, correct, today, confusedWith);
-  const nothing = { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, finished: false };
+  const nothing = { formulaName: FORMULA_BY_ID[formulaId].name, promoted: false, demoted: false, finished: false };
   // The first try is logged as it happens, right or wrong, so the stats include a miss even if
   // the student stops before getting the card right.
   let logged = true;
@@ -246,7 +246,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
     await saveSession(q, studentId, done);
     return nothing;
   }
-  const { card: updated, promoted } = result;
+  const { card: updated, promoted, demoted } = result;
   const finished = buildQueue({ ...rec.cards, [formulaId]: updated }, done, today).length === 0;
   // Sent together: one trip to the database.
   await Promise.all([
@@ -268,7 +268,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
         .values({ studentId, day: today, done: true, missed: 0 })
         .onConflictDoUpdate({ target: [days.studentId, days.day], set: { done: true, missed: 0 } }),
   ]);
-  return { formulaName: FORMULA_BY_ID[formulaId].name, promoted, finished };
+  return { formulaName: FORMULA_BY_ID[formulaId].name, promoted, demoted, finished };
 }
 
 function assertDue(ctx: Awaited<ReturnType<typeof context>>, formulaId: string) {

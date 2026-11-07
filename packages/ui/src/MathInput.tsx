@@ -14,12 +14,83 @@ declare module "react" {
 }
 
 let loader: Promise<unknown> | null = null;
+/** Set once MathLive is in, so a box on a later card appears right away instead of a frame or two late. */
+let ready = false;
 function loadMathLive() {
   return (loader ??= import("mathlive").then(({ MathfieldElement }) => {
     MathfieldElement.fontsDirectory = "/mathlive/fonts";
     MathfieldElement.soundsDirectory = null;
     keepAboveKeyboard();
+    ready = true;
   }));
+}
+
+/** On a phone or tablet, focusing a box opens the on-screen keyboard, so a card waits for a tap. */
+const isTouch = () => window.matchMedia("(pointer: coarse)").matches;
+
+/**
+ * MathLive can believe a box has focus when nothing on the page does (after the window was in the
+ * background, or with several boxes on a card), and then a click on a box leaves keystrokes going
+ * nowhere. Once it's done with the click, check, and hand focus to the box's real input.
+ */
+function ensureFocus(el: MathfieldElement) {
+  const take = () => {
+    const sink = el.shadowRoot?.querySelector<HTMLElement>(".ML__keyboard-sink");
+    if (sink && el.shadowRoot?.activeElement !== sink) sink.focus({ preventScroll: true });
+  };
+  take();
+  // Again after MathLive's own focus step, which runs a moment later.
+  setTimeout(take, 0);
+}
+
+/** Typing `x1` gives x₁, so a long formula doesn't need an arrow key after every subscript. */
+const SHORTCUTS = {
+  ...Object.fromEntries(
+    ["a", "b", "c", "d", "n", "p", "q", "r", "s", "t", "x", "y", "z", "A", "B"].flatMap((v) => [0, 1, 2, 3, 4].map((i) => [`${v}${i}`, `${v}_${i}`])),
+  ),
+  cap: "\\cap",
+  cup: "\\cup",
+};
+
+/**
+ * `/` starts a fraction with the cursor in the denominator, and everything typed after it used to
+ * stay there: `I+B/2-1` came out as I + B/(2-1). Read it the way a calculator does instead: the
+ * denominator ends at the next + - = or *, or at a `)` that closes nothing, unless it's in
+ * brackets (`a/(b+c)`). The toolbar's fraction button leaves the cursor alone. This listens to
+ * `beforeinput`, so the on-screen keyboard follows the same rule.
+ */
+function endDenominators(el: MathfieldElement, fromToolbar: () => boolean) {
+  let inside: { brackets: number; typed: number } | null = null;
+  const onInput = (e: Event) => {
+    const data = (e as InputEvent).data;
+    if (typeof data !== "string") return;
+    if (data.startsWith("\\frac{#@}")) {
+      inside = fromToolbar() ? null : { brackets: 0, typed: 0 };
+      return;
+    }
+    if (!inside) return;
+    if (data === "(") inside.brackets++;
+    else if (data === ")" && inside.brackets > 0) inside.brackets--;
+    else if (inside.brackets === 0 && inside.typed > 0 && (data === ")" || /^\s*([+\-=*]|\\cdot|\\times)\s*$/.test(data))) {
+      el.executeCommand("moveAfterParent");
+      inside = null;
+      return;
+    }
+    inside.typed++;
+  };
+  // The cursor moved somewhere else, so whatever comes next isn't the end of that denominator.
+  const forget = () => (inside = null);
+  const onKey = (e: KeyboardEvent) => {
+    if (/^(Arrow|Tab|Home|End|Backspace|Delete)/.test(e.key)) forget();
+  };
+  el.addEventListener("beforeinput", onInput);
+  el.addEventListener("keydown", onKey, { capture: true });
+  el.addEventListener("pointerdown", forget);
+  return () => {
+    el.removeEventListener("beforeinput", onInput);
+    el.removeEventListener("keydown", onKey, { capture: true });
+    el.removeEventListener("pointerdown", forget);
+  };
 }
 
 /** Room below the answer box for the math toolbar and the Check / Continue buttons. */
@@ -82,8 +153,9 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
   { onChange, onEnter, onFocus, disabled, tools = true, autoFocus, placeholder, state = "idle" },
   ref,
 ) {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(ready);
   const mf = useRef<MathfieldElement>(null);
+  const toolbarInsert = useRef(false);
   const cb = useRef({ onChange, onEnter, onFocus });
   useEffect(() => {
     cb.current = { onChange, onEnter, onFocus };
@@ -103,7 +175,9 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
     el.mathVirtualKeyboardPolicy = "auto";
     el.smartFence = true;
     el.menuItems = [];
+    el.inlineShortcuts = { ...el.inlineShortcuts, ...SHORTCUTS };
     if (placeholder) el.placeholder = placeholder;
+    const stopTracking = endDenominators(el, () => toolbarInsert.current);
     const onInput = () => cb.current.onChange(el.value);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -115,8 +189,19 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
     el.addEventListener("focus", onFocusIn);
     el.addEventListener("input", onInput);
     el.addEventListener("keydown", onKey, { capture: true });
-    if (autoFocus) requestAnimationFrame(() => el.focus());
+    if (autoFocus && !isTouch()) {
+      requestAnimationFrame(() => {
+        // Already in a box: the frame came late (a background tab), and the click wins.
+        if (document.activeElement?.tagName === "MATH-FIELD") return;
+        // MathLive scrolls to a box it focuses, which would open a card partway down the page.
+        const top = window.scrollY;
+        el.focus();
+        window.scrollTo({ top });
+        ensureFocus(el);
+      });
+    }
     return () => {
+      stopTracking();
       el.removeEventListener("focus", onFocusIn);
       el.removeEventListener("input", onInput);
       el.removeEventListener("keydown", onKey, { capture: true });
@@ -124,11 +209,23 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
   }, [loaded, autoFocus, placeholder]);
 
   useEffect(() => {
-    if (mf.current) mf.current.readOnly = !!disabled;
+    const el = mf.current;
+    if (!el) return;
+    el.readOnly = !!disabled;
+    // Once answered, let go of the box: the on-screen keyboard closes and the result is in view.
+    if (disabled) {
+      el.blur();
+      window.mathVirtualKeyboard?.hide();
+    }
   }, [disabled, loaded]);
 
+  // The next card shouldn't open under a keyboard left over from this one.
+  useEffect(() => () => window.mathVirtualKeyboard?.hide(), []);
+
   const insert = (latex: string) => {
+    toolbarInsert.current = true;
     mf.current?.insert(latex, { focus: true, selectionMode: "placeholder" });
+    toolbarInsert.current = false;
     if (mf.current) onChange(mf.current.value);
   };
 
@@ -152,7 +249,22 @@ export const MathInput = forwardRef<MathInputHandle, Props>(function MathInput(
 
   return (
     <div className="w-full">
-      <div className={`rounded-2xl border-2 px-4 py-2.5 transition-all ${ring}`}>
+      <div
+        className={`rounded-2xl border-2 px-4 py-2.5 transition-all ${ring}`}
+        // MathLive keeps its own focus events to itself, so this is how the card learns which box is in use.
+        onFocusCapture={() => cb.current.onFocus?.()}
+        onPointerDown={() => {
+          if (disabled || !mf.current) return;
+          cb.current.onFocus?.();
+          ensureFocus(mf.current);
+        }}
+        // The box's padding isn't the field: a click there would otherwise just take focus away.
+        onMouseDown={(e) => {
+          if (e.target === mf.current || disabled) return;
+          e.preventDefault();
+          mf.current?.focus();
+        }}
+      >
         {loaded ? (
           <math-field ref={mf} className="block w-full text-xl outline-none" />
         ) : (

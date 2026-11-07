@@ -8,7 +8,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     statement: "\\left(\\frac{u}{v}\\right)' = \\frac{u'v - uv'}{v^2}",
     setup: "Write $p = u'$ and $q = v'$.",
     whenToUse: "Differentiating one function divided by another.",
-    recall: [{ lhs: "\\left(\\frac{u}{v}\\right)' =", answer: "\\frac{pv-uq}{v^2}", vars: { u: [1, 5], v: [1, 5], p: [1, 5], q: [1, 5] }, banned: ["'", "\\prime"] }],
+    recall: [{ lhs: "\\left(\\frac{u}{v}\\right)' =", answer: "\\frac{pv-uq}{v^2}", vars: { u: [1, 5], v: [1, 5], p: [1, 5], q: [1, 5] }, aliases: { "u'": "p", "v'": "q" }, banned: ["'", "\\prime"] }],
     related: ["product-rule", "chain-rule"],
     problems: [
       { id: "qr1", text: "Let $f(x) = \\frac{x}{x+1}$. Find $f'(1)$.", answer: "\\frac{1}{4}", solution: "$f'(x) = \\frac{1}{(x+1)^2}$." },
@@ -22,7 +22,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     statement: "\\lim_{x\\to a}\\frac{f(x)}{g(x)} = \\lim_{x\\to a}\\frac{f'(x)}{g'(x)} \\quad \\left(\\tfrac00 \\text{ or } \\tfrac\\infty\\infty\\right)",
     setup: "Write $p = f'(a)$ and $q = g'(a) \\ne 0$.",
     whenToUse: "A limit gives $\\frac00$ or $\\frac\\infty\\infty$ when you plug in.",
-    recall: [{ lhs: "\\lim_{x\\to a}\\frac{f(x)}{g(x)} \\ \\left(\\tfrac00\\right) =", answer: "\\frac{p}{q}", vars: { p: [1, 5], q: [1, 5] } }],
+    recall: [{ lhs: "\\lim_{x\\to a}\\frac{f(x)}{g(x)} \\ \\left(\\tfrac00\\right) =", answer: "\\frac{p}{q}", vars: { p: [1, 5], q: [1, 5] }, aliases: { "f'(a)": "p", "g'(a)": "q" } }],
     related: ["key-limits", "taylor-sin-cos"],
     problems: [
       { id: "lh1", text: "Evaluate $\\lim_{x\\to0}\\frac{e^x - 1}{x}$.", answer: "1", solution: "$\\frac{e^0}{1} = 1$." },
@@ -154,7 +154,7 @@ export const CALCULUS_2 = defineTopic("Calculus", [
     statement: "y = f(a) + f'(a)(x - a)",
     setup: "Write $p = f(a)$ and $m = f'(a)$.",
     whenToUse: "The line touching a curve at a point, or a linear approximation.",
-    recall: [{ lhs: "y =", answer: "p+m(x-a)", vars: { p: [1, 5], m: [1, 5], x: [1, 5], a: [1, 5] } }],
+    recall: [{ lhs: "y =", answer: "p+m(x-a)", vars: { p: [1, 5], m: [1, 5], x: [1, 5], a: [1, 5] }, aliases: { "f'(a)": "m", "f(a)": "p" } }],
     related: ["power-rule", "common-derivatives"],
     problems: [
       { id: "tg1", text: "Find the $y$-intercept of the tangent line to $y = x^2$ at $x = 3$.", answer: "-9", uses: ["tangent-line", "power-rule"], solution: "$y = 9 + 6(x - 3)$." },

@@ -18,6 +18,12 @@ export const TARGET_RETENTION = 0.9;
 export const PROMOTE_STABILITY = 10;
 /** An application card counts as mastered at this stability. */
 export const MASTERED_STABILITY = 30;
+/**
+ * Missing this many application reviews in a row sends a card back to recall. One miss can be a
+ * slip; two in a row, on different days, mean the formula itself has gone, so problems won't help
+ * until it's remembered again.
+ */
+export const DEMOTE_AFTER = 2;
 
 const scheduler = fsrs(
   generatorParameters({ request_retention: TARGET_RETENTION, enable_fuzz: false, enable_short_term: false }),
@@ -37,6 +43,8 @@ export interface Memory {
   scheduledDays: number;
   due: number;
   last: number | null;
+  /** Application reviews missed in a row (older saves don't have it). */
+  misses?: number;
 }
 
 export interface Card {
@@ -85,14 +93,20 @@ export function newCard(formulaId: string, source: Card["source"], day: number, 
   return { formulaId, source, stage: "recall", memory: { ...freshMemory(day), due: introduceOn }, addedDay: day };
 }
 
-export function review(card: Card, firstTryCorrect: boolean, day: number): { card: Card; promoted: boolean } {
+export function review(card: Card, firstTryCorrect: boolean, day: number): { card: Card; promoted: boolean; demoted: boolean } {
   const next = scheduler.next(toFsrs(card.memory), toDate(day), firstTryCorrect ? Rating.Good : Rating.Again);
   const memory = fromFsrs(next.card, day);
-  if (card.stage === "recall" && memory.stability >= PROMOTE_STABILITY) {
-    // Knows it cold: start training recognition, with its own fresh memory model (still a reviewed card).
-    return { card: { ...card, stage: "apply", memory: { ...freshMemory(day), due: day + 1, last: day } }, promoted: true };
+  // Each stage has its own memory model, so a card that changes stage starts over (still a reviewed card).
+  const restart = { ...freshMemory(day), due: day + 1, last: day };
+  if (card.stage === "recall") {
+    // Knows it cold: start training recognition.
+    if (memory.stability >= PROMOTE_STABILITY) return { card: { ...card, stage: "apply", memory: restart }, promoted: true, demoted: false };
+    return { card: { ...card, memory }, promoted: false, demoted: false };
   }
-  return { card: { ...card, memory }, promoted: false };
+  const misses = firstTryCorrect ? 0 : (card.memory.misses ?? 0) + 1;
+  // Struggling: back to typing the formula from memory. It returns to problems the usual way.
+  if (misses >= DEMOTE_AFTER) return { card: { ...card, stage: "recall", memory: restart }, promoted: false, demoted: true };
+  return { card: { ...card, memory: { ...memory, misses } }, promoted: false, demoted: false };
 }
 
 /** Predicted probability the student remembers the card on `day` (null if never reviewed). */

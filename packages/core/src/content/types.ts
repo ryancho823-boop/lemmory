@@ -61,6 +61,11 @@ export interface RecallBlank {
    * the definition written out counts too. They're allowed in answers but not sampled on their own.
    */
   defs?: Record<string, string>;
+  /**
+   * The real notation for a stand-in variable, like `P(B)` for `q`. A student may type either, and
+   * the answer may be written with it, so the card can show and accept the formula as it's known.
+   */
+  aliases?: Record<string, string>;
   /** Substrings that may not appear in the input, so the left side can't be retyped as the answer. */
   banned?: string[];
   /** Require a factored ("product") or expanded ("sum") answer for identities. */
