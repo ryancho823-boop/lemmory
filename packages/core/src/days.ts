@@ -19,6 +19,11 @@ export function isTimeZone(tz: string) {
   }
 }
 
+/** Born in this month (1–12) and year? A birthday month still counts as under 13, since we don't ask the day. */
+export function isUnder13(year: number, month: number, now = new Date()) {
+  return (now.getFullYear() - year) * 12 + now.getMonth() + 1 - month <= 13 * 12;
+}
+
 /** "2026-11-06" → day number, or null. */
 export function parseDate(iso: string) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());

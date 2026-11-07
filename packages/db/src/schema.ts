@@ -34,6 +34,10 @@ export const users = sqliteTable("users", {
    * it per class). Null until their first visit.
    */
   settledThrough: integer("settled_through"),
+  /** Who gave permission for a student under 13: a parent by email, a parent's signed form, or a school. Null for everyone else; we don't keep birthdays. */
+  consent: text("consent", { enum: ["parent", "signed", "school"] }),
+  /** When the parent is due their follow-up email, the second step of email consent. Cleared once sent. */
+  parentFollowUpAt: integer("parent_follow_up_at", { mode: "timestamp_ms" }),
   createdAt: createdAt(),
 });
 
@@ -54,11 +58,30 @@ export const emailTokens = sqliteTable(
   {
     id: text("id").primaryKey(),
     userId: user("user_id"),
-    kind: text("kind", { enum: ["confirm", "reset"] }).notNull(),
+    kind: text("kind", { enum: ["confirm", "reset", "remove"] }).notNull(),
     email: text("email"),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [index("email_tokens_user").on(t.userId, t.kind)],
+);
+
+/**
+ * A child under 13 waiting on a parent. It holds only what we may keep before permission, and it's
+ * deleted when the parent agrees or the link runs out. `id` is a SHA-256 of the emailed token.
+ */
+export const parentRequests = sqliteTable(
+  "parent_requests",
+  {
+    id: text("id").primaryKey(),
+    firstName: text("first_name").notNull(),
+    parentEmail: text("parent_email").notNull(),
+    classId: text("class_id").references(() => classes.id, { onDelete: "cascade" }),
+    timezone: text("timezone"),
+    /** We have the parent's signed form, so the account can be in a class. */
+    signed: integer("signed", { mode: "boolean" }).notNull().default(false),
+    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (t) => [index("parent_requests_email").on(t.parentEmail)],
 );
 
 /** What a teacher wants emailed. No row means the defaults: the weekly report is on. */
@@ -87,6 +110,8 @@ export const classes = sqliteTable(
     gameDay: integer("game_day").notNull(),
     /** Points each student had already earned on `gameDay` before the game started. */
     gameBaseline: text("game_baseline", { mode: "json" }).$type<Record<string, number>>().notNull().default({}),
+    /** Set once the school's signed form is in, so under-13s can join without a parent's email. */
+    schoolApprovedAt: integer("school_approved_at", { mode: "timestamp_ms" }),
     createdAt: createdAt(),
   },
   (t) => [index("classes_teacher").on(t.teacherId)],

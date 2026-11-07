@@ -1,4 +1,5 @@
 import { isoDate } from "@lemmory/core/days";
+import { SITE_URL } from "@lemmory/core/urls";
 import { PageHeader, Panel } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
@@ -34,6 +35,19 @@ export default async function Settings({ params }: PageProps<"/c/[classId]/setti
           <p className="mb-3 text-sm text-ink/55">A new code stops the old one from working. Students already in the class stay.</p>
           <NewCodeButton classId={classId} />
         </div>
+        <p className="mt-4 border-t border-line pt-4 text-sm text-ink/55">
+          {klass.schoolApprovedAt ? (
+            "Your school approved this class, so students under 13 can join with the code."
+          ) : (
+            <>
+              Students under 13 need a parent&apos;s signed form. A school can approve a whole class with the{" "}
+              <a href={`${SITE_URL}/privacy/school-form`} className="underline">
+                school form
+              </a>
+              .
+            </>
+          )}
+        </p>
       </Panel>
       <ConfirmForm
         title="Delete this class"

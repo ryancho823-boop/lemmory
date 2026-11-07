@@ -25,6 +25,12 @@
     "db:seed": "npm run seed -w @lemmory/db",
     "club:verify": "npm run club:verify -w @lemmory/db --",
     "club:verify:prod": "npm run club:verify:prod -w @lemmory/db --",
+    "school:approve": "npm run school:approve -w @lemmory/db --",
+    "school:approve:prod": "npm run school:approve:prod -w @lemmory/db --",
+    "student:data": "npm run student:data -w @lemmory/db --",
+    "student:data:prod": "npm run student:data:prod -w @lemmory/db --",
+    "parent:invite": "npm run parent:invite -w @lemmory/db --",
+    "parent:invite:prod": "npm run parent:invite:prod -w @lemmory/db --",
     "setup": "npm run db:migrate && npm run db:seed"
   },
   "devDependencies": {

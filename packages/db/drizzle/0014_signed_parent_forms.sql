@@ -1,0 +1,1 @@
+ALTER TABLE `parent_requests` ADD `signed` integer DEFAULT false NOT NULL;
