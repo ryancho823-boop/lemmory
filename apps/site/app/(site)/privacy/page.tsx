@@ -19,7 +19,7 @@ export default function Privacy() {
           the classes they join, and their practice: which formulas are in their deck, each answer marked right or wrong, which formulas they mixed up,
           and their points and streak. We ask for a contact email, theirs or a parent&apos;s, and use it only for account emails: confirming the address, changing it, and resetting passwords. We don&apos;t keep the answers they type.
           At sign-up we ask for a birth month and year to see whether a parent or school has to agree first. We don&apos;t store them. A student under 13
-          gets a cookie for one day so the answer can&apos;t simply be changed, and we record who gave permission.
+          gets a cookie for one day so the answer can&apos;t simply be changed, and we record who gave permission, including the name a parent signs with and when.
         </p>
         <p>
           <b>Teachers:</b> name, email address and password (hashed the same way), their classes and assignments, the plan they chose, and whether they want the weekly report. Paid plans
@@ -84,10 +84,9 @@ export default function Privacy() {
         <p>A child under 13 can use Lemmory only after one of these:</p>
         <ul>
           <li>
-            <b>A parent or guardian agrees.</b> The child gives us their first name and a parent&apos;s email, and nothing else. For a child studying on
-            their own, we email the parent, who agrees and sets up the account. A day later we email again, with a link to delete the account if the
-            parent didn&apos;t agree or changes their mind. To join a class, where teachers and classmates see some of their information, the parent signs
-            the <Link href="/privacy/parent-form">parent form</Link> first.
+            <b>A parent or guardian agrees.</b> The child gives us their first name and a parent&apos;s email, and nothing else. We email the parent, who
+            signs online and sets up the account. A day later we email again, with a link to delete the account if the parent didn&apos;t sign or changes
+            their mind. A parent can use the paper <Link href="/privacy/parent-form">parent form</Link> instead.
           </li>
           <li>
             <b>The child&apos;s school agrees</b> for a class it runs, by signing the <Link href="/privacy/school-form">school form</Link>. A school can do

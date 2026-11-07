@@ -21,7 +21,7 @@ import { type DaySession, buildQueue, emptySession, isDoneToday, newCards, nothi
 import { isNew } from "@lemmory/core/srs";
 import { type StarterLevel, starterDeck } from "@lemmory/core/starter";
 import { SITE_URL } from "@lemmory/core/urls";
-import { EMAIL_APPROVAL_FOR_CLASSES } from "./accounts";
+import { ONLINE_SIGNATURE } from "./accounts";
 import { getStudentPlan, isOpen, planState, studentPlanState } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, handDaysToStudents, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday, studentZones } from "./records";
@@ -408,12 +408,12 @@ export async function schoolPermissionOnly(studentId: string) {
   return row?.consent === "school";
 }
 
-/** Why an under-13 can't join this class, if they can't. See EMAIL_APPROVAL_FOR_CLASSES. */
+/** Why an under-13 can't join this class, if they can't. See ONLINE_SIGNATURE. */
 export async function classPermissionProblem(studentId: string, klass: { schoolApprovedAt: Date | null }) {
   if (klass.schoolApprovedAt) return null;
   const row = await db.select({ consent: users.consent }).from(users).where(eq(users.id, studentId)).get();
   if (row?.consent === "school") return "Your school's permission covers your school's classes. Ask a parent to email support@lemmory.com.";
-  if (row?.consent === "parent" && !EMAIL_APPROVAL_FOR_CLASSES) return `To join a class, a parent needs to sign the form at ${SITE_URL}/privacy/parent-form.`;
+  if (row?.consent === "parent" && !ONLINE_SIGNATURE) return `To join a class, a parent needs to sign the form at ${SITE_URL}/privacy/parent-form.`;
   return null;
 }
 

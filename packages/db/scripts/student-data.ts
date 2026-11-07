@@ -34,8 +34,8 @@ async function main() {
   const inClasses = await db.select({ name: classes.name }).from(enrollments).innerJoin(classes, eq(classes.id, enrollments.classId)).where(eq(enrollments.studentId, student.id));
   const deck = await db.select({ formulaId: cards.formulaId, stage: cards.stage }).from(cards).where(eq(cards.studentId, student.id));
   const [answers] = await db.select({ n: count() }).from(reviews).where(eq(reviews.studentId, student.id));
-  const { name, recoveryEmail, timezone, consent, createdAt } = student;
-  console.log(JSON.stringify({ name, username, contactEmail: recoveryEmail, timezone, permission: consent, joined: createdAt, classes: inClasses.map((c) => c.name), cardsInDeck: deck, answersRecorded: answers.n }, null, 2));
+  const { name, recoveryEmail, timezone, consent, parentSignature, parentSignedAt, createdAt } = student;
+  console.log(JSON.stringify({ name, username, contactEmail: recoveryEmail, timezone, permission: consent, parentSignature, parentSignedAt, joined: createdAt, classes: inClasses.map((c) => c.name), cardsInDeck: deck, answersRecorded: answers.n }, null, 2));
 }
 
 main().then(

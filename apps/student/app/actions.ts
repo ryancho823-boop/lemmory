@@ -101,10 +101,24 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   redirect("/");
 }
 
-/** Remembers an under-13 birthday for a day, so going back to pick another year doesn't get around the parent step. */
+/**
+ * Remembers an under-13 birthday for a day. "1" is an answer that can be corrected once, for a slip
+ * in the year list; "back" means it was; "2" is a second under-13 answer, which can't be changed.
+ */
 const UNDER_13_COOKIE = "lemmory_under13";
+const setUnder13 = async (value: string) =>
+  (await cookies()).set(UNDER_13_COOKIE, value, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 86_400 });
+const under13Answer = async () => (await cookies()).get(UNDER_13_COOKIE)?.value;
+
+/** Returns whether the answer can still be corrected. */
 export async function noteUnder13() {
-  (await cookies()).set(UNDER_13_COOKIE, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 86_400 });
+  const was = await under13Answer();
+  const now = was === "back" || was === "2" ? "2" : "1";
+  await setUnder13(now);
+  return now === "1";
+}
+export async function changeBirthday() {
+  if ((await under13Answer()) === "1") await setUnder13("back");
 }
 const SCHOOL_ONLY = "Your school's permission covers your school's classes. Ask a parent to email support@lemmory.com.";
 
@@ -118,7 +132,8 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const onOwn = fd.get("own") === "1";
   const birthYear = Number(field(fd, "birthYear"));
   const birthMonth = Number(field(fd, "birthMonth"));
-  const under13 = (await cookies()).has(UNDER_13_COOKIE) || (birthYear > 0 && birthMonth > 0 && isUnder13(birthYear, birthMonth));
+  const answer = await under13Answer();
+  const under13 = answer === "1" || answer === "2" || (birthYear > 0 && birthMonth > 0 && isUnder13(birthYear, birthMonth));
   const values = {
     code: field(fd, "code").toUpperCase(),
     firstName: field(fd, "firstName"),
@@ -174,14 +189,15 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
 
 /** A parent agrees from their email and sets up the account. */
 export async function approveChild(token: string, _: FormState, fd: FormData): Promise<FormState> {
-  const values = { lastName: field(fd, "lastName"), username: field(fd, "username").toLowerCase() };
+  const values = { lastName: field(fd, "lastName"), username: field(fd, "username").toLowerCase(), signature: field(fd, "signature") };
   const password = String(fd.get("password") ?? "");
   const fail = (error: string) => ({ error, values });
   if (fd.get("agree") !== "on") return fail("Tick the box to give your permission.");
+  if (!/\S\s+\S/.test(values.signature) || values.signature.length > 80) return fail("Type your full name to sign.");
   if (!values.lastName || values.lastName.length > 40) return fail("Enter their last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
-  const done = await approveParentRequest(str(token), values.lastName, values.username, password);
+  const done = await approveParentRequest(str(token), values.lastName, values.username, password, values.signature);
   if (!done) return fail("This link has expired. Ask your child to sign up again.");
   if (done === "taken") return fail("That username is taken. Try another.");
   if (done.classId) await joinClass(done.id, done.classId);

@@ -40,7 +40,7 @@ export default async function Settings({ params }: PageProps<"/c/[classId]/setti
             "Your school approved this class, so students under 13 can join with the code."
           ) : (
             <>
-              Students under 13 need a parent&apos;s signed form. A school can approve a whole class with the{" "}
+              Students under 13 need a parent to sign online, which we set up by email. A school can approve a whole class with the{" "}
               <a href={`${SITE_URL}/privacy/school-form`} className="underline">
                 school form
               </a>

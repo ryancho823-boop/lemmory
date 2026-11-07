@@ -46,14 +46,15 @@ test("a parent agrees, the account appears, and the follow-up can delete it", as
 
   await accounts.createStudent("Taken", "taken", "correct-horse");
   assert.equal(await accounts.approveParentRequest(token, "Lee", "taken", "correct-horse"), "taken");
-  const done = await accounts.approveParentRequest(token, "Lee", "mia", "correct-horse");
+  const done = await accounts.approveParentRequest(token, "Lee", "mia", "correct-horse", "Dana Lee");
   assert.ok(done && done !== "taken");
   assert.equal((await requests()).length, 0);
   assert.equal(await accounts.approveParentRequest(token, "Lee", "mia2", "correct-horse"), null);
   const row = (await userRow(done.id))!;
   assert.equal(row.name, "Mia Lee");
-  assert.equal(row.consent, "parent");
-  assert.doesNotMatch(outbox.at(-1)!.text, /leaderboard/);
+  assert.equal(row.consent, "signed");
+  assert.equal(row.parentSignature, "Dana Lee");
+  assert.ok(row.parentSignedAt);
   assert.ok(row.emailConfirmedAt);
   assert.match((await accounts.changeEmail(done.id, "student", "kid@test.test", "correct-horse"))!, /parent's email/);
   assert.equal((await userRow(done.id))!.recoveryEmail, "parent@test.test");
@@ -108,29 +109,22 @@ test("classmates see an under-13 as a first name and initial, and teachers see t
   assert.deepEqual(await names(true), ["Ana Maria Ruiz", "Teo Park"]);
 });
 
-test("a class needs a signed form, not an email, unless the school approved it", async () => {
+test("a parent's online signature covers a class, and other under-13 limits still hold", async () => {
   const teacher = (await accounts.createTeacher("T", "forms@test.test", "correct-horse"))!;
   const classId = await createClass(teacher, { name: "Forms", contestName: null, contestDay: null, timezone: "UTC" });
   const klass = (await db.select().from(schema.classes).where(eq(schema.classes.id, classId)).get())!;
 
   assert.equal(await accounts.requestParentPermission("Lia", "form@test.test", classId), null);
-  const mail = outbox.at(-1)!;
-  assert.match(mail.text, /signed form/);
-  assert.ok(mail.text.includes(klass.joinCode));
-  assert.doesNotMatch(mail.text, /token=/);
-
-  assert.equal(await accounts.requestParentPermission("Lia", "form@test.test", classId, undefined, true), null);
-  const done = await accounts.approveParentRequest(tokenIn(), "Fox", "lia", "correct-horse");
+  assert.match(outbox.at(-1)!.text, /teachers see their results/);
+  const done = await accounts.approveParentRequest(tokenIn(), "Fox", "lia", "correct-horse", "Sam Fox");
   assert.ok(done && done !== "taken");
   assert.equal(done.classId, classId);
   assert.equal((await userRow(done.id))!.consent, "signed");
   assert.equal(await classPermissionProblem(done.id, klass), null);
 
-  const onEmail = (await accounts.createStudent("Em", "em", "correct-horse", "UTC", undefined, { consent: "parent" }))!;
   const viaSchool = (await accounts.createStudent("Sc", "sc", "correct-horse", "UTC", undefined, { consent: "school" }))!;
   const teen = (await accounts.createStudent("Te", "te", "correct-horse", "UTC"))!;
-  assert.match((await classPermissionProblem(onEmail, klass))!, /sign the form/);
   assert.match((await classPermissionProblem(viaSchool, klass))!, /school's classes/);
   assert.equal(await classPermissionProblem(teen, klass), null);
-  assert.equal(await classPermissionProblem(onEmail, { schoolApprovedAt: new Date() }), null);
+  assert.equal(await classPermissionProblem(viaSchool, { schoolApprovedAt: new Date() }), null);
 });

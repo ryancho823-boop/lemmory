@@ -44,7 +44,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
         </>
       }
     >
-      <JoinForm code={typeof code === "string" ? code : ""} onOwn={onOwn} under13={(await cookies()).has("lemmory_under13")} />
+      <JoinForm code={typeof code === "string" ? code : ""} onOwn={onOwn} answer={(await cookies()).get("lemmory_under13")?.value} />
     </AuthFrame>
   );
 }
