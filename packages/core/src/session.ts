@@ -81,8 +81,8 @@ export function recordAttempt<S extends QueueSession>(session: S, card: Card, co
     if (card.source === "self") entry.extra = true;
   }
   if (!correct) return { session: next, entry, done: null };
-  const { card: updated, promoted } = review(card, firstTry, today);
-  return { session: { ...next, completed: [...next.completed, id] }, entry, done: { card: updated, promoted } };
+  const { card: updated, promoted, demoted } = review(card, firstTry, today);
+  return { session: { ...next, completed: [...next.completed, id] }, entry, done: { card: updated, promoted, demoted } };
 }
 
 /**

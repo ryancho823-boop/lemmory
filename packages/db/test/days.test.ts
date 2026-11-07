@@ -67,7 +67,7 @@ test("in a class: missed cards come back the next day on top of that day's own, 
   shift = 1;
   assert.equal((await view(s)).queue.length, 7, "day 1: the 3 left over, plus the last 4 new ones");
   shift = 2;
-  assert.equal((await view(s)).queue.length, 7, "day 2: day 1 was skipped, so all 7 are still there");
+  assert.equal((await view(s)).queue.length, 10, "day 2: day 1 was skipped, so all 7 are still there, plus day 0's 3 reviews coming back");
   await doCards(s, 99);
   assert.ok((await view(s)).doneToday, "finishing empties the day, even when cards graduate");
   shift = 3;

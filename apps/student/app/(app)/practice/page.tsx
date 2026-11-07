@@ -11,5 +11,5 @@ export default async function PracticePage() {
   const deck = Object.values(v.record.cards)
     .filter((c) => !isNew(c) && !v.queue.includes(c.formulaId))
     .map((c) => ({ id: c.formulaId, topic: FORMULA_BY_ID[c.formulaId].topic }));
-  return <Practice deck={deck} />;
+  return <Practice deck={deck} deckSize={Object.keys(v.record.cards).length} />;
 }

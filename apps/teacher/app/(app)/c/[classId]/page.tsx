@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR } from "@lemmory/core/formulas";
-import { classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
-import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
+import { LOW_ACCURACY, classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
+import { BarList } from "@lemmory/ui/charts";
 
 /** Formulas under this first-try accuracy are listed under "What the class is forgetting". */
 const FORGETTING = 0.8;
@@ -23,8 +23,6 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
     assignments.map((a) => a.formulaId),
     today,
   ).filter((h) => h.n > 0);
-  // Formulas are compared with this class's own average, not a fixed cutoff.
-  const typical = average(health.map((h) => h.accuracy));
   // Only formulas the class is actually getting wrong: a 100% formula isn't being forgotten.
   const forgotten = health.filter((h) => (h.accuracy ?? 1) < FORGETTING);
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
@@ -47,6 +45,9 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
     .sort((a, b) => a.score - b.score)
     .slice(0, 5);
   const thisWeek = assignments.filter((a) => a.week === klass.currentWeek);
+  // Weeks only move when the teacher says so, so point it out when one has run long.
+  const weekAge = thisWeek.length ? today - Math.max(...thisWeek.map((a) => a.day)) : 0;
+  const contestOver = klass.contestDay !== null && klass.contestDay < today;
 
   return (
     <div className="space-y-6">
@@ -63,6 +64,15 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
         action={<Button href={`${base}/assign`}>Assign formulas</Button>}
       />
 
+      {contestOver && (
+        <p className="rounded-lg bg-lemon-soft px-4 py-3">
+          {klass.contestName ?? "Your contest"} is over, so students no longer see a countdown.{" "}
+          <Link href={`${base}/settings`} className="font-semibold underline">
+            Set the next contest
+          </Link>
+        </p>
+      )}
+
       {students.length < 3 && (
         <Panel className="p-5">
           <h2 className="text-[15px] font-bold">{students.length ? "Invite the rest of your class" : "Invite your students"}</h2>
@@ -75,7 +85,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
         <Panel>
           <PanelHeader
             title="What the class is forgetting"
-            info={`Right on the first try, last 14 days. Red means well below this class's average${typical === null ? "" : ` (${pct(typical)})`}: reteach those.`}
+            info="Right on the first try, last 4 weeks. Red means under 60%: reteach those."
             action={
               <Link href={`${base}/formulas`} className="text-sm font-semibold text-ink/50 hover:text-ink">
                 All
@@ -93,7 +103,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
               </p>
             ) : (
               <BarList
-                flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
+                flagBelow={LOW_ACCURACY}
                 unit="right"
                 rows={forgotten.slice(0, 8).map((h) => ({
                   key: h.formulaId,
@@ -135,6 +145,7 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
           <Panel>
             <PanelHeader
               title={`Week ${klass.currentWeek} homework`}
+              sub={weekAge >= 7 ? `Last assigned ${weekAge} days ago. Ready for week ${klass.currentWeek + 1}?` : undefined}
               action={
                 <Link href={`${base}/assign`} className="text-sm font-semibold text-ink/50 hover:text-ink">
                   Edit

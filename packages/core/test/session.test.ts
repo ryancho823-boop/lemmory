@@ -90,3 +90,25 @@ test("a card the student added themselves is logged as extra", () => {
   const { entry } = recordAttempt(emptySession(DAY), newCard("heron", "self", DAY), true, DAY);
   assert.equal(entry!.extra, true);
 });
+
+test("a retried card only counts as finished once it's right, on both sides", async () => {
+  const { todayProgress } = await import("../src/analytics");
+  const { newCard, review } = await import("../src/srs");
+  const today = 20_000;
+  const finished = review(newCard("a", "teacher", today), true, today).card;
+  const missed = newCard("b", "teacher", today);
+  const student = {
+    id: "s",
+    name: "S",
+    isYou: false,
+    cards: { a: finished, b: missed },
+    log: [
+      { day: today, formulaId: "a", stage: "recall" as const, firstTry: true },
+      { day: today, formulaId: "b", stage: "recall" as const, firstTry: false },
+    ],
+    scored: {},
+    doneDays: [],
+    missed: {},
+  };
+  assert.deepEqual(todayProgress(student, today), { answered: 1, total: 2 });
+});

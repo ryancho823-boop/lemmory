@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LEVEL_LABEL, TOPIC_COLOR, type Formula, type Topic } from "@lemmory/core/content/types";
 import type { Stage } from "@lemmory/core/srs";
+import { GOOD_ACCURACY, LOW_ACCURACY } from "@lemmory/core/points";
 import { InfoTip } from "./InfoTip";
 
 export function cx(...c: (string | false | null | undefined)[]) {
@@ -42,7 +43,7 @@ export function PageHeader({ eyebrow, title, sub, info, action }: { eyebrow?: st
   );
 }
 
-type BtnProps = { href?: string; onClick?: () => void; variant?: "primary" | "lemon" | "ghost" | "outline"; size?: "sm" | "md" | "lg"; className?: string; children: React.ReactNode; disabled?: boolean; type?: "button" | "submit" };
+type BtnProps = { href?: string; onClick?: () => void; variant?: "primary" | "lemon" | "ghost" | "outline" | "danger"; size?: "sm" | "md" | "lg"; className?: string; children: React.ReactNode; disabled?: boolean; type?: "button" | "submit" };
 
 export function Button({ href, onClick, variant = "primary", size = "md", className, children, disabled, type = "button" }: BtnProps) {
   const cls = cx(
@@ -54,6 +55,7 @@ export function Button({ href, onClick, variant = "primary", size = "md", classN
     variant === "lemon" && "bg-lemon text-ink hover:brightness-105",
     variant === "ghost" && "text-ink/65 hover:bg-ink/5 hover:text-ink",
     variant === "outline" && "border border-line bg-white text-ink hover:border-ink/25",
+    variant === "danger" && "bg-bad text-white hover:bg-bad/85",
     className,
   );
   return href ? (
@@ -100,13 +102,13 @@ export function Stat({ label, value, hint, icon }: { label: string; value: React
 }
 
 /** A first-try rate for a formula; with only a few tries the counts say more than a percentage. */
-export const tries = (n: number, accuracy: number | null) =>
-  accuracy === null ? "–" : n < 3 ? `Missed ${n - Math.round(accuracy * n)} of ${n}` : pct(accuracy);
+/** "1 of 3 right": a count, since a percentage of a few tries says more than it knows. */
+export const tries = (n: number, accuracy: number | null) => (accuracy === null ? "–" : `${Math.round(accuracy * n)} of ${n} right`);
 export const pct = (x: number | null | undefined) => (x === null || x === undefined ? "–" : `${Math.round(x * 100)}%`);
 
 export function Meter({ value, className }: { value: number | null; className?: string }) {
   const v = value ?? 0;
-  const color = v >= 0.85 ? "var(--color-good)" : v >= 0.65 ? "var(--color-warn)" : "var(--color-bad)";
+  const color = v >= GOOD_ACCURACY ? "var(--color-good)" : v >= LOW_ACCURACY ? "var(--color-warn)" : "var(--color-bad)";
   return (
     <div className={cx("h-2 overflow-hidden bg-ink/8", className)}>
       <div className="h-full" style={{ width: `${v * 100}%`, background: color }} />

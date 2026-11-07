@@ -30,6 +30,15 @@ interface Props {
   banner?: React.ReactNode;
 }
 
+/** Letters and numbers only, so "am gm" finds AM-GM and "cauchy schwarz" finds Cauchy-Schwarz. */
+const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+/** Does the search match the name, its initials (sfft) or the other text? */
+function found(needle: string, name: string, rest: string) {
+  const initials = name.split(/[\s-]+/).map((w) => w[0] ?? "").join("").toLowerCase();
+  return squash(`${name} ${rest}`).includes(needle) || initials.startsWith(needle);
+}
+
 /** Topic sidebar + compact rows grouped by topic. Shared by the student bank and the teacher's assign page. */
 export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta, assigned: assignedIds, deck = [], locked: LOCKED = [], banner }: Props) {
   const { q, setQ, topic, setTopic, level, setLevel, scope, setScope } = useBankFilters();
@@ -41,16 +50,16 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
     (scope === "assigned" && assigned.has(f.id)) ||
     (scope === "unassigned" && !assigned.has(f.id)) ||
     (scope === "deck" && inDeck.has(f.id));
-  const needle = q.trim().toLowerCase();
+  const needle = squash(q);
   const matches = (f: BankEntry) =>
     inScope(f) &&
     (level === "All" || LEVELS.indexOf(f.level) <= LEVELS.indexOf(level)) &&
-    (!needle || `${f.name} ${f.whenToUse} ${f.topic}`.toLowerCase().includes(needle));
+    (!needle || found(needle, f.name, `${f.whenToUse} ${f.topic}`));
   const visible = FORMULAS.filter((f) => matches(f) && (topic === "All" || f.topic === topic));
   const lockedMatches = (f: LockedEntry) =>
     scope === "all" &&
     (level === "All" || LEVELS.indexOf(f.level) <= LEVELS.indexOf(level)) &&
-    (!needle || `${f.name} ${f.topic}`.toLowerCase().includes(needle));
+    (!needle || found(needle, f.name, f.topic));
   const lockedVisible = LOCKED.filter((f) => lockedMatches(f) && (topic === "All" || f.topic === topic));
   const count = (t?: Topic) => FORMULAS.filter((f) => matches(f) && (!t || f.topic === t)).length + LOCKED.filter((f) => lockedMatches(f) && (!t || f.topic === t)).length;
   const groups = TOPICS.map((t) => ({ topic: t, items: visible.filter((f) => f.topic === t), locked: lockedVisible.filter((f) => f.topic === t) })).filter((g) => g.items.length || g.locked.length);
@@ -69,7 +78,7 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
         ];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[200px_1fr]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[200px_minmax(0,1fr)]">
       {/* Topic sidebar */}
       <aside className="lg:sticky lg:top-8 lg:self-start">
         <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1 lg:mx-0 lg:flex-col lg:overflow-visible">
@@ -86,7 +95,7 @@ export function FormulaBrowser({ formulas: FORMULAS, role, hrefFor, action, meta
           value={level}
           onChange={(e) => setLevel(e.target.value as Level | "All")}
           aria-label="Contest level"
-          className="mt-4 hidden h-9 w-full rounded-xl border border-line bg-white px-3 text-sm font-medium lg:block"
+          className="mt-3 h-9 w-full rounded-xl border border-line bg-white px-3 text-sm font-medium lg:mt-4"
         >
           <option value="All">All levels</option>
           {LEVELS.map((l) => (

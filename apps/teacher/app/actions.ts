@@ -20,6 +20,7 @@ import {
   startNextWeek,
   unassign,
   updateClass,
+  renameTeacher,
 } from "@lemmory/db/teacher";
 
 // Server actions are public endpoints: every one checks the session, and the db layer
@@ -84,6 +85,16 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   await sendConfirmation(id, "teacher", values.email);
   await startSession(id, "teacher");
   redirect("/plan");
+}
+
+/** Fix the name students see. */
+export async function renameMe(_: FormState, fd: FormData): Promise<FormState> {
+  const id = await me();
+  const name = field(fd, "name");
+  if (name.length < 2 || name.length > 60) return { error: "Enter your name." };
+  await renameTeacher(id, name);
+  revalidatePath("/", "layout");
+  return { ok: "Saved." };
 }
 
 /** Change the email, which is also the login. Nothing changes until the link sent to the new address is clicked. */

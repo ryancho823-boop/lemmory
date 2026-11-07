@@ -40,9 +40,9 @@ export function StudentAnalytics({
           {
             label: "Day streak",
             value: m.streak,
-            hint: m.doneToday ? "Today's review is done." : "Today's review isn't done yet.",
+            hint: `Days in a row with every card finished. ${m.doneToday ? "Today's are done." : "Today's aren't done yet."}`,
           },
-          { label: "Cards reviewed", value: m.reviews14, hint: "In the last 14 days." },
+          { label: "Cards reviewed", value: m.reviews14.toLocaleString("en-US"), hint: "In the last 14 days. Cards you added yourself count here, but only assigned cards earn points." },
           {
             label: "Right on first try",
             value: pct(m.accuracy),
@@ -94,7 +94,7 @@ export function StudentAnalytics({
           <Panel>
             <PanelHeader
               title="Staying up to date"
-              info="Each column is a week."
+              info="Each column is a week. A day counts toward your streak when every card is finished."
             />
             <div className="px-5 pb-5 pt-4">
               <WeekGrid student={student} today={today} />
@@ -120,6 +120,7 @@ export function StudentAnalytics({
                     </span>
                   ),
                   value: t.accuracy,
+                  n: t.n,
                   hint: `${t.n} ${t.n === 1 ? "review" : "reviews"}`,
                 }))}
               />

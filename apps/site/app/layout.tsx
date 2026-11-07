@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import { SITE_URL } from "@lemmory/core/urls";
 import { StoreProvider } from "@/lib/store";
 
 // Source Serif 4 (a classic textbook serif) for headings and big numbers, Source Sans 3 for body text.
@@ -10,7 +11,16 @@ const sourceSans = Source_Sans_3({ variable: "--font-source-sans", subsets: ["la
 
 export const metadata: Metadata = {
   title: "Lemmory: remember every formula",
-  description: "Spaced-repetition formula practice for competition math academies.",
+  description: "Spaced-repetition formula practice for competition math classes.",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    title: "Lemmory: remember every formula",
+    description: "Flashcards with spaced repetition, built for competition math.",
+    url: SITE_URL,
+    siteName: "Lemmory",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

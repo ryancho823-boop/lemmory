@@ -44,7 +44,7 @@ export default async function PlanPage() {
         <section aria-label="Your plan" className="rounded-lg border-2 border-ink bg-white">
           <dl className="grid divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
             <Fact label="Your plan" value={kind ? name : "None yet"} />
-            <Fact label="Status" value={status} />
+            <Fact label="Status" value={status} detail={paying && endsAt && endsAt > new Date() ? `Free trial runs until ${fmt(endsAt)}` : undefined} />
             <Fact label={paying ? "Monthly cost" : "After the trial"} value={cost === null ? "Pick a plan" : `$${cost} a month`} detail={`For ${count}`} />
           </dl>
           {note && <p className="border-t border-line px-5 py-3">{note}</p>}

@@ -62,7 +62,7 @@ export const CALCULUS = defineTopic("Calculus", [
     statement: "(uv)' = u'v + uv'",
     setup: "Write $p = u'$ and $q = v'$.",
     whenToUse: "Differentiating two functions multiplied together, like $x^2e^x$ or $x\\sin x$.",
-    recall: [{ lhs: "(uv)' =", answer: "pv+uq", vars: { u: [1, 5], v: [1, 5], p: [1, 5], q: [1, 5] }, banned: ["'", "\\prime"] }],
+    recall: [{ lhs: "(uv)' =", answer: "pv+uq", vars: { u: [1, 5], v: [1, 5], p: [1, 5], q: [1, 5] }, aliases: { "u'": "p", "v'": "q" }, banned: [")'", ")^"] }],
     related: ["chain-rule", "power-rule"],
     problems: [
       {

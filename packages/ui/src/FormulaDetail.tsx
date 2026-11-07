@@ -1,4 +1,4 @@
-import { ChevronDown, Lightbulb, Sigma } from "lucide-react";
+import { ChevronDown, Lightbulb } from "lucide-react";
 import type { Formula } from "@lemmory/core/content/types";
 import type { Note } from "@lemmory/core/content/notes/types";
 import { Rich, Tex } from "./Tex";
@@ -46,9 +46,7 @@ export function FormulaDetail({ f, note, aside, actions }: { f: Formula; note: N
             </p>
             <details className="group mt-5 rounded-xl border border-line">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold hover:bg-canvas">
-                <span className="flex items-center gap-2">
-                  <Sigma size={16} className="text-ink/50" /> Show proof
-                </span>
+                Show proof
                 <ChevronDown size={16} className="text-ink/40 transition-transform group-open:rotate-180" />
               </summary>
               <p className="border-t border-line px-4 py-4 leading-relaxed text-ink/80">
@@ -73,9 +71,12 @@ export function FormulaDetail({ f, note, aside, actions }: { f: Formula; note: N
               <Rich text={example.text} />
             </p>
             {example.figure && <Figure figure={example.figure} className="mt-3 h-auto w-full max-w-[240px]" />}
-            <details className="group mt-3">
-              <summary className="cursor-pointer text-sm font-semibold text-ink/50 hover:text-ink">Show solution</summary>
-              <p className="mt-2 leading-relaxed text-ink/80">
+            <details className="group mt-4 rounded-xl border border-line">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold hover:bg-canvas">
+                Show solution
+                <ChevronDown size={16} className="text-ink/40 transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="border-t border-line px-4 py-4 leading-relaxed text-ink/80">
                 <Rich text={example.solution} /> <b>Answer:</b> <Tex math={example.answer} />
               </p>
             </details>

@@ -125,9 +125,14 @@ export function AppShell({ role, children }: { role: Role; children: React.React
         </div>
       }
       mobileExtra={
-        <button onClick={nextDay} disabled={atLimit} className={small}>
-          Next day
-        </button>
+        <>
+          <button onClick={nextDay} disabled={atLimit} className={small}>
+            Next day
+          </button>
+          <button onClick={() => confirm("Reset all demo data?") && reset()} className={small}>
+            Reset
+          </button>
+        </>
       }
     >
       {children}

@@ -1,5 +1,10 @@
 import type { LogEntry, StudentRecord } from "./records";
 
+/** Under this first-try accuracy is shown in red, everywhere: formulas, topics and students. */
+export const LOW_ACCURACY = 0.6;
+/** At or over this is shown in green. In between is yellow. */
+export const GOOD_ACCURACY = 0.85;
+
 // ── points ──
 // Every finished card is worth the same, however many tries it took (review is graded
 // on completion). Finishing the day's review adds a bonus that grows with the streak.

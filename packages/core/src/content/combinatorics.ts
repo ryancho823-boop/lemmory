@@ -205,7 +205,7 @@ export const COMBINATORICS = defineTopic("Combinatorics", [
     statement: "D_n = (n-1)(D_{n-1} + D_{n-2}), \\quad D_1 = 0,\\ D_2 = 1",
     setup: "Permutations where nothing stays in its original spot. Write $p = D_{n-1}$ and $q = D_{n-2}$. Also $D_n \\approx \\frac{n!}{e}$.",
     whenToUse: "Letters in wrong envelopes, hats returned to the wrong people, nobody gets their own gift.",
-    recall: [{ lhs: "D_n =", answer: "(n-1)(p+q)", vars: { n: int(3, 9), p: [1, 50], q: [1, 50] } }],
+    recall: [{ lhs: "D_n =", answer: "(n-1)(p+q)", vars: { n: int(3, 9), p: [1, 50], q: [1, 50] }, aliases: { "D_{n-1}": "p", "D_{n-2}": "q" } }],
     related: ["pie"],
     problems: [
       {

@@ -315,7 +315,7 @@ export const GEOMETRY_V2 = defineTopic("Geometry", [
   {
     id: "mass-points",
     name: "Mass Points",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "\\text{Masses } b \\text{ at } B, \\ c \\text{ at } C \\text{ balance at } D: \\ \\frac{BD}{DC} = \\frac cb, \\ \\text{mass at } D = b + c",
     setup: "Put masses on the vertices so each cevian's foot is the balance point of its side.",
     after: "Each segment is split in the inverse ratio of the masses at its ends.",

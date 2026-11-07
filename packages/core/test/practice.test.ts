@@ -34,3 +34,12 @@ test("the choices include every formula the problem uses, and at most four", () 
     assert.ok(options.length <= 4 && new Set(options).size === options.length);
   }
 });
+
+test("a formula that also works is never offered as a wrong choice", () => {
+  const bank = { formulas: FORMULAS, byId: FORMULA_BY_ID };
+  for (let i = 0; i < 40; i++) {
+    const { options } = setupApply(bank, FORMULA_BY_ID["stewart"], [], []);
+    assert.ok(!options.includes("law-of-cosines"));
+    assert.equal(options.length, 4);
+  }
+});

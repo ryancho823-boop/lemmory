@@ -82,7 +82,7 @@ export const NUMBER_THEORY = defineTopic("Number Theory", [
   {
     id: "fermat",
     name: "Fermat's Little Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "a^{p-1} \\equiv 1 \\pmod p",
     setup: "$p$ prime and $p \\nmid a$.",
     whenToUse: "Find the remainder of a large power when divided by a prime.",

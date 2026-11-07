@@ -7,10 +7,27 @@ import { getClass } from "@/lib/session";
 
 export const metadata = { title: "Formula analytics · Lemmory for teachers" };
 
-export default async function FormulaAnalytics({ params }: PageProps<"/c/[classId]/formulas">) {
-  const { classId } = await params;
-  const { students, assignments, today } = await getClass(classId);
-  const byId = new Map(classFormulaHealth(students, assignments.map((a) => a.formulaId), today).map((h) => [h.formulaId, h]));
+const SORTS = [
+  { key: "name", label: "Formula", className: "px-5" },
+  { key: "topic", label: "Topic", className: "px-3" },
+  { key: "week", label: "Week", className: "px-3" },
+  { key: "accuracy", label: "First-try accuracy", className: "px-3" },
+];
+
+export default async function FormulaAnalytics({ params, searchParams }: PageProps<"/c/[classId]/formulas">) {
+  const [{ classId }, { sort = "week" }] = await Promise.all([params, searchParams]);
+  const { students, assignments: assigned, today } = await getClass(classId);
+  const byId = new Map(classFormulaHealth(students, assigned.map((a) => a.formulaId), today).map((h) => [h.formulaId, h]));
+  const f = (id: string) => FORMULA_BY_ID[id];
+  const assignments = [...assigned].sort((a, b) =>
+    sort === "name"
+      ? f(a.formulaId).name.localeCompare(f(b.formulaId).name)
+      : sort === "topic"
+        ? f(a.formulaId).topic.localeCompare(f(b.formulaId).topic)
+        : sort === "accuracy"
+          ? (byId.get(a.formulaId)?.accuracy ?? 2) - (byId.get(b.formulaId)?.accuracy ?? 2)
+          : 0,
+  );
 
   return (
     <div>
@@ -27,26 +44,30 @@ export default async function FormulaAnalytics({ params }: PageProps<"/c/[classI
           <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b border-line text-left text-xs text-ink/45">
               <tr>
-                <th className="px-5 py-3 font-semibold">Formula</th>
-                <th className="px-3 py-3 font-semibold">Topic</th>
-                <th className="px-3 py-3 font-semibold">Week</th>
-                <th className="px-3 py-3 font-semibold">First-try accuracy</th>
+                {SORTS.map((s) => (
+                  <th key={s.key} aria-sort={sort === s.key ? "ascending" : undefined} className={`${s.className} py-3 font-semibold`}>
+                    <Link href={`?sort=${s.key}`} className={sort === s.key ? "text-ink underline" : "hover:text-ink"}>
+                      {s.label}
+                    </Link>
+                  </th>
+                ))}
                 <th />
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {assignments.map((a) => {
-                const f = FORMULA_BY_ID[a.formulaId];
+                const row = FORMULA_BY_ID[a.formulaId];
                 const h = byId.get(a.formulaId)!;
                 return (
-                  <tr key={a.formulaId} className="group hover:bg-canvas">
+                  <tr key={a.formulaId} className="group relative hover:bg-canvas">
                     <td className="px-5 py-3">
-                      <Link href={`/c/${classId}/formulas/${f.id}`} className="block font-semibold group-hover:underline">
-                        {f.name}
+                      {/* Stretched over the row, so a click anywhere opens the formula. */}
+                      <Link href={`/c/${classId}/formulas/${row.id}`} className="block font-semibold after:absolute after:inset-0 group-hover:underline">
+                        {row.name}
                       </Link>
                     </td>
                     <td className="px-3 py-3">
-                      <TopicPill topic={f.topic} />
+                      <TopicPill topic={row.topic} />
                     </td>
                     <td className="px-3 py-3 text-ink/60">{a.week}</td>
                     <td className="px-3 py-3">

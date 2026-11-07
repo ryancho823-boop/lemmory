@@ -27,11 +27,12 @@ export function Assign({
     <div>
       <PageHeader
         title="Assign formulas"
+        sub={`Now assigning for week ${currentWeek}`}
         info="Assigned formulas join every student's deck. Scheduling is automatic."
         // Only once this week has homework, so a new teacher can't skip an empty week by mistake.
         action={
           assignments.some((a) => a.week === currentWeek) && (
-            <Button variant="outline" disabled={pending} onClick={() => start(() => nextWeekAction(classId))}>
+            <Button variant="outline" disabled={pending} onClick={() => confirm(`Start week ${currentWeek + 1}? New formulas you assign will go into it.`) && start(() => nextWeekAction(classId))}>
               Start week {currentWeek + 1}
             </Button>
           )

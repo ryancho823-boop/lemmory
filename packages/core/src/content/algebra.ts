@@ -64,7 +64,7 @@ export const ALGEBRA = defineTopic("Algebra", [
   },
   {
     id: "sum-of-cubes",
-    name: "Sum & Difference of Cubes",
+    name: "Sum and Difference of Cubes",
     level: "AMC 10",
     statement: "a^3 \\pm b^3 = (a \\pm b)(a^2 \\mp ab + b^2)",
     setup: "Factoring identities for cubes.",
@@ -281,7 +281,7 @@ export const ALGEBRA = defineTopic("Algebra", [
   {
     id: "change-of-base",
     name: "Change of Base",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "\\log_b a = \\frac{\\log a}{\\log b} = \\frac{\\ln a}{\\ln b}",
     setup: "Any common base works on top and bottom. Consequence: $\\log_b a \\cdot \\log_a c = \\log_b c$.",
     whenToUse: "Logs with different bases appear together, or a product of logs chains together.",

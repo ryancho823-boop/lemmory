@@ -58,7 +58,7 @@ export function TeacherFormula({ id }: { id: string }) {
 
       <StatStrip
         items={[
-          { label: "Right on first try", value: pct(c.accuracy), hint: "Whole class, last 14 days." },
+          { label: "Right on first try", value: pct(c.accuracy), hint: "Whole class, last 4 weeks." },
           { label: "Recall mode", value: pct(c.recall), hint: "Typing the formula from memory." },
           { label: "Application mode", value: pct(c.apply), hint: "Picking it for a problem, then solving." },
           { label: "In application", value: `${c.inApply}/${c.rows.length}`, hint: `${c.mastered} have mastered it.` },
@@ -68,7 +68,13 @@ export function TeacherFormula({ id }: { id: string }) {
       <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
         <Panel>
           <PanelHeader title="Students" info="Sorted by lowest predicted recall first." />
-          <ul className="mt-3 divide-y divide-line">
+          <div className="hidden grid-cols-[1fr_100px_90px_120px] gap-x-4 px-5 pt-3 text-xs font-semibold text-ink/55 sm:grid">
+            <span>Student</span>
+            <span>Stage</span>
+            <span>First try, 4 weeks</span>
+            <span>Predicted recall</span>
+          </div>
+          <ul className="mt-1 divide-y divide-line">
             {rows.map((r) => (
               <li key={r.student.id}>
                 <Link href={`/teacher/students/${r.student.id}`} className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-5 py-2.5 hover:bg-canvas sm:grid-cols-[1fr_100px_90px_120px]">
@@ -78,7 +84,7 @@ export function TeacherFormula({ id }: { id: string }) {
                   <span>
                     <StageSteps stage={r.card.stage} mastered={isMastered(r.card)} />
                   </span>
-                  <span className="text-xs text-ink/50">{r.n ? `${pct(r.accuracy)} of ${r.n}` : "No reviews"}</span>
+                  <span className="text-xs text-ink/50">{r.n ? `${Math.round((r.accuracy ?? 0) * r.n)} of ${r.n} right` : "No reviews"}</span>
                   {r.retention === null ? (
                     <span className="text-xs text-ink/45">Just promoted</span>
                   ) : (

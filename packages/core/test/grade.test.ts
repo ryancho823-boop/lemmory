@@ -35,3 +35,33 @@ test("a big answer doesn't accept a near miss", () => {
   assert.ok(!gradeNumber("10077696", "10077690"));
   assert.ok(gradeNumber("\\frac{\\sqrt{154}}{3}", "\\sqrt{\\frac{154}{9}}"));
 });
+
+test("cards take the formula as it's normally written", () => {
+  const f = FORMULA_BY_ID;
+  const [cond] = f["conditional-probability"].recall;
+  assert.ok(gradeRecall(cond, "\\frac{P\\left(A\\cap B\\right)}{P\\left(B\\right)}"));
+  assert.ok(gradeRecall(cond, "\\frac{P(AB)}{P(B)}"));
+  assert.ok(!gradeRecall(cond, "\\frac{P(B)}{P(A\\cap B)}"));
+  assert.ok(!gradeRecall(cond, "\\frac{P(A)}{P(B)}"));
+  const [bayes] = f["bayes"].recall;
+  assert.ok(gradeRecall(bayes, "\\frac{P(B\\mid A)P(A)}{P(B)}"));
+  const [prod] = f["product-rule"].recall;
+  assert.ok(gradeRecall(prod, "u'v+uv'"));
+  assert.ok(gradeRecall(prod, "u^{\\prime}v+uv^{\\prime}"));
+  const [der] = f["derangements"].recall;
+  assert.ok(gradeRecall(der, "(n-1)(D_{n-1}+D_{n-2})"));
+  const [varc] = f["variance"].recall;
+  assert.ok(gradeRecall(varc, "E\\left\\lbrack X^2\\right\\rbrack-E\\left\\lbrack X\\right\\rbrack^2"));
+});
+
+test("either secant counts for a tangent", () => {
+  const [, tangent] = FORMULA_BY_ID["power-of-a-point"].recall;
+  assert.ok(gradeRecall(tangent, "PA\\cdot PB"));
+  assert.ok(gradeRecall(tangent, "PC\\cdot PD"));
+  assert.ok(!gradeRecall(tangent, "PA\\cdot PD"));
+});
+
+test("x1 counts as x with a subscript where the card has one", () => {
+  const blank = FORMULA_BY_ID["shoelace"].recall[0];
+  assert.ok(gradeRecall(blank, blank.answer.replace(/_\{?(\d)\}?/g, "$1")));
+});

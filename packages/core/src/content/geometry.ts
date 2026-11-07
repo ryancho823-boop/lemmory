@@ -153,7 +153,7 @@ export const GEOMETRY = defineTopic("Geometry", [
     whenToUse: "Two chords cross, two secants come from one point, or a tangent and a secant share an endpoint.",
     recall: [
       { lhs: "\\text{Two lines through } P\\text{: } PA\\cdot PB =", answer: "PC\\cdot PD", vars: { P: pos, A: pos, B: pos, C: pos, D: pos } },
-      { lhs: "\\text{Tangent: } PT^2 =", answer: "PA\\cdot PB", vars: { P: pos, A: pos, B: pos, T: pos } },
+      { lhs: "\\text{Tangent: } PT^2 =", answer: "PA\\cdot PB", accept: ["PC\\cdot PD"], vars: { P: pos, A: pos, B: pos, C: pos, D: pos, T: pos } },
     ],
     related: ["inscribed-angle", "stewart", "ptolemy"],
     problems: [
@@ -174,7 +174,7 @@ export const GEOMETRY = defineTopic("Geometry", [
   {
     id: "stewart",
     name: "Stewart's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "b^2m + c^2n = a(d^2 + mn)",
     setup: "Cevian $AD = d$ splits $BC = a$ into $BD = m$ and $DC = n$; $b = CA$, $c = AB$.",
     after: "Mnemonic: \\\"A man and his dad put a bomb in the sink\\\": $man + dad = bmb + cnc$.",
@@ -199,7 +199,7 @@ export const GEOMETRY = defineTopic("Geometry", [
   {
     id: "ptolemy",
     name: "Ptolemy's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "AC\\cdot BD = AB\\cdot CD + AD\\cdot BC",
     setup: "Cyclic quadrilateral with consecutive sides $a, b, c, d$ and diagonals $p, q$.",
     whenToUse: "A cyclic quadrilateral where you need a diagonal, or a point on a circle around a regular polygon.",

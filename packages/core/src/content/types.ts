@@ -7,7 +7,7 @@ export type Topic =
   | "Probability"
   | "Calculus";
 
-export type Level = "AMC 8" | "AMC 10" | "AMC 12" | "AIME" | "Calculus";
+export type Level = "AMC 8" | "AMC 10" | "AMC 12" | "AIME" | "Olympiad" | "Calculus";
 
 export const TOPICS: Topic[] = [
   "Algebra",
@@ -33,7 +33,7 @@ export const TOPIC_COLOR: Record<Topic, string> = {
   Calculus: "#a16207",
 };
 
-export const LEVELS: Level[] = ["AMC 8", "AMC 10", "AMC 12", "AIME", "Calculus"];
+export const LEVELS: Level[] = ["AMC 8", "AMC 10", "AMC 12", "AIME", "Olympiad", "Calculus"];
 
 /** "Calculus" covers the calculus rounds at tournaments like SMT and BMT. */
 export const LEVEL_LABEL: Record<Level, string> = {
@@ -41,6 +41,7 @@ export const LEVEL_LABEL: Record<Level, string> = {
   "AMC 10": "AMC 10",
   "AMC 12": "AMC 12",
   AIME: "AIME",
+  Olympiad: "Olympiad",
   Calculus: "Calc rounds",
 };
 
@@ -61,6 +62,11 @@ export interface RecallBlank {
    * the definition written out counts too. They're allowed in answers but not sampled on their own.
    */
   defs?: Record<string, string>;
+  /**
+   * The real notation for a stand-in variable, like `P(B)` for `q`. A student may type either, and
+   * the answer may be written with it, so the card can show and accept the formula as it's known.
+   */
+  aliases?: Record<string, string>;
   /** Substrings that may not appear in the input, so the left side can't be retyped as the answer. */
   banned?: string[];
   /** Require a factored ("product") or expanded ("sum") answer for identities. */

@@ -55,8 +55,25 @@ export function ReviewSession({
   // Set when the card on screen graduates, so the note shows with that card (and goes with it).
   const [graduated, setGraduated] = useState<string | null>(null);
 
+  // The card after this one, asked for while this one is being answered, so the next appears at once.
+  const ahead = useRef(new Map<string, Promise<Prompt>>());
+  const nextUp = active?.prompt ? active.queue[1] : undefined;
+  useEffect(() => {
+    if (nextUp && !ahead.current.has(nextUp)) {
+      const early = getPrompt(nextUp, "review");
+      early.catch(() => {}); // Tried again when it's needed.
+      ahead.current.set(nextUp, early);
+    }
+  }, [nextUp]);
+
+  const fetchPrompt = (id: string) => {
+    const early = ahead.current.get(id);
+    ahead.current.delete(id);
+    return early ? early.catch(() => getPrompt(id, "review")) : getPrompt(id, "review");
+  };
+
   const load = (id: string) =>
-    getPrompt(id, "review").then(
+    fetchPrompt(id).then(
       (prompt) => setActive((a) => (a && a.queue[0] === id ? { ...a, prompt } : a)),
       () => setError("Couldn't load the next card. Reload the page to pick up where you left off."),
     );
@@ -79,11 +96,15 @@ export function ReviewSession({
     // Only the finish screen keeps the last card's note; otherwise it would sit over the next card.
     setActive({ ...active, queue, firstTries, attempt: active.attempt + 1, prompt: null, toast: queue.length ? null : graduated });
     setGraduated(null);
+    // A new card starts at the top, with the progress bar and its label in view.
+    window.scrollTo({ top: 0 });
     if (queue.length) load(queue[0]);
   };
 
   // ── Finished ──
-  if (doneToday || (active && !active.queue.length)) {
+  // Answering the last card marks the day done and refreshes this page, so `doneToday` can turn true
+  // while that card's result is still on screen. A review in progress finishes when its queue does.
+  if (active ? !active.queue.length : doneToday) {
     const finished = Object.keys(active?.firstTries ?? {});
     // Cards the student added themselves are extra practice: no points.
     const counted = finished.filter((id) => cards[id]?.source !== "self").length;
@@ -99,7 +120,7 @@ export function ReviewSession({
             <div className="mx-auto mt-6 grid max-w-sm grid-cols-3 gap-2">
               <Mini label="Cards" value={`+${counted * CARD_POINTS}`} />
               <Mini label={`${s}-day streak`} value={`+${streakBonus(s)}`} />
-              <Mini label="Points" value={counted * CARD_POINTS + streakBonus(s)} />
+              <Mini label="Today's points" value={counted * CARD_POINTS + streakBonus(s)} />
             </div>
           )}
           {extra > 0 && <p className="mt-3 text-xs text-ink/45">+{extra} extra cards from your own deck (no points)</p>}
@@ -153,6 +174,7 @@ export function ReviewSession({
             onDone={done}
             onOutcome={(o) => {
               if (o.promoted) setGraduated(`${o.formulaName} graduated to application mode.`);
+              if (o.demoted) setGraduated(`${o.formulaName} is back in recall for a while. Problems return once the formula is solid.`);
             }}
           />
         </Panel>

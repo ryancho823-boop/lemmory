@@ -30,9 +30,9 @@ export function ConfirmForm({
       <div className="mt-1 text-sm text-ink/60">{body}</div>
       <form action={run} className="mt-4 flex items-end gap-2">
         <div className="flex-1">
-          <Field label={label} name="confirm" type={type} required autoComplete={type === "password" ? "current-password" : "off"} error={state?.error} />
+          <Field label={label} name="confirm" type={type} required autoComplete={type === "password" ? "new-password" : "off"} error={state?.error} />
         </div>
-        <Button type="submit" size="lg" variant="outline" className="text-bad" disabled={pending}>
+        <Button type="submit" size="lg" variant="danger" disabled={pending}>
           {submit}
         </Button>
       </form>

@@ -1,6 +1,6 @@
 import { TOPICS, type Topic } from "./content/types";
 import type { LogEntry, StudentRecord } from "./records";
-import { pointsBetween, streak } from "./points";
+import { LOW_ACCURACY, pointsBetween, streak } from "./points";
 import { type Card, isMastered, retrievability } from "./srs";
 
 export * from "./points";
@@ -45,11 +45,15 @@ export function summary(s: Student, today: number) {
   };
 }
 
-/** Today so far: cards answered (first tries) and today's total, for "2 of 11". */
+/**
+ * Today so far: cards finished and today's total, for "2 of 11". A card that was missed stays due
+ * until it's right, so it counts as left, the same as on the student's own screen.
+ */
 export function todayProgress(s: Student, today: number) {
-  const answered = new Set(s.log.filter((l) => l.day === today).map((l) => l.formulaId));
-  const left = Object.values(s.cards).filter((c) => c.memory.due <= today && !answered.has(c.formulaId)).length;
-  return { answered: answered.size, total: answered.size + left };
+  const reviewed = new Set(s.log.filter((l) => l.day === today).map((l) => l.formulaId));
+  const left = Object.values(s.cards).filter((c) => c.memory.due <= today).length;
+  const answered = [...reviewed].filter((id) => s.cards[id] && s.cards[id].memory.due > today).length;
+  return { answered, total: answered + left };
 }
 
 /**
@@ -67,12 +71,15 @@ export function weakestTopic(s: Student, today: number, topicOf: (formulaId: str
     .sort((a, b) => (a.accuracy ?? 1) - (b.accuracy ?? 1))[0];
 }
 
+/** Every class number about a formula looks back this many days, so the pages agree with each other. */
+export const FORMULA_WINDOW = 28;
+
 /** Who a teacher should look at: behind on reviews, or under 60% on the first try. The furthest behind come first. */
 export function needsAttention(students: Student[], today: number, topicOf: (formulaId: string) => Topic | undefined, limit = 8) {
   const pct = (x: number | null) => `${Math.round((x ?? 0) * 100)}%`;
   return students
     .map((s) => ({ s, m: summary(s, today) }))
-    .filter(({ s, m }) => isBehind(s, today) || (m.reviews14 >= 3 && (m.accuracy ?? 1) < 0.6))
+    .filter(({ s, m }) => isBehind(s, today) || (m.reviews14 >= 3 && (m.accuracy ?? 1) < LOW_ACCURACY))
     .map(({ s, m }) => {
       const waiting = Object.values(s.cards).filter((c) => c.source === "teacher" && c.memory.due <= today).length;
       const away = m.lastActive === null ? null : today - m.lastActive;
@@ -173,7 +180,7 @@ export function formulaAcrossClass(students: Student[], formulaId: string, today
     .filter((s) => s.cards[formulaId])
     .map((s) => {
       const card = s.cards[formulaId];
-      const l = recent(s.log, today, 28).filter((x) => x.formulaId === formulaId);
+      const l = recent(s.log, today, FORMULA_WINDOW).filter((x) => x.formulaId === formulaId);
       return {
         student: s,
         card,
@@ -183,11 +190,12 @@ export function formulaAcrossClass(students: Student[], formulaId: string, today
       };
     });
   const all = students.flatMap((s) => s.log.filter((l) => l.formulaId === formulaId));
+  const window = recent(all, today, FORMULA_WINDOW);
   return {
     rows,
-    accuracy: accuracy(recent(all, today)),
-    recall: accuracy(recent(all, today).filter((l) => l.stage === "recall")),
-    apply: accuracy(recent(all, today).filter((l) => l.stage === "apply")),
+    accuracy: accuracy(window),
+    recall: accuracy(window.filter((l) => l.stage === "recall")),
+    apply: accuracy(window.filter((l) => l.stage === "apply")),
     weekly: weekly(all, today),
     confusions: confusions(all),
     inApply: rows.filter((r) => r.card.stage === "apply").length,
@@ -201,6 +209,7 @@ export function classFormulaHealth(students: Student[], formulaIds: string[], to
       const all = recent(
         students.flatMap((s) => s.log.filter((l) => l.formulaId === id)),
         today,
+        FORMULA_WINDOW,
       );
       const ret = students.map((s) => (s.cards[id] ? retrievability(s.cards[id], today) : null)).filter((x): x is number => x !== null);
       return {
@@ -209,8 +218,8 @@ export function classFormulaHealth(students: Student[], formulaIds: string[], to
         n: all.length,
         retention: ret.length ? ret.reduce((a, b) => a + b, 0) / ret.length : null,
         struggling: students.filter((s) => {
-          const a = accuracy(recent(s.log, today).filter((l) => l.formulaId === id));
-          return a !== null && a < 0.6;
+          const a = accuracy(recent(s.log, today, FORMULA_WINDOW).filter((l) => l.formulaId === id));
+          return a !== null && a < LOW_ACCURACY;
         }).length,
       };
     })
@@ -221,7 +230,7 @@ export function classFormulaHealth(students: Student[], formulaIds: string[], to
 
 export type DayStatus = "done" | "few" | "some" | "many" | "today" | "none";
 
-/** Green: all done. Light green: 5 or fewer missed. Yellow: fewer than 15. Red: 15 or more. */
+/** Green: all done. Pale yellow: 5 or fewer cards left. Yellow: fewer than 15. Red: 15 or more. */
 export function dayStatus(s: StudentRecord, day: number, today: number): DayStatus {
   if (s.doneDays.includes(day)) return "done";
   if (day === today) return "today";

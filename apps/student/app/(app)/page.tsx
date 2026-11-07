@@ -58,7 +58,7 @@ function Today({ v, s, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlocked
           ) : (
             <div>
               <p className="flex items-center gap-1 text-4xl font-extrabold">
-                {v.queue.length} {v.queue.length === 1 ? "card" : "cards"} today
+                {v.queue.length} {v.queue.length === 1 ? "card" : "cards"} {v.completedToday ? "left" : "today"}
                 <InfoTip title="Today's cards" align="left">
                   About {Math.max(2, Math.round(v.queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>
@@ -99,7 +99,7 @@ function Today({ v, s, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlocked
                     </span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {tries(w.n, w.accuracy)}{w.n >= 3 && <span className="text-ink/70"> right</span>}
+                      {tries(w.n, w.accuracy)}
                     </span>
                   </Link>
                 </li>
@@ -107,7 +107,7 @@ function Today({ v, s, fresh, weak }: { v: Awaited<ReturnType<typeof getUnlocked
             })}
           </ul>
         </Panel>
-        {v.klass && <Leaderboard rows={v.leaderboard} gameAge={v.gameAge} compact />}
+        {v.klass && v.leaderboard.length > 1 && <Leaderboard rows={v.leaderboard} gameAge={v.gameAge} compact />}
       </div>
     </>
   );

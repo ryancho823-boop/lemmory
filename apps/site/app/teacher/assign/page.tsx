@@ -19,7 +19,7 @@ export default function AssignPage() {
         // Only once this week has homework, so a new teacher can't skip an empty week by mistake.
         action={
           state.assignments.some((a) => a.week === state.currentWeek) && (
-            <Button variant="outline" onClick={startNextWeek}>
+            <Button variant="outline" onClick={() => confirm(`Start week ${state.currentWeek + 1}? New formulas you assign will go into it.`) && startNextWeek()}>
               Start week {state.currentWeek + 1}
             </Button>
           )

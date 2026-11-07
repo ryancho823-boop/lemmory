@@ -70,7 +70,7 @@ export const TIERS: Tier[] = [
         title: "What you pay",
         items: [
           `$${club.perStudent} for each student, every month`,
-          `Never more than $${club.classCap} a month for the club, however many students join`,
+          `Never more than $${club.classCap} a month per class, however many students join`,
           `Example: 5 students cost $${5 * club.perStudent} a month; 30 students cost $${Math.min(30 * club.perStudent, club.classCap)}`,
         ],
       },
@@ -99,7 +99,7 @@ export const TIERS: Tier[] = [
       },
       {
         title: "What you pay",
-        items: [`Free for the first ${TRIAL_DAYS} days`, `Then $${student.monthly} a month`, "Not needed if your teacher's plan already covers your class"],
+        items: [`Free for the first ${TRIAL_DAYS} days`, `Then $${student.monthly} a month, once payments are connected`, "Not needed if your teacher's plan already covers your class"],
       },
     ],
   },
@@ -108,6 +108,7 @@ export const TIERS: Tier[] = [
 /** Rules for the teacher plans (academies and clubs), not the individual student plan. */
 export const TEACHER_PLAN_RULES = [
   `Free for the first ${TRIAL_DAYS} days.`,
-  "After that, enter your academy's or school's details and pay to keep going. Your classes and students' progress are saved.",
+  "After that, enter your academy's or school's details to keep going. Your classes and students' progress are saved.",
+  "Payments aren't connected yet, so nothing is charged for now. We'll tell you before that changes.",
   "Your students never pay.",
 ];

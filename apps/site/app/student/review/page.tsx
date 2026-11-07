@@ -67,13 +67,19 @@ export default function ReviewPage() {
       toast: queue.length ? null : graduated,
     });
     setGraduated(null);
+    // A new card starts at the top, with the progress bar and its label in view.
+    window.scrollTo({ top: 0 });
   };
 
   // As soon as a card is graded: does this answer graduate it? (The same rule the store applies on Continue.)
   const graded = (correct: boolean) => {
     const id = active?.queue[0];
     const card = id ? state.cards[id] : undefined;
-    if (card && dryRun(state.session, card, correct, today).done?.promoted) setGraduated(`${FORMULA_BY_ID[card.formulaId].name} graduated to application mode.`);
+    if (!card) return;
+    const result = dryRun(state.session, card, correct, today).done;
+    const name = FORMULA_BY_ID[card.formulaId].name;
+    if (result?.promoted) setGraduated(`${name} graduated to application mode.`);
+    if (result?.demoted) setGraduated(`${name} is back in recall for a while. Problems return once the formula is solid.`);
   };
 
   if (!ready) return <Skeleton className="mx-auto h-96 max-w-3xl" />;
@@ -97,7 +103,7 @@ export default function ReviewPage() {
             <div className="mx-auto mt-6 grid max-w-sm grid-cols-3 gap-2">
               <Mini label="Cards" value={`+${cards * CARD_POINTS}`} />
               <Mini label={`${s}-day streak`} value={`+${streakBonus(s)}`} />
-              <Mini label="Points" value={cards * CARD_POINTS + streakBonus(s)} />
+              <Mini label="Today's points" value={cards * CARD_POINTS + streakBonus(s)} />
             </div>
           )}
           {extra > 0 && <p className="mt-3 text-xs text-ink/45">+{extra} extra cards from your own deck (no points)</p>}

@@ -81,7 +81,7 @@ export const COMBINATORICS_2 = defineTopic("Combinatorics", [
     setup: "Write $p = T_{n-1}$ and $q = T_{n-2}$, where $T_n$ counts ways to tile a $1 \\times n$ strip with pieces of size $1$ and $2$.",
     after: "Condition on the last piece: size $1$ or size $2$.",
     whenToUse: "Stairs climbed $1$ or $2$ at a time, domino tilings of a $2 \\times n$ strip.",
-    recall: [{ lhs: "T_n =", answer: "p+q", vars: { p: [1, 50], q: [1, 50] } }],
+    recall: [{ lhs: "T_n =", answer: "p+q", vars: { p: [1, 50], q: [1, 50] }, aliases: { "T_{n-1}": "p", "T_{n-2}": "q" } }],
     related: ["derangements", "catalan"],
     problems: [
       { id: "fib1", text: "In how many ways can you climb $10$ stairs taking $1$ or $2$ steps at a time?", answer: "89", solution: "$1, 2, 3, 5, 8, 13, 21, 34, 55, 89$." },

@@ -1,8 +1,9 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SITE_URL } from "@lemmory/core/urls";
 import { cx } from "./ui";
 
 export interface NavItem {
@@ -77,6 +78,12 @@ export function Frame({
   mobileExtra?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  // Load the math fonts now: a card that's first to use them would show its text with the math missing.
+  useEffect(() => {
+    document.fonts?.load("1em KaTeX_Main");
+    document.fonts?.load("italic 1em KaTeX_Math");
+  }, []);
+
   return (
     <div className="product min-h-screen bg-canvas lg:grid lg:grid-cols-[256px_minmax(0,1fr)]">
       <div className="hidden border-r border-line bg-white lg:block">
@@ -226,7 +233,9 @@ export function AuthFrame({
     <div className="grid min-h-screen place-items-center bg-canvas px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex justify-center">
-          <Logo tag={tag} />
+          <a href={SITE_URL} aria-label="Lemmory home">
+            <Logo tag={tag} />
+          </a>
         </div>
         <div className="mt-8 rounded-3xl border border-line bg-white p-7">
           {top && <div className="mb-6">{top}</div>}

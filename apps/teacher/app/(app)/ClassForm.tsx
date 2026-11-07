@@ -74,6 +74,12 @@ export function ClassForm({
 
   // The list, plus the class's own zone if it isn't one of them.
   const zones = useMemo(() => (tz && !ZONES.some(([z]) => z === tz) ? [...ZONES, [tz, zoneLabel(tz)] as [string, string]] : ZONES), [tz]);
+  // Every other zone, for places the short list doesn't name. Set after hydration, like the zone itself.
+  const [others, setOthers] = useState<string[]>([]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the browser's own list
+    setOthers(Intl.supportedValuesOf("timeZone"));
+  }, []);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -111,6 +117,17 @@ export function ClassForm({
               {label}
             </option>
           ))}
+          {others.length > 0 && (
+            <optgroup label="Every time zone">
+              {others
+                .filter((z) => !zones.some(([known]) => known === z))
+                .map((z) => (
+                  <option key={z} value={z}>
+                    {z.replaceAll("_", " ")}
+                  </option>
+                ))}
+            </optgroup>
+          )}
         </select>
       </label>
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}

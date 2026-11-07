@@ -227,7 +227,7 @@ export const TRIG_V2 = defineTopic("Trigonometry", [
   },
   {
     id: "half-angle-tan-identity",
-    name: "Half-Angle Tangent Identity",
+    name: "Half-Angle Tangents in a Triangle",
     level: "AIME",
     statement: "\\tan\\frac A2\\tan\\frac B2 + \\tan\\frac B2\\tan\\frac C2 + \\tan\\frac C2\\tan\\frac A2 = 1",
     setup: "$A$, $B$, $C$ are the angles of a triangle.",

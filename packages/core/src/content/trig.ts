@@ -9,7 +9,7 @@ export const TRIG = defineTopic("Trigonometry", [
     id: "double-angle",
     name: "Double Angle Formulas",
     level: "AMC 12",
-    statement: "\\sin 2x = 2\\sin x\\cos x, \\qquad \\cos 2x = \\cos^2 x - \\sin^2 x",
+    statement: "\\sin 2x = 2\\sin x\\cos x, \\qquad \\cos 2x = \\cos^2 x - \\sin^2 x = 2\\cos^2 x - 1 = 1 - 2\\sin^2 x",
     setup: "From the angle addition formulas with both angles equal to $x$.",
     after: "Also $\\cos 2x = 2\\cos^2 x - 1 = 1 - 2\\sin^2 x$.",
     whenToUse: "An angle and its double both appear, or a product $\\sin x \\cos x$ needs simplifying.",
@@ -67,7 +67,7 @@ export const TRIG = defineTopic("Trigonometry", [
     statement: "\\tan(a+b) = \\frac{\\tan a + \\tan b}{1 - \\tan a\\tan b}",
     setup: "Write $p = \\tan a$ and $q = \\tan b$.",
     whenToUse: "Two angles are known by their tangents (slopes, grid triangles) and you need their sum.",
-    recall: [{ lhs: "\\tan(a+b) =", answer: "\\frac{p+q}{1-pq}", vars: { p: [0.1, 0.5], q: [0.1, 0.5] } }],
+    recall: [{ lhs: "\\tan(a+b) =", answer: "\\frac{p+q}{1-pq}", vars: { p: [0.1, 0.5], q: [0.1, 0.5] }, aliases: { "\\tan a": "p", "\\tan b": "q" } }],
     related: ["angle-addition", "double-angle"],
     problems: [
       {

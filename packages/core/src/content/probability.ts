@@ -2,6 +2,9 @@ import { defineTopic, int } from "./types";
 
 const prob: [number, number] = [0.1, 0.9];
 
+/** Every way of writing "A and B" over "B", so the card can take the formula as it's normally written. */
+const AND_GIVEN_B = { "P(A\\cap B)": "x", "P(B\\cap A)": "x", "P(AB)": "x", "P(A,B)": "x", "P(B)": "q" };
+
 export const PROBABILITY = defineTopic("Probability", [
   {
     id: "binomial-probability",
@@ -42,7 +45,7 @@ export const PROBABILITY = defineTopic("Probability", [
     whenToUse: "\"Expected number of...\": split the count into indicator variables and add their probabilities.",
     recall: [
       { lhs: "E[\\text{fair } n\\text{-sided die}] =", answer: "\\frac{n+1}{2}", vars: { n: int(4, 20) } },
-      { lhs: "E[aX+b] =", answer: "am+b", vars: { a: [1, 5], b: [1, 5], m: [1, 5] } },
+      { lhs: "E[aX+b] =", answer: "am+b", aliases: { "E[X]": "m" }, vars: { a: [1, 5], b: [1, 5], m: [1, 5] } },
     ],
     related: ["geometric-distribution", "binomial-probability"],
     problems: [
@@ -65,9 +68,9 @@ export const PROBABILITY = defineTopic("Probability", [
     name: "Conditional Probability",
     level: "AMC 10",
     statement: "P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}",
-    setup: "Write $x = P(A \\cap B)$ and $q = P(B)$. Knowing $B$ happened shrinks the sample space to $B$.",
+    setup: "Knowing $B$ happened shrinks the sample space to $B$. Type $\\cap$ as \"cap\".",
     whenToUse: "\"Given that...\" or \"if we know...\": restrict to the outcomes where the condition holds.",
-    recall: [{ lhs: "P(A\\mid B) =", answer: "\\frac{x}{q}", vars: { x: [0.05, 0.2], q: [0.3, 0.9] } }],
+    recall: [{ lhs: "P(A\\mid B) =", answer: "\\frac{P(A\\cap B)}{P(B)}", vars: { x: [0.05, 0.2], q: [0.3, 0.9] }, aliases: AND_GIVEN_B }],
     related: ["bayes"],
     problems: [
       {
@@ -91,7 +94,7 @@ export const PROBABILITY = defineTopic("Probability", [
     statement: "P(A \\mid B) = \\frac{P(B \\mid A)\\,P(A)}{P(B)}",
     setup: "Write $p = P(A)$, $r = P(B \\mid A)$, and $q = P(B)$.",
     whenToUse: "You know the probability one way (a test given a disease) and need it the other way (a disease given a test).",
-    recall: [{ lhs: "P(A\\mid B) =", answer: "\\frac{rp}{q}", vars: { p: prob, r: prob, q: prob } }],
+    recall: [{ lhs: "P(A\\mid B) =", answer: "\\frac{rp}{q}", vars: { p: prob, r: prob, q: prob }, aliases: { "P(A)": "p", "P(B\\mid A)": "r", "P(B|A)": "r", "P(B)": "q" } }],
     related: ["conditional-probability"],
     problems: [
       {

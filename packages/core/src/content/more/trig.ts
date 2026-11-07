@@ -6,7 +6,7 @@ export const TRIG_2 = defineTopic("Trigonometry", [
   {
     id: "sum-to-product",
     name: "Sum-to-Product",
-    level: "AIME",
+    level: "AMC 12",
     statement: "\\sin a + \\sin b = 2\\sin\\tfrac{a+b}{2}\\cos\\tfrac{a-b}{2}, \\quad \\sin a - \\sin b = 2\\cos\\tfrac{a+b}{2}\\sin\\tfrac{a-b}{2}",
     setup: "Similar forms exist for cosines.",
     whenToUse: "A sum or difference of two sines or cosines at different angles.",
@@ -27,7 +27,7 @@ export const TRIG_2 = defineTopic("Trigonometry", [
   {
     id: "product-to-sum",
     name: "Product-to-Sum",
-    level: "AIME",
+    level: "AMC 12",
     statement: "2\\sin a\\cos b = \\sin(a+b) + \\sin(a-b), \\quad 2\\cos a\\cos b = \\cos(a-b) + \\cos(a+b)",
     setup: "The reverse of sum-to-product.",
     whenToUse: "A product of two trig functions at different angles needs to become a sum.",
@@ -41,7 +41,7 @@ export const TRIG_2 = defineTopic("Trigonometry", [
   {
     id: "triple-angle",
     name: "Triple Angle Formulas",
-    level: "AIME",
+    level: "AMC 12",
     statement: "\\sin 3x = 3\\sin x - 4\\sin^3 x, \\qquad \\cos 3x = 4\\cos^3 x - 3\\cos x",
     setup: "Angle addition applied twice.",
     whenToUse: "An angle and its triple appear together, or a cubic in $\\sin x$ or $\\cos x$.",

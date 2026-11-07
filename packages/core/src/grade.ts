@@ -16,6 +16,9 @@ function normalize(latex: string) {
     .replace(/\\left|\\right/g, "")
     .replace(/\\mathrm\{([^}]*)\}/g, "$1")
     .replace(/\\placeholder\{\}/g, "")
+    .replace(/\\lbrack/g, "[")
+    .replace(/\\rbrack/g, "]")
+    .replace(/\^\{?\\prime\}?/g, "'")
     .trim();
 }
 
@@ -109,14 +112,29 @@ function scoped<T>(fn: () => T): T {
   }
 }
 
+/** Swap each alias for its stand-in variable, longest first, ignoring spaces. */
+function applyAliases(blank: RecallBlank, latex: string) {
+  const aliases = Object.entries(blank.aliases ?? {}).sort(([a], [b]) => b.length - a.length);
+  return aliases.reduce((out, [from, to]) => {
+    const chars = [...from.replace(/\s+/g, "")].map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    return out.replace(new RegExp(chars.join("\\s*"), "g"), `(${to})`);
+  }, latex);
+}
+
+/** `x1` for x₁ wherever the card has an x₁, in case the box didn't turn it into a subscript. */
+function subscripts(blank: RecallBlank, latex: string) {
+  return latex.replace(/(?<![\\a-zA-Z_])([a-zA-Z])(\d)(?![\d}])/g, (typed, v, i) => (`${v}_${i}` in blank.vars ? `${v}_${i}` : typed));
+}
+
 function recall(blank: RecallBlank, input: string): boolean {
-  const clean = normalize(input);
-  if (!clean) return false;
-  if (blank.banned?.some((b) => clean.replace(/\s+/g, "").includes(b))) return false;
+  const typed = normalize(input);
+  if (!typed) return false;
+  if (blank.banned?.some((b) => typed.replace(/\s+/g, "").includes(b))) return false;
+  const clean = subscripts(blank, applyAliases(blank, typed));
   if (strayUnknowns(clean, allowedVars(blank)).length) return false;
   if (blank.form === "product" && !["Multiply", "Power"].includes(topHead(clean) ?? "")) return false;
   if (blank.form === "sum" && !["Add", "Subtract"].includes(topHead(clean) ?? "")) return false;
-  return [blank.answer, ...(blank.accept ?? [])].some((a) => sameValue(blank, a, clean));
+  return [blank.answer, ...(blank.accept ?? [])].some((a) => sameValue(blank, applyAliases(blank, a), clean));
 }
 
 /** Is the typed number equal to the problem's answer? Accepts any form, e.g. 9.25 or 37/4. */

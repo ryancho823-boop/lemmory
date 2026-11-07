@@ -18,23 +18,23 @@ const TEXT = {
     button: "Try the student demo",
     second: "See the teacher view",
   },
-  bank: { title: <>{TOTAL_FORMULAS} formulas from AMC 8 to AIME and calculus rounds that we can test you on</>, link: "See the formula bank", linkNote: "Open it in the demo" },
+  bank: { title: <>{TOTAL_FORMULAS} formulas, from AMC 8 to AIME and calculus rounds</>, link: "See the formula bank", linkNote: "Open it in the demo" },
   mission: {
     quote: "Every formula a student learns should still be there on contest day.",
     body: "We make review part of the course, so every student keeps what they're taught, not just the ones with perfect study habits.",
   },
   inside: { title: "A look inside", body: "Real screens from the app. The demo has all of them, with a sample class you can click around." },
   how: {
-    schedulerTitle: "Then the scheduler takes over",
-    schedulerBody: "Each right answer pushes the next review further out. A miss stays in that day's review until it's right, then the card comes back sooner. Here is one formula, where each square is a day:",
+    schedulerTitle: "One formula, 90 days",
+    schedulerBody: "Each right answer pushes the next review further out. A miss stays in that day's review until it's right, then the card comes back sooner. Two misses in a row on problems send it back to recall. Each square is a day:",
     fsrsTitle: "What is FSRS?",
-    fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. For every student and every formula, it estimates how strong the memory is and how fast it's fading, then schedules the next review for the day recall is predicted to drop to 90%. It was trained on hundreds of millions of real reviews.",
+    fsrsBody: "FSRS (Free Spaced Repetition Scheduler) is the open-source algorithm that decides when each card comes back. From a student's answers on a card, it estimates how strong that memory is, then schedules the next review for the day recall is predicted to drop to 90%. We use its published default settings, trained on hundreds of millions of real reviews.",
   },
   research: { title: "Built on how memory actually works" },
 };
 
 const PROBLEMS = [
-  { title: "Formulas fade", body: "Forgotten within 1-2 weeks without specific practice." },
+  { title: "Formulas fade", body: "A week after studying, students who only re-read remembered 40%." },
   { title: "Classes move on", body: "A class learns a formula, then jumps straight into the next topic." },
   { title: "Sources are scattered across the internet", body: "AoPS Wiki, random PDFs, forum posts." },
 ];
@@ -124,14 +124,14 @@ export default function Overview() {
       <section className="bg-ink text-white">
         <div className="grid lg:grid-cols-2">
           {/* Photo by Kevin Yudhistira Alloni: unsplash.com/photos/WBU233kGI6g (Unsplash License). */}
-          <div className="relative aspect-[4/3] lg:aspect-auto">
-            <Image src="/photos/desk-at-night.jpg" alt="A student seen from behind, working late at a desk under a lamp, with a calendar and sticky notes on the wall" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <div className="relative aspect-[21/9] lg:aspect-auto">
+            <Image src="/photos/desk-at-night-large.jpg" alt="A student seen from behind, working late at a desk under a lamp, with a calendar and sticky notes on the wall" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="px-5 py-16 lg:px-16 lg:py-24">
-            <h2 data-reveal className="max-w-lg font-display text-[32px] leading-[1.2] sm:text-[40px]">
-              Right now, no one <em>actively helps</em> you put formulas into your <em>long-term memory</em>.
+            <h2 data-reveal className="max-w-2xl font-display text-[32px] leading-[1.2] sm:text-[40px] lg:max-w-lg">
+              Right now, no one <em>actively helps</em> students put formulas into <em>long-term memory</em>.
             </h2>
-            <ol className="mt-10 max-w-lg">
+            <ol className="mt-10 grid gap-x-8 md:grid-cols-3 lg:max-w-lg lg:grid-cols-1">
               {PROBLEMS.map((p, i) => (
                 <li key={p.title} data-reveal className="flex gap-5 border-t border-white/20 py-5">
                   <span className="font-display text-xl leading-7 text-lemon">{i + 1}</span>
@@ -197,7 +197,7 @@ export default function Overview() {
         </Container>
       </section>
 
-      <section>
+      <section id="research" className="scroll-mt-20">
         <Container className="py-20 lg:py-24">
           <SectionTitle reveal>{TEXT.research.title}</SectionTitle>
           <div className="mt-10 grid items-start gap-12 lg:grid-cols-[1fr_1.15fr]">

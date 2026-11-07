@@ -33,8 +33,9 @@ export function ChangeEmailForm({
       )}
       {waiting && <p className="mt-1 text-sm text-ink/60">Waiting for you to click the link sent to {waiting}.</p>}
       <form action={run} className="mt-4 space-y-3">
-        <Field label={email ? "New email" : "Email"} name="email" type="email" required autoComplete="email" error={state?.error} />
-        {email && <Field label="Your password" name="password" type="password" required autoComplete="current-password" />}
+        {/* Not a login form: with the usual hints, Chrome would fill the username in as the new email. */}
+        <Field label={email ? "New email" : "Email"} name="email" type="email" required autoComplete="off" error={state?.error} />
+        {email && <Field label="Your password" name="password" type="password" required autoComplete="new-password" />}
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" variant="outline" disabled={saving} className="shrink-0">
             {saving ? "Sending…" : "Send confirmation link"}
