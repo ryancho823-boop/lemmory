@@ -3,7 +3,7 @@
 
 import type { Formula, Level } from "./content/types";
 
-const LEVEL_RANK: Record<Level, number> = { "AMC 8": 0, "AMC 10": 1, "AMC 12": 2, Calculus: 2, AIME: 3 };
+const LEVEL_RANK: Record<Level, number> = { "AMC 8": 0, "AMC 10": 1, "AMC 12": 2, Calculus: 2, AIME: 3, Olympiad: 4 };
 
 function complexity(f: Formula) {
   // Length of what has to be recalled, plus a bump for each extra blank.

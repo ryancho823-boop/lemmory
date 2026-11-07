@@ -51,7 +51,7 @@ export const ALGEBRA_2 = defineTopic("Algebra", [
   {
     id: "newton-sums",
     name: "Sum of Squares of Roots",
-    level: "AIME",
+    level: "AMC 10",
     statement: "\\textstyle\\sum r_i^2 = \\left(\\sum r_i\\right)^2 - 2\\sum_{i<j} r_ir_j",
     setup: "Write $s$ for the sum of the roots and $q$ for the sum of their pairwise products (both from Vieta). This is the first of Newton's sums.",
     whenToUse: "A polynomial's roots and the sum of their squares, without solving for the roots.",

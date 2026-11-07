@@ -6,6 +6,7 @@ import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
 import { changeMyEmail, changeMyPassword, deleteMyAccount } from "../../actions";
 import { requireTeacher } from "@/lib/session";
 import { SettingsFrame } from "../SettingsFrame";
+import { RenameForm } from "./RenameForm";
 import { WeeklyReportSwitch } from "./WeeklyReportSwitch";
 
 export const metadata = { title: "Account · Lemmory for teachers" };
@@ -20,6 +21,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
         {confirmed && <p role="status" className="font-semibold text-good">Your email is confirmed.</p>}
         {expired && !user.emailConfirmed && <p role="status" className="font-semibold text-bad">That link doesn&apos;t work anymore. Send a new one below.</p>}
         {user.emailOverdue && <p className="font-semibold">Confirm your email to keep using Lemmory.</p>}
+        <RenameForm name={user.name} />
         <ChangeEmailForm email={user.contactEmail} confirmed={user.emailConfirmed} pending={waiting} hint="This is also how you log in." action={changeMyEmail} />
         <WeeklyReportSwitch on={weekly} />
         <ChangePasswordForm action={changeMyPassword} />

@@ -76,7 +76,7 @@ export const GEOMETRY_2 = defineTopic("Geometry", [
   {
     id: "ceva",
     name: "Ceva's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "\\frac{BD}{DC}\\cdot\\frac{CE}{EA}\\cdot\\frac{AF}{FB} = 1",
     setup: "Cevians $AD$, $BE$, $CF$ of triangle $ABC$ meet at one point exactly when this holds.",
     whenToUse: "Three cevians are concurrent and you need one of the ratios they create.",

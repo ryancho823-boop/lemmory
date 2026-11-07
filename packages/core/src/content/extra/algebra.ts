@@ -51,7 +51,7 @@ export const ALGEBRA_3 = defineTopic("Algebra", [
     id: "conjugate-roots",
     name: "Conjugate Root Theorem",
     level: "AMC 10",
-    statement: "a + b\\sqrt{c} \\text{ a root} \\implies a - b\\sqrt{c} \\text{ a root};\\quad a + bi \\implies a - bi",
+    statement: "\\text{Rational coefficients: } a + b\\sqrt{c} \\text{ a root} \\implies a - b\\sqrt{c} \\text{ a root};\\quad \\text{real coefficients: } a + bi \\implies a - bi",
     setup: "Radical roots pair up when the coefficients are rational; complex roots pair up when they're real.",
     whenToUse: "A polynomial with rational or real coefficients has an irrational or complex root, and you need the others.",
     recall: [{ lhs: "\\text{If } a+b\\sqrt{c} \\text{ is a root, so is}", answer: "a-b\\sqrt{c}", vars: { a: pos, b: pos, c: pos } }],

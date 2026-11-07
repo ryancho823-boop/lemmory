@@ -5,8 +5,8 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FORMULA_BY_ID, TOPIC_COLOR, topicOf } from "@/lib/bank";
 import { useStore } from "@/lib/store";
 import { CLASS_NAME } from "@/lib/sim";
-import { classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
-import { BarList, FLAG_MARGIN, average } from "@lemmory/ui/charts";
+import { LOW_ACCURACY, classFormulaHealth, isBehind, summary, weakestTopic } from "@lemmory/core/analytics";
+import { BarList } from "@lemmory/ui/charts";
 
 /** Formulas under this first-try accuracy are listed under "What the class is forgetting". */
 const FORGETTING = 0.8;
@@ -19,8 +19,6 @@ export default function TeacherOverview() {
   const sums = students.map((s) => ({ s, m: summary(s, today) }));
   const done = sums.filter((x) => x.m.doneToday).length;
   const health = classFormulaHealth(students, state.assignments.map((a) => a.formulaId), today);
-  // Formulas are compared with this class's own average, not a fixed cutoff.
-  const typical = average(health.map((h) => h.accuracy));
   // Only formulas the class is actually getting wrong: a 100% formula isn't being forgotten.
   const forgotten = health.filter((h) => (h.accuracy ?? 1) < FORGETTING);
   // Who's behind on reviews or struggling, with the specifics a teacher would act on.
@@ -61,7 +59,7 @@ export default function TeacherOverview() {
         <Panel>
           <PanelHeader
             title="What the class is forgetting"
-            info={`Right on the first try, last 14 days. Red means well below this class's average${typical === null ? "" : ` (${pct(typical)})`}: reteach those.`}
+            info="Right on the first try, last 4 weeks. Red means under 60%: reteach those."
             action={
               <Link href="/teacher/formulas" className="text-sm font-semibold text-ink/50 hover:text-ink">
                 All
@@ -73,7 +71,7 @@ export default function TeacherOverview() {
               <p className="text-sm text-ink/50">Nothing to reteach: every formula is above 80% right.</p>
             ) : (
             <BarList
-              flagBelow={typical === null ? undefined : typical - FLAG_MARGIN}
+              flagBelow={LOW_ACCURACY}
               unit="right"
               rows={forgotten.slice(0, 8).map((h) => ({
                 key: h.formulaId,

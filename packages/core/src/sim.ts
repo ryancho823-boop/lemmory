@@ -67,7 +67,7 @@ function rng(seed: number) {
 }
 const clamp = (x: number, lo = 0.03, hi = 0.98) => Math.min(hi, Math.max(lo, x));
 
-const LEVEL_DIFFICULTY: Record<Level, number> = { "AMC 8": 0.02, "AMC 10": 0.1, "AMC 12": 0.18, AIME: 0.28, Calculus: 0.15 };
+const LEVEL_DIFFICULTY: Record<Level, number> = { "AMC 8": 0.02, "AMC 10": 0.1, "AMC 12": 0.18, AIME: 0.28, Olympiad: 0.36, Calculus: 0.15 };
 export function difficulty(bank: Bank, formulaId: string) {
   const f = bank.byId[formulaId];
   return LEVEL_DIFFICULTY[f.level] + ((hash(formulaId) % 100) / 100 - 0.5) * 0.14;

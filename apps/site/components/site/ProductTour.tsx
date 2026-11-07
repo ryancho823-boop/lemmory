@@ -16,7 +16,7 @@ const VIEWS = [
     title: "One button a day",
     body: "Students see how many cards are due, the formulas they keep missing, and where they stand on the class leaderboard.",
     src: "/shots/tour-student-home.png",
-    alt: "Student home page: 9 cards today with a Start button, a list of formulas to focus on, and the class leaderboard",
+    alt: "Student home page: today's cards with a Start button, a list of formulas to focus on, and the class leaderboard",
   },
   {
     id: "assign",
@@ -32,7 +32,7 @@ const VIEWS = [
     color: ACCENT.green,
     tab: "Class overview",
     title: "See what the class is forgetting",
-    body: "Accuracy on every assigned formula, who finished today's review, who's falling behind, and which look-alike formulas students mix up, so you know what to reteach before the contest.",
+    body: "The formulas the class gets wrong most, who finished today's review, and who's falling behind, so you know what to reteach before the contest.",
     src: "/shots/tour-teacher-overview.png",
     alt: "Teacher overview: what the class is forgetting, students who need attention, and this week's homework",
   },
@@ -41,9 +41,9 @@ const VIEWS = [
     color: ACCENT.purple,
     tab: "Student stats",
     title: "Progress students can see",
-    body: "A streak calendar, accuracy by topic, and the formulas that need more work.",
+    body: "A streak, a calendar of finished days, and the formulas that need more work.",
     src: "/shots/tour-student-stats.png",
-    alt: "Student stats page: streak, cards reviewed, formulas that need work, a calendar and accuracy by topic",
+    alt: "Student stats page: streak, cards reviewed, formulas that need work and a calendar",
   },
 ];
 

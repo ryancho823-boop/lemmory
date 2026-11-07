@@ -69,26 +69,26 @@ const SCENARIOS = [
   {
     id: "right",
     label: "Always right",
-    days: { 3: "r", 4: "p", 7: "p", 21: "p", 78: "p" },
-    note: "5 reviews in 78 days. The gaps keep growing.",
+    days: { 2: "r", 3: "p", 5: "p", 16: "p", 62: "p" },
+    note: "5 reviews in 62 days. Problems start the day after recall sticks, and from there each gap is longer than the last.",
   },
   {
     id: "recall",
-    label: "Miss on day 3",
-    days: { 3: "x", 4: "r", 7: "r", 14: "r", 15: "p", 18: "p", 32: "p", 89: "p" },
-    note: "It stays a recall card and comes back the next day. Problems wait until day 15, once it sticks.",
+    label: "Miss the recall",
+    days: { 2: "x", 3: "r", 5: "r", 11: "r", 12: "p", 14: "p", 25: "p", 71: "p" },
+    note: "It stays a recall card and comes back the next day. Problems wait until day 12, once it sticks.",
   },
   {
     id: "problem",
-    label: "Miss on day 7",
-    days: { 3: "r", 4: "p", 7: "x", 8: "p", 11: "p", 18: "p", 35: "p", 73: "p" },
+    label: "Miss a problem",
+    days: { 2: "r", 3: "p", 5: "x", 6: "p", 8: "p", 14: "p", 29: "p", 62: "p" },
     note: "It comes back the next day, then the gaps start small and grow again.",
   },
   {
     id: "twice",
-    label: "Miss twice",
-    days: { 3: "r", 4: "p", 7: "x", 8: "x", 9: "p", 12: "p", 15: "p", 20: "p", 29: "p", 45: "p", 71: "p" },
-    note: "Two misses in a row keep it close: 11 reviews instead of 5, until it's safe again.",
+    label: "Miss two in a row",
+    days: { 2: "r", 3: "p", 5: "x", 6: "x", 7: "r", 9: "r", 10: "p", 12: "p", 23: "p", 69: "p" },
+    note: "Two misses in a row mean the formula itself has faded, so it goes back to recall. Problems return on day 10.",
   },
 ] as const;
 

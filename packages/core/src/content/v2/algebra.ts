@@ -123,7 +123,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "schur",
     name: "Schur's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "a(a-b)(a-c) + b(b-a)(b-c) + c(c-a)(c-b) \\ge 0 \\quad (a, b, c \\ge 0)",
     setup: "For nonnegative $a, b, c$.",
     after: "Equality when $a = b = c$, or when two are equal and the third is $0$. Expanded: $a^3+b^3+c^3+3abc \\ge a^2b+a^2c+b^2a+b^2c+c^2a+c^2b$.",
@@ -138,7 +138,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "muirhead",
     name: "Muirhead's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "(p) \\succ (q) \\implies \\sum_{\\text{sym}} a^{p_1}b^{p_2}c^{p_3} \\ge \\sum_{\\text{sym}} a^{q_1}b^{q_2}c^{q_3}",
     setup: "For positive variables: if exponent list $p$ majorizes $q$ (same total, more spread out), its symmetric sum is bigger.",
     whenToUse: "Comparing two symmetric polynomials of the same degree, like $\\sum a^3$ against $\\sum a^2b$.",
@@ -166,7 +166,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "maclaurin",
     name: "Maclaurin's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "S_1 \\ge \\sqrt{S_2} \\ge \\sqrt[3]{S_3}, \\quad S_1 = \\tfrac{a+b+c}{3},\\ S_2 = \\tfrac{ab+bc+ca}{3},\\ S_3 = abc",
     setup: "For positive variables, averages of the elementary symmetric sums, with the matching root taken, decrease.",
     whenToUse: "You know one of $a+b+c$, $ab+bc+ca$, $abc$ and want a bound on another.",
@@ -180,7 +180,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "newton-inequality",
     name: "Newton's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "S_k^2 \\ge S_{k-1}S_{k+1}, \\quad \\text{e.g. } \\left(\\tfrac{ab+bc+ca}{3}\\right)^2 \\ge \\tfrac{a+b+c}{3}\\cdot abc",
     setup: "Uses the same averaged symmetric sums as Maclaurin, but holds for all real variables.",
     whenToUse: "Bounding $ab+bc+ca$ from $a+b+c$ and $abc$, or the reverse.",
@@ -194,7 +194,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "karamata",
     name: "Karamata's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "(x_i) \\succ (y_i),\\ f \\text{ convex} \\implies \\sum f(x_i) \\ge \\sum f(y_i)",
     setup: "A more spread-out list (same total) gives a bigger sum of a convex function.",
     whenToUse: "Maximizing a sum of a convex function of variables in a range: push them to the ends.",
@@ -208,7 +208,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "aczel",
     name: "Aczél's Inequality",
-    level: "AIME",
+    level: "Olympiad",
     statement: "(a_1b_1 - a_2b_2 - \\cdots)^2 \\ge (a_1^2 - a_2^2 - \\cdots)(b_1^2 - b_2^2 - \\cdots)",
     setup: "When $a_1^2 > a_2^2 + \\cdots$. Cauchy-Schwarz with minus signs, and the inequality reversed.",
     whenToUse: "Expressions like $ab - xy$ where $a^2 - x^2$ and $b^2 - y^2$ are known.",
@@ -405,7 +405,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
     name: "Sum of Reciprocals of Roots",
     level: "AMC 10",
     statement: "\\frac{1}{r_1} + \\cdots + \\frac{1}{r_n} = \\frac{e_{n-1}}{e_n} = -\\frac{a_1}{a_0}",
-    setup: "For a polynomial with constant term $a_0 \\ne 0$ and $x$-coefficient $a_1$.",
+    setup: "For a polynomial whose constant term isn't $0$. Here $a_0$ is that constant term and $a_1$ the coefficient of $x$.",
     whenToUse: "The sum of the reciprocals of the roots.",
     recall: [{ lhs: "\\text{For } ax^2+bx+c:\\ \\frac{1}{r_1}+\\frac{1}{r_2} =", answer: "-\\frac{b}{c}", vars: { a: pos, b: pos, c: pos } }],
     related: ["vieta-general", "transformed-roots"],
@@ -578,7 +578,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "cauchy-functional",
     name: "Cauchy's Functional Equation",
-    level: "AIME",
+    level: "Olympiad",
     statement: "f(x + y) = f(x) + f(y),\\ f \\text{ continuous or monotonic} \\implies f(x) = cx",
     setup: "A continuous function that turns sums into sums.",
     after: "With $c = f(1)$, it's $f(x) = cx$. The same idea solves $f(xy) = f(x) + f(y)$ (a logarithm) and $f(x+y) = f(x)f(y)$ (an exponential).",
@@ -636,7 +636,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "vieta-jumping",
     name: "Vieta Jumping",
-    level: "AIME",
+    level: "Olympiad",
     statement: "x^2 - (ky)x + (y^2 - m) = 0 \\text{ with root } x \\implies x' = ky - x \\text{ is also a root}",
     setup: "From one integer solution, Vieta gives a second, smaller one. Descend to a smallest solution and get a contradiction or a pattern.",
     whenToUse: "Quadratic Diophantine equations like $x^2 + y^2 + 1 = kxy$ or $\\frac{a^2+b^2}{ab+1}$.",
@@ -650,7 +650,7 @@ export const ALGEBRA_V2 = defineTopic("Algebra", [
   {
     id: "uvw",
     name: "The uvw Method",
-    level: "AIME",
+    level: "Olympiad",
     statement: "u = a+b+c,\\ v = ab+bc+ca,\\ w = abc: \\text{ extremes occur with two variables equal (or one } = 0)",
     setup: "Fix $u$ and $v$; then $w$ ranges over an interval whose ends have two equal variables.",
     whenToUse: "Maximizing or minimizing a symmetric expression of three variables.",

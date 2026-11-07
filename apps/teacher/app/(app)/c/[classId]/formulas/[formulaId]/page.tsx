@@ -62,7 +62,7 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
 
       <StatStrip
         items={[
-          { label: "Right on first try", value: pct(c.accuracy), hint: "Class, last 14 days" },
+          { label: "Right on first try", value: pct(c.accuracy), hint: "Class, last 4 weeks" },
           { label: "Recall mode", value: pct(c.recall), hint: "Typing the formula" },
           { label: "Application mode", value: pct(c.apply), hint: "Spotting it in a problem" },
           { label: "In application", value: `${c.inApply}/${c.rows.length}`, hint: `${c.mastered} mastered` },
@@ -72,7 +72,13 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
       <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
         <Panel>
           <PanelHeader title="Students" info="Sorted by lowest predicted recall first." />
-          <ul className="mt-3 divide-y divide-line">
+          <div className="hidden grid-cols-[1fr_100px_90px_120px] gap-x-4 px-5 pt-3 text-xs font-semibold text-ink/55 sm:grid">
+            <span>Student</span>
+            <span>Stage</span>
+            <span>First try, 4 weeks</span>
+            <span>Predicted recall</span>
+          </div>
+          <ul className="mt-1 divide-y divide-line">
             {rows.length === 0 && <li className="px-5 py-4 text-sm text-ink/50">No students yet.</li>}
             {rows.map((r) => (
               <li key={r.student.id}>
@@ -86,7 +92,7 @@ export default async function TeacherFormula({ params }: PageProps<"/c/[classId]
                   <span>
                     <StageSteps stage={r.card.stage} mastered={isMastered(r.card)} />
                   </span>
-                  <span className="text-xs text-ink/50">{r.n ? `${pct(r.accuracy)} of ${r.n}` : "No reviews"}</span>
+                  <span className="text-xs text-ink/50">{r.n ? `${Math.round((r.accuracy ?? 0) * r.n)} of ${r.n} right` : "No reviews"}</span>
                   {r.retention === null ? (
                     <span className="text-xs text-ink/45">Not started</span>
                   ) : (

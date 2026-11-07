@@ -71,14 +71,18 @@ function toFsrs(m: Memory): FsrsCard {
 }
 
 function fromFsrs(c: FsrsCard, day: number): Memory {
+  // FSRS keeps its four answer buttons at least a day apart, which pushes a weak card's "Good" out
+  // to 3 days even when its memory only lasts 1. There's one button here, so the next review comes
+  // when recall is due to reach 90%: at the stability. New cards haven't been through this yet.
+  const days = c.state === 0 ? 0 : Math.max(1, Math.round(c.stability));
   return {
     stability: c.stability,
     difficulty: c.difficulty,
     state: c.state,
     reps: c.reps,
     lapses: c.lapses,
-    scheduledDays: c.scheduled_days,
-    due: Math.max(day + 1, toDay(c.due)),
+    scheduledDays: days,
+    due: days ? day + days : toDay(c.due),
     last: day,
   };
 }

@@ -5,16 +5,18 @@ import { type DayStatus, dayStatus } from "@lemmory/core/analytics";
 import type { StudentRecord } from "@lemmory/core/records";
 import { pct } from "./ui";
 
+/** Under this many tries, a bar shows the count, not a percentage. */
+const FEW_TRIES = 5;
+
 /** Horizontal bars for a 0..1 value with a label on the left and the value on the right. */
 export function BarList({
   rows,
   flagBelow,
   unit,
 }: {
-  rows: { key: string; label: React.ReactNode; value: number | null; hint?: string; href?: string }[];
+  rows: { key: string; label: React.ReactNode; value: number | null; hint?: string; href?: string; n?: number }[];
   /**
-   * Bars under this value are red; the rest stay neutral. Pass a baseline such as the class's own
-   * average minus a margin, so a typical class doesn't look like an emergency.
+   * Bars under this value are red; the rest stay neutral. Pass LOW_ACCURACY, the cutoff every page uses.
    */
   flagBelow?: number;
   /** A word after each value, so "73%" says what it counts ("73% right"). */
@@ -24,17 +26,19 @@ export function BarList({
     <ul className="space-y-2.5">
       {rows.map((r) => {
         const v = r.value ?? 0;
-        const flagged = flagBelow !== undefined && r.value !== null && v < flagBelow;
+        // A few tries are shown as a count, in a neutral color: they aren't enough to judge by.
+        const few = r.n !== undefined && r.n < FEW_TRIES;
+        const flagged = !few && flagBelow !== undefined && r.value !== null && v < flagBelow;
         const color = flagged ? "var(--color-bad)" : "var(--color-seq-400)";
         return (
           <li key={r.key} className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(120px,200px)_1fr_auto]">
             <div className="truncate text-sm">{r.label}</div>
             <div className={`text-right text-sm font-semibold tabular-nums sm:order-last ${flagged ? "text-bad" : ""}`}>
-              {pct(r.value)}
+              {few ? `${Math.round(v * r.n!)} of ${r.n}` : pct(r.value)}
               {unit && r.value !== null && <span className="font-normal"> {unit}</span>}
             </div>
             <div className="relative col-span-2 h-2.5 bg-ink/6 sm:col-span-1" title={r.hint}>
-              <div className="h-full transition-[width] duration-500" style={{ width: `${Math.max(v * 100, 2)}%`, background: color }} />
+              <div className="h-full transition-[width] duration-500" style={{ width: `${v * 100}%`, background: few ? "rgb(15 17 33 / 0.2)" : color }} />
               {r.hint && (
                 <span className="pointer-events-none absolute -top-8 left-0 z-10 hidden whitespace-nowrap rounded-lg bg-ink px-2 py-1 text-xs text-white group-hover:block">
                   {r.hint}
@@ -48,20 +52,11 @@ export function BarList({
   );
 }
 
-/** The average of these values (null if none), for comparing each one with the rest. */
-export function average(values: (number | null)[]) {
-  const xs = values.filter((v): v is number => v !== null);
-  return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
-}
-
-/** How far under the class's own average a formula has to be before it's flagged red. */
-export const FLAG_MARGIN = 0.1;
-
 const STATUS_STYLE: Record<DayStatus, { bg: string; label: string }> = {
   done: { bg: "var(--color-good)", label: "All done" },
-  few: { bg: "#9fdc9f", label: "5 or fewer missed" },
-  some: { bg: "var(--color-warn)", label: "6–14 missed" },
-  many: { bg: "var(--color-bad)", label: "15+ missed" },
+  few: { bg: "#fbe9a9", label: "1–5 cards left" },
+  some: { bg: "var(--color-warn)", label: "6–14 left" },
+  many: { bg: "var(--color-bad)", label: "15+ left" },
   today: { bg: "transparent", label: "Today" },
   none: { bg: "rgb(15 17 33 / 0.06)", label: "No cards that day" },
 };
@@ -75,7 +70,7 @@ export function WeekGrid({ student, today, weeks = 5 }: { student: StudentRecord
   const fmt = (d: number) => new Date(d * DAY_MS).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   const tip = (d: number, st: DayStatus) => {
     const m = student.missed[d];
-    if (st === "few" || st === "some" || st === "many") return `${fmt(d)}: ${m} missed`;
+    if (st === "few" || st === "some" || st === "many") return `${fmt(d)}: ${m} ${m === 1 ? "card" : "cards"} left undone`;
     return `${fmt(d)}: ${STATUS_STYLE[st].label}`;
   };
 

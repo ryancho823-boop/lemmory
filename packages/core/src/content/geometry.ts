@@ -174,7 +174,7 @@ export const GEOMETRY = defineTopic("Geometry", [
   {
     id: "stewart",
     name: "Stewart's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "b^2m + c^2n = a(d^2 + mn)",
     setup: "Cevian $AD = d$ splits $BC = a$ into $BD = m$ and $DC = n$; $b = CA$, $c = AB$.",
     after: "Mnemonic: \\\"A man and his dad put a bomb in the sink\\\": $man + dad = bmb + cnc$.",
@@ -199,7 +199,7 @@ export const GEOMETRY = defineTopic("Geometry", [
   {
     id: "ptolemy",
     name: "Ptolemy's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "AC\\cdot BD = AB\\cdot CD + AD\\cdot BC",
     setup: "Cyclic quadrilateral with consecutive sides $a, b, c, d$ and diagonals $p, q$.",
     whenToUse: "A cyclic quadrilateral where you need a diagonal, or a point on a circle around a regular polygon.",

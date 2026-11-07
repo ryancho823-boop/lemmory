@@ -25,7 +25,7 @@ export default async function DeckPage({ searchParams }: PageProps<"/deck">) {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="My deck"
-        sub={`${cards.length} ${cards.length === 1 ? "formula" : "formulas"}`}
+        sub={`${cards.length} ${cards.length === 1 ? "formula" : "formulas"}. The bars show how mastered each one is.`}
         action={
           !v.doneToday && (
             <Button href="/review" size="sm">
@@ -84,8 +84,13 @@ function Row({ card, showTopic }: { card: Card; showTopic: boolean }) {
       <Link href={`/bank/${f.id}`} className="min-w-0 flex-1 truncate text-sm font-semibold hover:underline">
         {f.name}
       </Link>
-      <span className="h-1.5 w-28 shrink-0 overflow-hidden rounded-full bg-ink/8" title={`${Math.round(m * 100)}% mastered`}>
-        <span className="block h-full rounded-full bg-seq-400" style={{ width: `${Math.max(m * 100, m ? 4 : 0)}%` }} />
+      {/* Only assigned cards earn points, so say which ones do. */}
+      <span className="hidden shrink-0 text-xs text-ink/55 sm:block">{card.source === "self" ? "Your card · no points" : "Assigned"}</span>
+      <span className="flex w-32 shrink-0 items-center gap-2 text-xs tabular-nums text-ink/55">
+        <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink/8">
+          <span className="block h-full rounded-full bg-seq-400" style={{ width: `${Math.max(m * 100, m ? 4 : 0)}%` }} />
+        </span>
+        {Math.round(m * 100)}%
       </span>
       {card.source === "self" ? <RemoveButton formulaId={f.id} name={f.name} /> : <span className="w-[15px]" />}
     </li>

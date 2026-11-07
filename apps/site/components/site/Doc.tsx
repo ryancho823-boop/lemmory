@@ -17,9 +17,9 @@ export function DocPage({ title, updated, children }: { title: string; updated?:
   );
 }
 
-export function DocSection({ title, children }: { title: string; children: React.ReactNode }) {
+export function DocSection({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="mt-10 border-t border-line pt-6 first:mt-0 first:border-0 first:pt-0">
+    <section id={id} className="mt-10 scroll-mt-24 border-t border-line pt-6 first:mt-0 first:border-0 first:pt-0">
       <h2 className="font-display text-2xl">{title}</h2>
       {children}
     </section>

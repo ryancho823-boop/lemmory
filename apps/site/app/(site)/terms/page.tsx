@@ -6,7 +6,7 @@ export const metadata = { title: "Terms · Lemmory" };
 
 export default function Terms() {
   return (
-    <DocPage title="Terms" updated="November 5, 2026">
+    <DocPage title="Terms" updated="November 6, 2026">
       <p>These are the rules for using Lemmory. By making an account, you agree to them.</p>
 
       <DocSection title="Accounts">
@@ -17,10 +17,23 @@ export default function Terms() {
         </ul>
       </DocSection>
 
+      <DocSection title="Students under 13">
+        <ul>
+          <li>
+            A student under 13 may use Lemmory only with the permission described on the <Link href="/privacy#parents">privacy page</Link>: a parent
+            or guardian&apos;s signed form, or, for a class run by a school, the school&apos;s agreement.
+          </li>
+          <li>Teachers agree to have that permission before inviting a student under 13, to keep a copy, and to send it to us if we ask.</li>
+          <li>Students on the individual plan who are under 13 need a parent or guardian to send us the form.</li>
+          <li>A school that agrees for its students may use Lemmory only for its own teaching.</li>
+          <li>Students under 18 should read these terms with a parent or guardian, who agrees to them on the student&apos;s behalf.</li>
+        </ul>
+      </DocSection>
+
       <DocSection title="Plans and trials">
         <p>
           Every plan starts with a {TRIAL_DAYS}-day free trial. The prices are on the <Link href="/pricing">pricing page</Link>. When a trial ends
-          without a paid plan, reviewing pauses until one starts; nothing is deleted. Students in a class on a paid plan never pay. Payments aren&apos;t connected yet, so choosing a plan doesn&apos;t charge you anything for now. We&apos;ll tell you before that changes.
+          without a paid plan, reviewing pauses until one starts; nothing is deleted. Students in a class on a paid plan never pay. Payments aren&apos;t connected yet, so choosing a plan doesn&apos;t charge you anything for now. We&apos;ll tell you before that changes, and we&apos;ll add our refund terms here first.
         </p>
       </DocSection>
 
@@ -43,6 +56,14 @@ export default function Terms() {
         <p>
           We work to keep Lemmory running and correct, but it&apos;s provided as is, without a promise that it will always be available or free of
           errors, or that using it will raise anyone&apos;s scores.
+        </p>
+      </DocSection>
+
+      <DocSection title="Limits on liability">
+        <p>
+          As far as the law allows, Lemmory and the people who run it aren&apos;t liable for indirect or consequential losses from using it, like
+          lost data or a contest result. Our total liability to you is limited to what you paid us in the 12 months before the claim, or $50 if
+          that&apos;s more. Nothing here takes away rights the law says can&apos;t be taken away.
         </p>
       </DocSection>
 

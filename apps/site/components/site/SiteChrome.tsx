@@ -11,6 +11,7 @@ import { CONTACT_EMAIL } from "@/lib/links";
 const TABS = [
   { href: "/", label: "Overview", also: [] as string[] },
   { href: "/pricing", label: "Pricing", also: ["/plans"] },
+  { href: "/about", label: "About", also: [] as string[] },
 ];
 const isCurrent = (t: (typeof TABS)[number], path: string) => path === t.href || t.also.includes(path);
 
@@ -65,7 +66,6 @@ export function SiteHeader() {
 }
 
 const FOOTER_LINKS = [
-  { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ];
@@ -90,6 +90,7 @@ export function SiteFooter() {
               {CONTACT_EMAIL}
             </a>
           </p>
+          <p className="mt-1">© {new Date().getFullYear()} Lemmory</p>
         </div>
       </div>
     </footer>

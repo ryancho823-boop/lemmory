@@ -185,3 +185,8 @@ export async function deleteClass(teacherId: string, classId: string, typedName:
   });
   return true;
 }
+
+/** Change the name students see for their teacher. */
+export async function renameTeacher(teacherId: string, name: string) {
+  await db.update(users).set({ name }).where(and(eq(users.id, teacherId), eq(users.role, "teacher")));
+}

@@ -7,7 +7,7 @@ export type Topic =
   | "Probability"
   | "Calculus";
 
-export type Level = "AMC 8" | "AMC 10" | "AMC 12" | "AIME" | "Calculus";
+export type Level = "AMC 8" | "AMC 10" | "AMC 12" | "AIME" | "Olympiad" | "Calculus";
 
 export const TOPICS: Topic[] = [
   "Algebra",
@@ -33,7 +33,7 @@ export const TOPIC_COLOR: Record<Topic, string> = {
   Calculus: "#a16207",
 };
 
-export const LEVELS: Level[] = ["AMC 8", "AMC 10", "AMC 12", "AIME", "Calculus"];
+export const LEVELS: Level[] = ["AMC 8", "AMC 10", "AMC 12", "AIME", "Olympiad", "Calculus"];
 
 /** "Calculus" covers the calculus rounds at tournaments like SMT and BMT. */
 export const LEVEL_LABEL: Record<Level, string> = {
@@ -41,6 +41,7 @@ export const LEVEL_LABEL: Record<Level, string> = {
   "AMC 10": "AMC 10",
   "AMC 12": "AMC 12",
   AIME: "AIME",
+  Olympiad: "Olympiad",
   Calculus: "Calc rounds",
 };
 

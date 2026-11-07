@@ -75,12 +75,13 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
       <p className="mt-1.5 text-ink/60">
         <Rich text={prompt.setup} />
       </p>
-      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
+      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[320px]" />}
 
-      <div className="mt-7 space-y-4">
+      {/* One grid for every row, so the boxes line up whatever the width of each left side. */}
+      <div className="mt-7 grid grid-cols-[minmax(0,1fr)] gap-y-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-x-4">
         {prompt.blanks.map((b, i) => (
-          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
-            <div className="shrink-0 pt-3 text-lg sm:min-w-40 sm:text-right">
+          <div key={i} className="grid grid-cols-subgrid gap-y-2 sm:col-span-2">
+            <div className="pt-3 text-lg sm:text-right">
               <Tex math={`\\displaystyle ${b.lhs}`} />
             </div>
             <div className="min-w-0 flex-1">
@@ -114,7 +115,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
           </div>
         ))}
         {!results && active >= 0 && (
-          <div className="sm:pl-44">
+          <div className="sm:col-start-2">
             <MathToolbar onInsert={(latex) => inputs.current[active]?.insert(latex)} />
           </div>
         )}
@@ -125,7 +126,7 @@ export function RecallCard({ prompt, onCheck, onDone, autoFocus = true }: Props)
           {allRight ? (
             <span className="block">Any equivalent form counts.</span>
           ) : (
-            <span className="math-scroll block">
+            <span className="math-scroll block whitespace-nowrap">
               <Tex math={`\\displaystyle ${graded.statement}`} />
             </span>
           )}

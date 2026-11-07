@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
 import { FORMULA_BY_ID } from "@/lib/bank";
 import { RecallCard } from "@/components/review/RecallCard";
 import { ApplyCard } from "@/components/review/ApplyCard";
@@ -11,7 +11,8 @@ type Mode = "apply" | "recall";
 
 // AM-GM: one short box to recall, then a classic contest problem where spotting it is the skill.
 const FORMULA = "amgm";
-const PROBLEM = FORMULA_BY_ID[FORMULA].problems[0];
+// Not the first problem: that's the worked example on the formula's page.
+const PROBLEM = FORMULA_BY_ID[FORMULA].problems[1];
 const OPTIONS = ["vieta-quadratic", "amgm", "sfft", "arithmetic-series"];
 
 /**
@@ -45,9 +46,9 @@ export function TryIt() {
       <div className="min-h-[430px] p-6">
         {result !== null ? (
           <div className="flex min-h-[380px] flex-col items-center justify-center text-center">
-            <CheckCircle2 size={44} className="mx-auto text-good" />
-            <p className="mt-3 text-xl font-extrabold">{result ? "That's the whole card: recalled, then used." : "That one's done. You'll get it next time."}</p>
-            <p className="mt-1 text-ink/55">In the app, FSRS now picks the day it comes back.</p>
+            {result ? <CheckCircle2 size={44} className="mx-auto text-good" /> : <XCircle size={44} className="mx-auto text-bad" />}
+            <p className="mt-3 text-xl font-extrabold">{result ? "That's the whole card: recalled, then used." : "Not this time."}</p>
+            <p className="mt-1 text-ink/55">{result ? "In the app, FSRS now picks the day it comes back." : "In the app, a missed card comes back until you get it, then sooner the next day."}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <Button href="/student">
                 Try the full student demo <ArrowRight size={16} />

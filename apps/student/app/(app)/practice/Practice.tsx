@@ -29,7 +29,7 @@ function shuffle<T>(xs: T[]) {
  * Cram mode for the days before a contest: every card in the deck, back to back.
  * Nothing here is recorded, so it doesn't change the schedule, the stats, or points.
  */
-export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
+export function Practice({ deck, deckSize }: { deck: { id: string; topic: Topic }[]; deckSize: number }) {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState(false);
@@ -148,7 +148,11 @@ export function Practice({ deck }: { deck: { id: string; topic: Topic }[] }) {
         <Button size="lg" className="mt-8 w-full" onClick={start} disabled={!chosen.length}>
           Practice {chosen.length} {chosen.length === 1 ? "card" : "cards"} <ArrowRight size={18} />
         </Button>
-        {deck.length === 0 && <p className="mt-3 text-center text-sm text-ink/50">Cards show up here once you&apos;ve reviewed them at least once.</p>}
+        {deck.length < deckSize && (
+          <p className="mt-3 text-center text-sm text-ink/60">
+            {deck.length} of your {deckSize} cards. The rest are new or still in today&apos;s review, and practice would show their answers.
+          </p>
+        )}
       </Panel>
     </div>
   );

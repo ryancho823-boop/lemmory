@@ -24,7 +24,7 @@ export const ALGEBRA_PROBLEMS: Record<string, Omit<Problem, "uses">[]> = {
   "geometric-series": [
     { id: "q-geometric-series-3", text: "Evaluate $2 - 1 + \\frac12 - \\frac14 + \\cdots$.", answer: "\\frac{4}{3}", solution: "$\\frac{2}{1 - (-\\frac12)}$." },
     { id: "q-geometric-series-4", text: "Evaluate $1 + 2 + 4 + \\cdots + 2^9$.", answer: "1023", solution: "$\\frac{2^{10} - 1}{2 - 1}$." },
-    { id: "q-geometric-series-5", text: "An infinite geometric series has first term $4$ and sum $12$. Find its common ratio.", answer: "\\frac{2}{3}", solution: "$\\frac{4}{1 - r} = 12$, so $1 - r = \\frac13$." },
+    { id: "q-geometric-series-5", text: "An infinite geometric series has first term $4$ and sum $12$. Find its common ratio.", answer: "\\frac{2}{3}", solution: "$\\frac{4}{1 - r} = 12$, so $1 - r = \\frac13$ and $r = \\frac23$." },
   ],
   "power-sums": [
     { id: "q-power-sums-4", text: "Evaluate $11^2 + 12^2 + \\cdots + 20^2$.", answer: "2485", solution: "$\\frac{20 \\cdot 21 \\cdot 41}{6} - \\frac{10 \\cdot 11 \\cdot 21}{6} = 2870 - 385$." },

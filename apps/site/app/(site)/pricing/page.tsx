@@ -11,21 +11,21 @@ export const metadata = { title: "Plans and pricing · Lemmory" };
 // What a visitor deciding what to buy needs: the plans and how Lemmory compares.
 const INTRO = {
   title: "Plans and pricing",
-  sub: `Pick the plan that matches how you teach. Every plan starts with a ${TRIAL_DAYS}-day free trial, and students in a paid class never pay.`,
+  sub: `Pick the plan that matches how you teach. Every plan starts with a ${TRIAL_DAYS}-day free trial, and students in a paid class never pay. Payments aren't connected yet, so nothing is charged for now.`,
 };
 
 // How Lemmory compares with the other ways contest students and clubs study. Keep claims about
-// other tools conservative and recheck them now and then (last checked October 27, 2026).
+// other tools conservative and recheck them now and then (last checked November 6, 2026).
 const COMPARE = {
   columns: ["Lemmory", "AoPS Alcumus", "Achievable AMC", "Podsie", "Quizlet", "Anki"],
   rows: [
-    { label: "Built for math competitions", cells: [`Yes, ${TOTAL_FORMULAS} formulas`, "Problems only", "Yes", "No", "No", "No"] },
+    { label: "Built for math competitions", cells: [`Yes, ${TOTAL_FORMULAS} formulas`, "Yes, problems", "Yes", "No", "No", "No"] },
     { label: "Keeps formulas from being forgotten", cells: ["Yes", "Partly", "Yes", "Yes", "Partly", "Yes"] },
     { label: "Teaches when to use each formula", cells: ["Yes", "Problems only", "Problems only", "Write your own", "Make your own", "Make your own"] },
     { label: "Grades math in any equivalent form", cells: ["Yes", "Numbers only", "Multiple choice", "Partly", "No", "No"] },
     { label: "Ready to use on day one", cells: ["Yes", "Yes", "Yes", "Write your own", "Make your own", "Make your own"] },
     { label: "Shows what the class is forgetting", cells: ["Yes", "Reports", "No", "By standard", "Plus only", "No"] },
-    { label: "Price", cells: ["From $2/mo", "Free", "$99", "Free", "Free, Plus $36/yr", "Free"] },
+    { label: "Price", cells: ["From $2 a month", "Free", "$99, closed to new buyers", "Free", "Free, or $36 a year", "Free, iPhone app paid"] },
   ],
 };
 
@@ -33,7 +33,7 @@ const COMPARE = {
 // these cells summarize, so change them together.
 const GLANCE = {
   columns: ["Lemmory", "Contest practice", "Flashcard apps"],
-  note: "Contest practice here means the tools Alcumus and Achievable. Live academy courses cost much more. Flashcard apps: Anki, Quizlet, Podsie.",
+  note: "Contest practice here means the tools Alcumus and Achievable. AoPS, Think and AlphaStar on the chart are live courses, which cost much more, so they aren't in the tables. Flashcard apps: Anki, Quizlet, Podsie.",
   rows: [
     { label: "Built for contests", cells: ["Yes", "Yes", "No"] },
     { label: "Long-term memory", cells: ["Yes", "Partly", "Yes"] },
@@ -41,7 +41,7 @@ const GLANCE = {
     { label: "Grades any equivalent form", cells: ["Yes", "Partly", "Mostly no"] },
     { label: "Ready on day one", cells: ["Yes", "Yes", "Make your own"] },
     { label: "Shows what the class forgets", cells: ["Yes", "Partly", "Partly"] },
-    { label: "Price", cells: ["From $2/mo", "Free to $99", "Free to $36/yr"] },
+    { label: "Price", cells: ["From $2 a month", "Free to $99", "Free to $36 a year"] },
   ],
 };
 

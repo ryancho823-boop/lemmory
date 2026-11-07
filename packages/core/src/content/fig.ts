@@ -150,7 +150,10 @@ export function fig(spec: Spec): Figure {
   const texts = (spec.texts ?? []).map((t) => {
     if (t.at) return { at: to(t.at), text: t.text };
     const [a, b] = t.on!.split("-");
-    return { at: away(mid(pts[a], pts[b]), 12), text: t.text };
+    const m = mid(pts[a], pts[b]);
+    // Past any point label sitting at the middle of the side, like a median's foot.
+    const taken = Object.values(labels).some((l) => Math.hypot(l[0] - away(m, 12)[0], l[1] - away(m, 12)[1]) < 16);
+    return { at: away(m, taken ? 28 : 12), text: t.text };
   });
   return {
     w: Math.round((x1 - x0) * k + 2 * PAD),

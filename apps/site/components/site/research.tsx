@@ -25,16 +25,16 @@ export const RESEARCH = [
     body: "In a trial with 787 seventh graders across 54 classes, mixing problem types instead of practicing one type at a time raised scores a month later from 38% to 61%. Mixing forces students to choose the strategy.",
     use: "Application mode mixes formulas so students learn which one a problem needs.",
     cite: "Rohrer, Dedrick, Hartwig & Cheung (2020), Journal of Educational Psychology",
-    href: "https://ies.ed.gov/use-work/awards/efficacy-study-interleaved-mathematics-practice",
+    href: "https://doi.org/10.1037/edu0000367",
     icon: Shuffle,
   },
   {
     stat: "220M logs",
     label: "The FSRS scheduler",
-    body: "FSRS models each student's memory of each card and schedules the review for when recall is predicted to drop to 90%. It was built from 220 million real memory logs.",
+    body: "FSRS tracks the memory of each card from a student's answers and schedules the review for when recall is predicted to drop to 90%. It was built from 220 million real memory logs.",
     use: "Lemmory schedules every card with FSRS, using its published default parameters.",
     cite: "Ye, Su & Cao (2022), ACM KDD",
-    href: "https://dblp1.uni-trier.de/rec/conf/kdd/YeSC22.html",
+    href: "https://doi.org/10.1145/3534678.3539081",
     icon: LineChart,
   },
 ];
@@ -53,12 +53,13 @@ export function ForgettingCurve() {
   const x = (d: number) => pad.l + (d / days) * (W - pad.l - pad.r);
   const y = (r: number) => pad.t + (1 - r) * (H - pad.t - pad.b);
   const R = (t: number, S: number) => Math.pow(1 + (19 / 81) * (t / S), -0.5);
-  const noReview = Array.from({ length: 81 }, (_, i) => i / 2).map((t) => `${x(t)},${y(R(t, 1))}`);
+  const noReview = Array.from({ length: 81 }, (_, i) => i / 2).map((t) => `${x(t)},${y(R(t, 2.3))}`);
+  // The days and memory strengths of "Always right" in HowItWorks.tsx.
   const reviews = [
-    { at: 0, S: 1 },
-    { at: 1, S: 3 },
-    { at: 4, S: 10 },
-    { at: 14, S: 40 },
+    { at: 0, S: 2.3 },
+    { at: 2, S: 3 },
+    { at: 5, S: 11 },
+    { at: 16, S: 46 },
   ];
   const spaced: string[] = [];
   reviews.forEach((rv, i) => {
@@ -87,7 +88,7 @@ export function ForgettingCurve() {
         {reviews.slice(1).map((rv) => (
           <circle key={rv.at} cx={x(rv.at)} cy={y(1)} r={5} fill={CHART_LINE} stroke="white" strokeWidth={2} />
         ))}
-        <text x={x(31)} y={y(R(31, 1)) + 18} fontSize={12} fill={CHART_INK} fillOpacity={0.55}>
+        <text x={x(31)} y={y(R(31, 2.3)) + 18} fontSize={12} fill={CHART_INK} fillOpacity={0.55}>
           No review
         </text>
         <text x={x(22)} y={y(0.97) - 8} fontSize={12} fontWeight={700} fill={CHART_LABEL}>

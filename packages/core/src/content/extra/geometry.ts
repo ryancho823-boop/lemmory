@@ -107,7 +107,7 @@ export const GEOMETRY_3 = defineTopic("Geometry", [
   {
     id: "menelaus",
     name: "Menelaus's Theorem",
-    level: "AMC 12",
+    level: "AMC 10",
     statement: "\\frac{AF}{FB}\\cdot\\frac{BD}{DC}\\cdot\\frac{CE}{EA} = 1",
     setup: "A straight line meets lines $AB$, $BC$, $CA$ at $F$, $D$, $E$. Write $\\frac{AF}{FB} = x$ and $\\frac{BD}{DC} = y$ (lengths, not signed).",
     whenToUse: "A straight line cuts across a triangle and you need a ratio along one side. (Ceva is for three lines through one point.)",

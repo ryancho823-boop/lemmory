@@ -1,11 +1,12 @@
 import { ContactLink, DocPage, DocSection } from "@/components/site/Doc";
+import { PrintButton } from "@/components/site/PrintButton";
 
 export const metadata = { title: "Privacy · Lemmory" };
 
 // Keep this in step with what the code actually stores (packages/db/src/schema.ts).
 export default function Privacy() {
   return (
-    <DocPage title="Privacy" updated="November 5, 2026">
+    <DocPage title="Privacy" updated="November 6, 2026">
       <p>
         Lemmory is daily formula practice for math competition classes. This page says what we keep, why, who can see it, and how to have it deleted.
         The short version: we keep only what the app needs to work, we don&apos;t show ads, and we don&apos;t sell anyone&apos;s information.
@@ -64,11 +65,67 @@ export default function Privacy() {
         </p>
       </DocSection>
 
-      <DocSection title="Children">
+      <DocSection title="Children under 13" id="parents">
         <p>
-          Lemmory is used by students in classes run by their teachers, and students may be under 13. We collect only what&apos;s listed above. If you
-          are a parent or guardian and want to see or delete your child&apos;s information, email <ContactLink /> and we&apos;ll take care of it.
+          Some students on Lemmory may be under 13, so this section is the notice for their parents and guardians, as the US Children&apos;s Online
+          Privacy Protection Act (COPPA) requires. Lemmory is run by Ryan Cho. Reach us at <ContactLink />.
         </p>
+        <p>
+          <b>Permission comes first.</b> A student under 13 may use Lemmory only after one of these:
+        </p>
+        <ul>
+          <li>
+            <b>A parent or guardian agrees</b>, by signing the form below. This is needed for academies, tutors and students on the individual plan.
+          </li>
+          <li>
+            <b>The school agrees</b> on parents&apos; behalf, for a class or club run by that school. A school may do this only for use in its own
+            teaching, and we use the information only for that. The decision should come from the school, not one teacher alone.
+          </li>
+        </ul>
+        <p>
+          <b>What we collect from a child</b> is what&apos;s listed under Students at the top of this page: name, username, password, time zone, a
+          contact email, classes, and practice results. We use it only to run the student&apos;s practice and show results to the student and their
+          teachers. A child doesn&apos;t have to give more than Lemmory needs to work. We don&apos;t use it for ads, and we don&apos;t sell it.
+        </p>
+        <p>
+          <b>Who receives it:</b> the student&apos;s teachers; classmates, who see the name and points on the class leaderboard; and the service
+          companies named above, which only run parts of Lemmory for us. We don&apos;t share it with anyone else.
+        </p>
+        <p>
+          <b>How long we keep it:</b> until the account is deleted, by the student, the parent or us.
+        </p>
+        <p>
+          <b>What parents can do.</b> Email <ContactLink /> at any time to see what we hold about your child, have it deleted, or stop us collecting
+          any more. A school can ask the same for its students. Deleting the information ends the child&apos;s use of Lemmory. You can agree to Lemmory
+          using your child&apos;s information without agreeing to anything beyond what&apos;s on this page.
+        </p>
+        <p>
+          If we learn that a child under 13 has an account without this permission, we&apos;ll delete it. If you think that has happened, please tell us.
+        </p>
+      </DocSection>
+
+      <DocSection title="Parent permission form" id="parent-form">
+        <p>
+          Teachers: print this or copy it into an email for each student under 13, before they join. Parents: sign it and return it to the teacher, or
+          email a photo of it to <ContactLink />. Parents of students on the individual plan send it to us directly.
+        </p>
+        <div className="mt-5 rounded-lg border-2 border-ink bg-white p-6 print:border-0 print:p-0">
+          <p className="font-display text-xl">Permission for a child under 13 to use Lemmory</p>
+          <p>
+            I am the parent or legal guardian of the student named below. I have read the &quot;Children under 13&quot; section of the Lemmory privacy
+            page. I agree that Lemmory may collect and use my child&apos;s name, username, time zone, contact email, classes and practice results to run
+            their practice, and may show those results to their teachers and their name and points to classmates on the class leaderboard.
+          </p>
+          <p>I understand that I can see or delete this information, or withdraw this permission, at any time by emailing support@lemmory.com.</p>
+          <dl className="mt-5 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            {["Student's name", "Class and teacher", "Parent or guardian's name", "Parent or guardian's email", "Signature", "Date"].map((label) => (
+              <div key={label} className="border-b border-ink pb-7">
+                <dt className="text-sm">{label}</dt>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <PrintButton />
       </DocSection>
 
       <DocSection title="Changes">

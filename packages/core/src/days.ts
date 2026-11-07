@@ -32,11 +32,12 @@ export const isoDate = (day: number) => new Date(day * DAY_MS).toISOString().sli
 export const fmtDay = (day: number, opts: Intl.DateTimeFormatOptions = { weekday: "short", month: "short", day: "numeric" }) =>
   new Date(day * DAY_MS).toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
 
-/** "AMC 10A · Nov 5 · 25 days away", or just the name when there's no date. */
+/** "AMC 10A · Nov 5 · 25 days away", or just the name when there's no date. A contest that's over isn't shown. */
 export function contestLabel(name: string | null, date: number | null, today: number) {
   if (!name) return null;
   if (date === null) return name;
   const n = date - today;
-  const when = n < 0 ? "done" : n === 0 ? "today" : n === 1 ? "tomorrow" : `${n} days away`;
+  if (n < 0) return null;
+  const when = n === 0 ? "today" : n === 1 ? "tomorrow" : `${n} days away`;
   return `${name} · ${fmtDay(date, { month: "short", day: "numeric" })} · ${when}`;
 }

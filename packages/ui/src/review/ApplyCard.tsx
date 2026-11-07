@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { Check, X } from "lucide-react";
 import type { ApplyPrompt, PickResult, SolveResult } from "@lemmory/core/check";
 import { MathInput } from "../MathInput";
 import { Rich, Tex } from "../Tex";
@@ -52,20 +52,32 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
   useEnter(!!pick && !pick.right, () => onDone(false));
   useEnter(!!solve, () => onDone(solve!.right));
 
+  // 1 to 4 pick a formula, the way Enter checks one.
+  useEffect(() => {
+    if (pick) return;
+    const onKey = (e: KeyboardEvent) => {
+      const option = prompt.options[Number(e.key) - 1];
+      if (!option || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      setPicked((p) => (p.includes(option.id) ? p.filter((x) => x !== option.id) : [...p, option.id]));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pick, prompt.options]);
+
   return (
     <div>
       <StageTag stage="apply" />
       <p className="mt-4 text-lg leading-relaxed">
         <Rich text={prompt.text} />
       </p>
-      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[260px]" />}
+      {prompt.figure && <Figure figure={prompt.figure} className="mt-4 h-auto w-full max-w-[320px]" />}
 
       <div className="mt-7 flex items-center gap-2">
-        <Step n={1} done={!!pick} />
+        <Step n={1} result={pick?.right} />
         <h3 className="font-bold">Which formula{prompt.needs > 1 ? "s" : ""} does this need?</h3>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        {prompt.options.map((o) => {
+        {prompt.options.map((o, i) => {
           const on = picked.includes(o.id);
           const needed = !!pick?.uses.includes(o.id);
           const tone = !pick
@@ -80,11 +92,14 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
           return (
             <button key={o.id} type="button" onClick={() => toggle(o.id)} aria-pressed={on} className={cx("rounded-2xl border-2 px-4 py-3 text-left transition-all", tone)}>
               <span className="flex items-center justify-between gap-2 font-semibold">
-                {o.name}
+                <span>
+                  <kbd className={cx("mr-2 hidden font-sans text-xs font-medium sm:inline", on && !pick ? "text-white/60" : "text-ink/40")}>{i + 1}</kbd>
+                  {o.name}
+                </span>
                 {pick && needed && <Check size={16} strokeWidth={3} className="text-good" />}
               </span>
               {pick?.statements[o.id] && (needed || on) && (
-                <span className="math-scroll mt-1 block text-[17px]">
+                <span className="math-scroll mt-1 block whitespace-nowrap text-[17px]">
                   <Tex math={`\\displaystyle ${pick.statements[o.id]}`} />
                 </span>
               )}
@@ -112,7 +127,7 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
       {pick?.right && (
         <div className="rise">
           <div className="mt-8 flex items-center gap-2">
-            <Step n={2} done={!!solve} />
+            <Step n={2} result={solve?.right} />
             <h3 className="font-bold">Now solve it.</h3>
           </div>
           <div className="mt-3 max-w-sm">
@@ -146,10 +161,11 @@ export function ApplyCard({ prompt, onPick, onSolve, onDone }: Props) {
   );
 }
 
-function Step({ n, done }: { n: number; done: boolean }) {
+/** The step's number, then a check or a cross once it's answered. */
+function Step({ n, result }: { n: number; result?: boolean }) {
   return (
-    <span className={cx("grid size-6 place-items-center rounded-full text-xs font-bold", done ? "bg-ink text-white" : "bg-ink/8 text-ink/60")}>
-      {done ? <Check size={13} strokeWidth={3} /> : n}
+    <span className={cx("grid size-6 place-items-center rounded-full text-xs font-bold", result === undefined ? "bg-ink/8 text-ink/60" : result ? "bg-good text-white" : "bg-bad text-white")}>
+      {result === undefined ? n : result ? <Check size={13} strokeWidth={3} /> : <X size={13} strokeWidth={3} />}
     </span>
   );
 }

@@ -23,8 +23,12 @@ export default function LoginChooser() {
       </div>
       <p className="mt-8 text-center text-ink/75">
         New?{" "}
+        <a href={`${STUDENT_URL}/join`} className="font-semibold text-ink underline">
+          Sign up as a student
+        </a>{" "}
+        or{" "}
         <a href={SIGNUP_URL} className="font-semibold text-ink underline">
-          Sign up
+          as a teacher
         </a>
       </p>
     </section>

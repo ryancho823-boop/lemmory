@@ -82,8 +82,13 @@ function Row({ card, showTopic, onRemove }: { card: Card; showTopic: boolean; on
       <Link href={`/student/bank/${f.id}`} className="min-w-0 flex-1 truncate text-sm font-semibold hover:underline">
         {f.name}
       </Link>
-      <span className="h-1.5 w-28 shrink-0 overflow-hidden rounded-full bg-ink/8" title={`${Math.round(m * 100)}% mastered`}>
-        <span className="block h-full rounded-full bg-seq-400" style={{ width: `${Math.max(m * 100, m ? 4 : 0)}%` }} />
+      {/* Only assigned cards earn points, so say which ones do. */}
+      <span className="hidden shrink-0 text-xs text-ink/55 sm:block">{card.source === "self" ? "Your card · no points" : "Assigned"}</span>
+      <span className="flex w-32 shrink-0 items-center gap-2 text-xs tabular-nums text-ink/55">
+        <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink/8">
+          <span className="block h-full rounded-full bg-seq-400" style={{ width: `${Math.max(m * 100, m ? 4 : 0)}%` }} />
+        </span>
+        {Math.round(m * 100)}%
       </span>
       {card.source === "self" ? (
         <button onClick={onRemove} aria-label={`Remove ${f.name}`} className="text-ink/25 hover:text-bad">

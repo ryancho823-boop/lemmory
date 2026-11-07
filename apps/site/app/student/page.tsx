@@ -41,7 +41,7 @@ export default function StudentHome() {
           ) : (
             <div>
               <p className="flex items-center gap-1 text-4xl font-extrabold">
-                {queue.length} {queue.length === 1 ? "card" : "cards"} today
+                {queue.length} {queue.length === 1 ? "card" : "cards"} {state.session.completed.length ? "left" : "today"}
                 <InfoTip title="Today's cards" align="left">
                   About {Math.max(2, Math.round(queue.length * 0.5))} minutes, {fresh} of them new.
                 </InfoTip>
@@ -82,7 +82,7 @@ export default function StudentHome() {
                     </span>
                     <Meter value={w.accuracy} className="hidden w-20 xl:block" />
                     <span className="shrink-0 text-right tabular-nums">
-                      {tries(w.n, w.accuracy)}{w.n >= 3 && <span className="text-ink/70"> right</span>}
+                      {tries(w.n, w.accuracy)}
                     </span>
                   </Link>
                 </li>
