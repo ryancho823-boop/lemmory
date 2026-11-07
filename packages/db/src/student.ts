@@ -20,6 +20,8 @@ import { LOG_DAYS, type StudentRecord } from "@lemmory/core/records";
 import { type DaySession, buildQueue, emptySession, isDoneToday, newCards, nothingDue, recordAttempt } from "@lemmory/core/session";
 import { isNew } from "@lemmory/core/srs";
 import { type StarterLevel, starterDeck } from "@lemmory/core/starter";
+import { SITE_URL } from "@lemmory/core/urls";
+import { EMAIL_APPROVAL_FOR_CLASSES } from "./accounts";
 import { getStudentPlan, isOpen, planState, studentPlanState } from "./billing";
 import { db, type Tx } from "./client";
 import { addAssignedCards, classToday, handDaysToStudents, loadClass, loadRecords, pickZone, settle, settleIfBehind, studentToday, studentZones } from "./records";
@@ -400,9 +402,24 @@ export async function removeFromDeck(studentId: string, formulaId: string) {
   await db.delete(cards).where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId), eq(cards.source, "self")));
 }
 
+/** A school's permission covers its own classes, so these students can't use Lemmory outside them. */
+export async function schoolPermissionOnly(studentId: string) {
+  const row = await db.select({ consent: users.consent }).from(users).where(eq(users.id, studentId)).get();
+  return row?.consent === "school";
+}
+
+/** Why an under-13 can't join this class, if they can't. See EMAIL_APPROVAL_FOR_CLASSES. */
+export async function classPermissionProblem(studentId: string, klass: { schoolApprovedAt: Date | null }) {
+  if (klass.schoolApprovedAt) return null;
+  const row = await db.select({ consent: users.consent }).from(users).where(eq(users.id, studentId)).get();
+  if (row?.consent === "school") return "Your school's permission covers your school's classes. Ask a parent to email support@lemmory.com.";
+  if (row?.consent === "parent" && !EMAIL_APPROVAL_FOR_CLASSES) return `To join a class, a parent needs to sign the form at ${SITE_URL}/privacy/parent-form.`;
+  return null;
+}
+
 export async function findClassByCode(code: string) {
   return db
-    .select({ id: classes.id, name: classes.name, timezone: classes.timezone, teacher: users.name })
+    .select({ id: classes.id, name: classes.name, timezone: classes.timezone, teacher: users.name, schoolApprovedAt: classes.schoolApprovedAt })
     .from(classes)
     .innerJoin(users, eq(users.id, classes.teacherId))
     .where(eq(classes.joinCode, code.trim().toUpperCase()))

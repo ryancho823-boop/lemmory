@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentUser } from "@lemmory/db/auth";
@@ -43,7 +44,7 @@ export default async function JoinPage({ searchParams }: PageProps<"/join">) {
         </>
       }
     >
-      <JoinForm code={typeof code === "string" ? code : ""} onOwn={onOwn} />
+      <JoinForm code={typeof code === "string" ? code : ""} onOwn={onOwn} under13={(await cookies()).has("lemmory_under13")} />
     </AuthFrame>
   );
 }

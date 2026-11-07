@@ -147,10 +147,17 @@ export async function formulaLog(studentId: string, formulaId: string) {
   return rows.map(toEntry);
 }
 
+/** "Mia Lee" → "Mia L." */
+function shortName(name: string) {
+  const parts = name.trim().split(/\s+/);
+  return parts.length > 1 ? `${parts[0]} ${parts.at(-1)![0]}.` : parts[0];
+}
+
 /**
  * Everything about one class, with every student's record settled through yesterday.
  * Logs cover the last LOG_DAYS days; `withLogs: false` skips them (a student's page shows
- * classmates only on the leaderboard, which needs points and streaks, not their reviews).
+ * classmates only on the leaderboard, which needs points and streaks, not their reviews). There,
+ * a student under 13 is only a first name and initial.
  */
 export async function loadClass(classId: string, withLogs = true): Promise<ClassView | null> {
   const klass = await db.select().from(classes).where(eq(classes.id, classId)).get();
@@ -158,7 +165,7 @@ export async function loadClass(classId: string, withLogs = true): Promise<Class
   const today = classToday(klass);
   const [roster, assigned] = await Promise.all([
     db
-      .select({ studentId: enrollments.studentId, classId: enrollments.classId, settledThrough: enrollments.settledThrough, name: users.name })
+      .select({ studentId: enrollments.studentId, classId: enrollments.classId, settledThrough: enrollments.settledThrough, name: users.name, consent: users.consent })
       .from(enrollments)
       .innerJoin(users, eq(users.id, enrollments.studentId))
       .where(eq(enrollments.classId, classId))
@@ -176,7 +183,7 @@ export async function loadClass(classId: string, withLogs = true): Promise<Class
     today,
     contest: contestLabel(klass.contestName, klass.contestDay, today),
     assignments: assigned.filter((a) => FORMULA_BY_ID[a.formulaId]).sort((a, b) => a.week - b.week || a.day - b.day),
-    students: roster.map((r) => ({ id: r.studentId, name: r.name, isYou: false, ...records.get(r.studentId)! })),
+    students: roster.map((r) => ({ id: r.studentId, name: !withLogs && r.consent ? shortName(r.name) : r.name, isYou: false, ...records.get(r.studentId)! })),
   };
 }
 

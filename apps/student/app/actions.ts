@@ -3,8 +3,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { changeEmail, changePassword, checkLogin, createStudent, deleteAccount, requestPasswordReset, resetPasswordWithToken, sendConfirmation, setTimezone } from "@lemmory/db/accounts";
-import { isTimeZone } from "@lemmory/core/days";
+import { approveParentRequest, changeEmail, changePassword, checkLogin, createStudent, deleteAccount, removeByParent, requestParentPermission, requestPasswordReset, resetPasswordWithToken, sendConfirmation, setTimezone } from "@lemmory/db/accounts";
+import { isTimeZone, isUnder13 } from "@lemmory/core/days";
 import { STARTER_LEVELS, type StarterLevel } from "@lemmory/core/starter";
 import { MAX_ANSWER_LENGTH } from "@lemmory/core/grade";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
@@ -20,11 +20,13 @@ import {
   canStudentReview,
   answerRecall,
   answerSolve,
+  classPermissionProblem,
   findClassByCode,
   finishIfEmpty,
   joinClass,
   leaveClass,
   renameStudent,
+  schoolPermissionOnly,
   studentClasses,
   promptFor,
   removeFromDeck,
@@ -32,7 +34,7 @@ import {
 
 // Server actions are public endpoints: every one checks the session and its arguments.
 
-export type FormState = { error?: string; ok?: string; values?: Record<string, string> } | undefined;
+export type FormState = { error?: string; ok?: string; values?: Record<string, string>; school?: boolean } | undefined;
 
 async function me() {
   const user = await currentUser("student");
@@ -99,22 +101,39 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   redirect("/");
 }
 
+/** Remembers an under-13 birthday for a day, so going back to pick another year doesn't get around the parent step. */
+const UNDER_13_COOKIE = "lemmory_under13";
+export async function noteUnder13() {
+  (await cookies()).set(UNDER_13_COOKIE, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 86_400 });
+}
+const SCHOOL_ONLY = "Your school's permission covers your school's classes. Ask a parent to email support@lemmory.com.";
+
 /**
  * Student sign-up. With a class code the student joins that class. "On your own" (own=1)
- * skips the code; they land on My classes to get the individual plan.
+ * skips the code; they land on My classes to get the individual plan. Under 13, the class needs a
+ * school's approval; otherwise we keep only a first name and a parent's email, and the parent
+ * finishes the account from their email. The birthday itself is never stored.
  */
 export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   const onOwn = fd.get("own") === "1";
+  const birthYear = Number(field(fd, "birthYear"));
+  const birthMonth = Number(field(fd, "birthMonth"));
+  const under13 = (await cookies()).has(UNDER_13_COOKIE) || (birthYear > 0 && birthMonth > 0 && isUnder13(birthYear, birthMonth));
   const values = {
     code: field(fd, "code").toUpperCase(),
     firstName: field(fd, "firstName"),
     lastName: field(fd, "lastName"),
     username: field(fd, "username").toLowerCase(),
     email: field(fd, "email").toLowerCase(),
+    parentEmail: field(fd, "parentEmail").toLowerCase(),
+    birthYear: field(fd, "birthYear"),
+    birthMonth: field(fd, "birthMonth"),
   };
   const name = `${values.firstName} ${values.lastName}`.trim();
   const password = String(fd.get("password") ?? "");
-  const fail = (error: string) => ({ error, values });
+  let school = false;
+  const fail = (error: string) => ({ error, values, school });
+  if (!under13 && !(birthYear > 0 && birthMonth > 0)) return fail("Enter your birth month and year.");
   const { ip, device } = await requester();
   if ((await isLimited("signup", device)) || (await isLimited("signupNetwork", ip))) return fail(LIMIT_MESSAGE.signup);
   if (!onOwn && ((await isLimited("classCode", device)) || (await isLimited("classCodeNetwork", ip)))) return fail(LIMIT_MESSAGE.classCode);
@@ -124,11 +143,26 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
     await noteAttempt("classCodeNetwork", ip);
     return fail("No class has that code. Check with your teacher.");
   }
+  if (under13) {
+    await noteUnder13();
+    school = Boolean(klass?.schoolApprovedAt);
+    if (!school) {
+      if (!/^[\p{L}\p{M}' -]{1,40}$/u.test(values.firstName)) return fail("Enter your first name.");
+      if (!validEmail(values.parentEmail)) return fail("Enter your parent or guardian's email.");
+      const problem = await requestParentPermission(values.firstName, values.parentEmail, klass?.id, zoneField(fd));
+      if (problem) return fail(problem);
+      await noteAttempt("signup", device);
+      await noteAttempt("signupNetwork", ip);
+      return { ok: values.parentEmail };
+    }
+    // They started on the parent form, and this class turned out to be covered by the school.
+    if (!fd.has("username")) return { school, values };
+  }
   if (!values.firstName || !values.lastName || name.length > 60) return fail("Enter your first and last name.");
   if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
   if (!validEmail(values.email)) return fail("Enter a valid email. A parent's works.");
   if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
-  const id = await createStudent(name, values.username, password, zoneField(fd), values.email);
+  const id = await createStudent(name, values.username, password, zoneField(fd), values.email, school ? { consent: "school" } : undefined);
   if (!id) return fail("That username is taken. Try another.");
   await sendConfirmation(id, "student", values.email);
   await noteAttempt("signup", device);
@@ -136,6 +170,28 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   if (klass) await joinClass(id, klass.id);
   await startSession(id, "student");
   redirect(klass ? "/" : "/class");
+}
+
+/** A parent agrees from their email and sets up the account. */
+export async function approveChild(token: string, _: FormState, fd: FormData): Promise<FormState> {
+  const values = { lastName: field(fd, "lastName"), username: field(fd, "username").toLowerCase() };
+  const password = String(fd.get("password") ?? "");
+  const fail = (error: string) => ({ error, values });
+  if (fd.get("agree") !== "on") return fail("Tick the box to give your permission.");
+  if (!values.lastName || values.lastName.length > 40) return fail("Enter their last name.");
+  if (!/^[a-z0-9_.-]{3,30}$/.test(values.username)) return fail("Usernames are 3–30 letters, numbers, dots, dashes or underscores.");
+  if (password.length < PASSWORD_MIN || password.length > 200) return fail(`Passwords need at least ${PASSWORD_MIN} characters.`);
+  const done = await approveParentRequest(str(token), values.lastName, values.username, password);
+  if (!done) return fail("This link has expired. Ask your child to sign up again.");
+  if (done === "taken") return fail("That username is taken. Try another.");
+  if (done.classId) await joinClass(done.id, done.classId);
+  return { ok: `${done.firstName} can now log in with the username ${values.username}.` };
+}
+
+/** A parent takes back permission, from the link in their follow-up email. */
+export async function removeChild(token: string) {
+  await removeByParent(str(token));
+  redirect("/parent/remove?done=1");
 }
 
 const CLASS_COOKIE = "lemmory_class";
@@ -154,6 +210,8 @@ export async function joinWithCode(_: FormState, fd: FormData): Promise<FormStat
     await noteAttempt("classCodeNetwork", ip);
     return { error: "No class has that code. Check with your teacher.", values: { code } };
   }
+  const blocked = await classPermissionProblem(studentId, klass);
+  if (blocked) return { error: blocked, values: { code } };
   await joinClass(studentId, klass.id);
   await showClass(klass.id);
   redirect("/");
@@ -179,6 +237,7 @@ export async function leaveClassAction(classId: unknown) {
 
 /** Start the free trial of the individual plan. One per person: see trialProblem in billing. */
 export async function startTrialAction(): Promise<FormState> {
+  if (await schoolPermissionOnly(await me())) return { error: SCHOOL_ONLY };
   const error = await startStudentTrial(await me(), await trialSource());
   if (error) return { error };
   // The sidebar unlocks too, so re-render the layout, not just the page.
@@ -192,6 +251,7 @@ export async function buyStudentPlan(_: FormState, fd: FormData): Promise<FormSt
   const values = { billingName: field(fd, "billingName"), billingEmail: field(fd, "billingEmail") };
   if (values.billingName.length < 2 || values.billingName.length > 80) return { error: "Enter a parent or guardian's name.", values };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.billingEmail) || values.billingEmail.length > 200) return { error: "Enter a valid email for the receipt.", values };
+  if (await schoolPermissionOnly(await me())) return { error: SCHOOL_ONLY, values };
   await checkoutStudent(await me(), values.billingName, values.billingEmail);
   revalidatePath("/", "layout");
   redirect("/");

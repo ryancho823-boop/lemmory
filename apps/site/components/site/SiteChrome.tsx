@@ -11,14 +11,13 @@ import { CONTACT_EMAIL } from "@/lib/links";
 const TABS = [
   { href: "/", label: "Overview", also: [] as string[] },
   { href: "/pricing", label: "Pricing", also: ["/plans"] },
-  { href: "/about", label: "About", also: [] as string[] },
 ];
 const isCurrent = (t: (typeof TABS)[number], path: string) => path === t.href || t.also.includes(path);
 
 export function SiteHeader() {
   const path = usePathname();
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-canvas/95 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-6xl items-center gap-6 px-5 py-3.5">
         <Link href="/">
           <Logo />
@@ -66,13 +65,14 @@ export function SiteHeader() {
 }
 
 const FOOTER_LINKS = [
+  { href: "/about", label: "About" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line">
+    <footer className="border-t border-line print:hidden">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-ink/60">
         <Logo />
         <div className="sm:text-right">

@@ -13,6 +13,12 @@
     "club:verify": "tsx scripts/verify-club.ts",
     "migrate:prod": "tsx --env-file=../../.env.turso scripts/migrate.ts",
     "club:verify:prod": "tsx --env-file=../../.env.turso scripts/verify-club.ts",
+    "school:approve": "tsx scripts/school-approve.ts",
+    "school:approve:prod": "tsx --env-file=../../.env.turso scripts/school-approve.ts",
+    "student:data": "tsx --conditions=react-server scripts/student-data.ts",
+    "student:data:prod": "tsx --conditions=react-server --env-file=../../.env.turso scripts/student-data.ts",
+    "parent:invite": "tsx --conditions=react-server scripts/parent-invite.ts",
+    "parent:invite:prod": "NEXT_PUBLIC_STUDENT_URL=https://student.lemmory.com NEXT_PUBLIC_SITE_URL=https://www.lemmory.com tsx --conditions=react-server --env-file=../../.env.turso scripts/parent-invite.ts",
     "reset:prod": "node --env-file=../../.env.turso scripts/reset-live.mjs --wipe",
     "test": "tsx --conditions=react-server --test test/*.test.ts"
   },

@@ -6,7 +6,7 @@ export const metadata = { title: "Terms · Lemmory" };
 
 export default function Terms() {
   return (
-    <DocPage title="Terms" updated="November 5, 2026">
+    <DocPage title="Terms" updated="November 7, 2026">
       <p>These are the rules for using Lemmory. By making an account, you agree to them.</p>
 
       <DocSection title="Accounts">
@@ -15,6 +15,13 @@ export default function Terms() {
           <li>Teachers are responsible for the classes they create and for inviting only their own students.</li>
           <li>You can delete your account at any time from your account page.</li>
         </ul>
+      </DocSection>
+
+      <DocSection title="Students under 13">
+        <p>
+          A student under 13 needs a parent or guardian&apos;s permission, or their school&apos;s for a class it runs, as the{" "}
+          <Link href="/privacy#children">privacy page</Link> explains. A student under 18 should read these terms with a parent or guardian.
+        </p>
       </DocSection>
 
       <DocSection title="Plans and trials">

@@ -49,6 +49,7 @@ export const currentUser = cache(async (role: Role) => {
       email: users.email,
       username: users.username,
       recoveryEmail: users.recoveryEmail,
+      consent: users.consent,
       emailConfirmedAt: users.emailConfirmedAt,
       emailAddedAt: users.emailAddedAt,
       expiresAt: sessions.expiresAt,
@@ -66,6 +67,8 @@ export const currentUser = cache(async (role: Role) => {
     email: row.email,
     username: row.username,
     contactEmail,
+    /** A parent agreed to this account, so their email stays on it. */
+    parentEmailLocked: row.consent === "parent" || row.consent === "signed",
     emailConfirmed: confirmed,
     // Everyone gets a week to click the link, so a class isn't held up waiting on inboxes.
     emailOverdue: !contactEmail || (!confirmed && Date.now() - (row.emailAddedAt?.getTime() ?? 0) > EMAIL_GRACE_DAYS * 86_400_000),

@@ -2,7 +2,7 @@ import { pendingEmail } from "@lemmory/db/accounts";
 import { ChangeEmailForm } from "@lemmory/ui/ChangeEmailForm";
 import { ChangePasswordForm } from "@lemmory/ui/ChangePasswordForm";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
-import { PageHeader } from "@lemmory/ui/ui";
+import { PageHeader, Panel } from "@lemmory/ui/ui";
 import { changeMyEmail, changeMyPassword, deleteMyAccount } from "../../actions";
 import { getView, requireStudent } from "@/lib/session";
 import { RenameForm } from "./RenameForm";
@@ -20,13 +20,21 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
       {expired && !user.emailConfirmed && <p role="status" className="font-semibold text-bad">That link doesn&apos;t work anymore. Send a new one below.</p>}
       {user.emailOverdue && <p className="font-semibold">{user.contactEmail ? "Confirm your email to keep using Lemmory." : "Add an email to keep using Lemmory. It's how you get back in if you forget your password."}</p>}
       <RenameForm name={v.me.name} username={v.me.username} />
-      <ChangeEmailForm
-        email={user.contactEmail}
-        confirmed={user.emailConfirmed}
-        pending={waiting}
-        hint="Yours or a parent's. We use it to confirm your account and reset your password."
-        action={changeMyEmail}
-      />
+      {user.parentEmailLocked ? (
+        <Panel className="border-t-4 border-t-seq-400 p-6">
+          <h2 className="text-[15px] font-bold">Your parent&apos;s email</h2>
+          <p className="mt-1 text-sm">{user.contactEmail}</p>
+          <p className="mt-1 text-sm text-ink/60">To change it, they can email support@lemmory.com.</p>
+        </Panel>
+      ) : (
+        <ChangeEmailForm
+          email={user.contactEmail}
+          confirmed={user.emailConfirmed}
+          pending={waiting}
+          hint="Yours or a parent's. We use it to confirm your account and reset your password."
+          action={changeMyEmail}
+        />
+      )}
       <ChangePasswordForm action={changeMyPassword} />
       <ConfirmForm
         title="Delete your account"

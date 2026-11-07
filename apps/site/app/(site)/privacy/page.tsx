@@ -1,11 +1,13 @@
+import Link from "next/link";
 import { ContactLink, DocPage, DocSection } from "@/components/site/Doc";
+import { MAILING_ADDRESS, PHONE } from "@/lib/links";
 
 export const metadata = { title: "Privacy · Lemmory" };
 
 // Keep this in step with what the code actually stores (packages/db/src/schema.ts).
 export default function Privacy() {
   return (
-    <DocPage title="Privacy" updated="November 5, 2026">
+    <DocPage title="Privacy" updated="November 7, 2026">
       <p>
         Lemmory is daily formula practice for math competition classes. This page says what we keep, why, who can see it, and how to have it deleted.
         The short version: we keep only what the app needs to work, we don&apos;t show ads, and we don&apos;t sell anyone&apos;s information.
@@ -16,6 +18,8 @@ export default function Privacy() {
           <b>Students:</b> first and last name, a username, a password (stored only as a one-way hash, never readable), the time zone of their device,
           the classes they join, and their practice: which formulas are in their deck, each answer marked right or wrong, which formulas they mixed up,
           and their points and streak. We ask for a contact email, theirs or a parent&apos;s, and use it only for account emails: confirming the address, changing it, and resetting passwords. We don&apos;t keep the answers they type.
+          At sign-up we ask for a birth month and year to see whether a parent or school has to agree first. We don&apos;t store them. A student under 13
+          gets a cookie for one day so the answer can&apos;t simply be changed, and we record who gave permission.
         </p>
         <p>
           <b>Teachers:</b> name, email address and password (hashed the same way), their classes and assignments, the plan they chose, and whether they want the weekly report. Paid plans
@@ -43,7 +47,7 @@ export default function Privacy() {
       <DocSection title="Who can see it">
         <ul>
           <li>A student&apos;s teachers see that student&apos;s practice results in their classes.</li>
-          <li>Classmates see each other&apos;s names and points on the class leaderboard, never anyone&apos;s answers or results.</li>
+          <li>Classmates see each other&apos;s names and points on the class leaderboard, never anyone&apos;s answers or results. For a student under 13, that&apos;s a first name and last initial.</li>
           <li>No one else using Lemmory. There are no ads, no analytics or tracking scripts, and nothing is sold.</li>
         </ul>
         <p>
@@ -60,14 +64,56 @@ export default function Privacy() {
           their classes; their students keep their own accounts. A teacher can remove a student from a class at any time.
         </p>
         <p>
-          To have anything else deleted or corrected, or to ask what we keep about you or your child, email <ContactLink />.
+          To have anything else deleted or corrected, or to ask what we keep about you or your child, email <ContactLink />. We answer within 30 days.
         </p>
       </DocSection>
 
-      <DocSection title="Children">
+      <DocSection title="How long we keep it">
         <p>
-          Lemmory is used by students in classes run by their teachers, and students may be under 13. We collect only what&apos;s listed above. If you
-          are a parent or guardian and want to see or delete your child&apos;s information, email <ContactLink /> and we&apos;ll take care of it.
+          We keep information so the account works, and no longer than that. A student account is deleted after 12 months with no practice and no login,
+          unless it&apos;s on a paid plan. A request from a parent or school is finished within 30 days. If a parent doesn&apos;t answer our email, we
+          delete their email and the child&apos;s first name after 14 days. Teacher accounts stay until they&apos;re deleted.
+        </p>
+      </DocSection>
+
+      <DocSection title="Children under 13" id="children">
+        <p>
+          This is the notice for parents and guardians under the US Children&apos;s Online Privacy Protection Act (COPPA). Lemmory is run by Ryan Cho,{" "}
+          {MAILING_ADDRESS}, {PHONE}, <ContactLink />. Lemmory isn&apos;t run by or affiliated with that school.
+        </p>
+        <p>A child under 13 can use Lemmory only after one of these:</p>
+        <ul>
+          <li>
+            <b>A parent or guardian agrees.</b> The child gives us their first name and a parent&apos;s email, and nothing else. For a child studying on
+            their own, we email the parent, who agrees and sets up the account. A day later we email again, with a link to delete the account if the
+            parent didn&apos;t agree or changes their mind. To join a class, where teachers and classmates see some of their information, the parent signs
+            the <Link href="/privacy/parent-form">parent form</Link> first.
+          </li>
+          <li>
+            <b>The child&apos;s school agrees</b> for a class it runs, by signing the <Link href="/privacy/school-form">school form</Link>. A school can do
+            this only for use in its own teaching, and that&apos;s the only way we use the information. Academies and tutors aren&apos;t schools, so their
+            students use a parent&apos;s permission.
+          </li>
+        </ul>
+        <p>
+          We collect from a child what&apos;s listed under Students at the top of this page, and use it only to run their practice. A child never has to
+          give more than Lemmory needs. In a class, their teachers see their results, and classmates see their first name, last initial and points on the class leaderboard.
+          The companies named above handle it only to run Lemmory, and nobody else receives it.
+        </p>
+        <p>
+          <b>What parents can do:</b> email <ContactLink /> at any time to see what we hold about your child, have it deleted, or stop us collecting more.
+          Deleting it ends their use of Lemmory. You can agree to us collecting and using it without agreeing to any sharing beyond what this page
+          describes. If we learn a child under 13 has an account without permission, we delete it. Please tell us if you think that has happened.
+        </p>
+      </DocSection>
+
+      <DocSection title="Schools and FERPA" id="schools">
+        <p>
+          The Family Educational Rights and Privacy Act (FERPA) sets rules for schools&apos; student records. When a school uses Lemmory under the{" "}
+          <Link href="/privacy/school-form">school form</Link>, we act as a &quot;school official&quot;: we do a job the school would otherwise do, the
+          school keeps control of its students&apos; records, and we use them only for that job. We don&apos;t pass them on, except to the companies
+          named above that run Lemmory for us. The school can review or delete them at any time, and families&apos; requests to see or correct records go
+          through the school. If student information is ever exposed, we tell the school without delay.
         </p>
       </DocSection>
 
