@@ -125,7 +125,7 @@ export default function Overview() {
         <div className="grid lg:grid-cols-2">
           {/* Photo by Kevin Yudhistira Alloni: unsplash.com/photos/WBU233kGI6g (Unsplash License). */}
           <div className="relative aspect-[21/9] lg:aspect-auto">
-            <Image src="/photos/desk-at-night.jpg" alt="A student seen from behind, working late at a desk under a lamp, with a calendar and sticky notes on the wall" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+            <Image src="/photos/desk-at-night-large.jpg" alt="A student seen from behind, working late at a desk under a lamp, with a calendar and sticky notes on the wall" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="px-5 py-16 lg:px-16 lg:py-24">
             <h2 data-reveal className="max-w-2xl font-display text-[32px] leading-[1.2] sm:text-[40px] lg:max-w-lg">

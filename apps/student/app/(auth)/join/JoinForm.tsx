@@ -44,11 +44,7 @@ export function JoinForm({ code, onOwn }: { code: string; onOwn?: boolean }) {
         <a href={`${SITE_URL}/privacy`} className="underline">
           Privacy Policy
         </a>
-        . Under 13? You need your{" "}
-        <a href={`${SITE_URL}/privacy#parents`} className="underline">
-          parent&apos;s permission
-        </a>{" "}
-        first.
+        . Under 13? Sign up through your teacher or with a parent or guardian.
       </p>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Signing up…" : "Sign up"}

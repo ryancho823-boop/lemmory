@@ -23,11 +23,7 @@ export function SignupForm() {
         <a href={`${SITE_URL}/privacy`} className="underline">
           Privacy Policy
         </a>
-        . If a student is under 13, you agree to get the permission described in the{" "}
-        <a href={`${SITE_URL}/privacy#parents`} className="underline">
-          parent section
-        </a>{" "}
-        before they join.
+        .
       </p>
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Signing up…" : "Sign up"}

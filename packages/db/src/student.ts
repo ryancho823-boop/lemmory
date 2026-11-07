@@ -152,9 +152,9 @@ const savedSession = (q: Tx | typeof db, studentId: string) => q.select().from(r
 /** Today's session from the saved row (a session saved on an earlier day is over). */
 const sessionOn = (row: { data: DaySession } | undefined, today: number): DaySession => (row && row.data.day === today ? row.data : emptySession(today));
 
-async function saveSession(q: Tx, studentId: string, data: DaySession) {
-  await q.insert(reviewSessions).values({ studentId, data }).onConflictDoUpdate({ target: reviewSessions.studentId, set: { data } });
-}
+/** Not awaited here, so it can go in a transaction or in one batch with other writes. */
+const saveSession = (q: Tx | typeof db, studentId: string, data: DaySession) =>
+  q.insert(reviewSessions).values({ studentId, data }).onConflictDoUpdate({ target: reviewSessions.studentId, set: { data } });
 
 /**
  * One student's state, settled through yesterday by their own clock. The reads are sent
@@ -215,8 +215,13 @@ export async function promptFor(studentId: string, formulaId: string, mode: Mode
 /**
  * Record an attempt. Only the first attempt each day goes to the scheduler; a miss
  * stays in today's queue until it's right. Finishing the last card marks the day done.
+ *
+ * This runs on every answer, and a transaction costs a trip to the database per statement, which
+ * students waited through on "Checking…". So the reads go out together (see context) and the
+ * writes go in one atomic batch. Nothing is lost by leaving the transaction: one student's answers
+ * arrive one at a time, and the review log's unique key stops a second tab from scoring a card twice.
  */
-async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof context>>, formulaId: string, correct: boolean, confusedWith?: string[]): Promise<Outcome> {
+async function record(studentId: string, ctx: Awaited<ReturnType<typeof context>>, formulaId: string, correct: boolean, confusedWith?: string[]): Promise<Outcome> {
   const { today, record: rec, session: ses } = ctx;
   const card = rec.cards[formulaId];
   const { session: done, entry, done: result } = recordAttempt(ses, card, correct, today, confusedWith);
@@ -225,7 +230,7 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
   // the student stops before getting the card right.
   let logged = true;
   if (entry) {
-    const inserted = await q
+    const inserted = await db
       .insert(reviews)
       .values({
         studentId,
@@ -243,31 +248,27 @@ async function record(q: Tx, studentId: string, ctx: Awaited<ReturnType<typeof c
     logged = inserted.length > 0;
   }
   if (!result) {
-    await saveSession(q, studentId, done);
+    await saveSession(db, studentId, done);
     return nothing;
   }
   const { card: updated, promoted, demoted } = result;
   const finished = buildQueue({ ...rec.cards, [formulaId]: updated }, done, today).length === 0;
-  // Sent together: one trip to the database.
-  await Promise.all([
-    // Points come from these daily totals, so keep them in step with the log (self-added cards earn none).
-    card.source !== "self" &&
-      logged &&
-      q
-        .insert(dailyScores)
-        .values({ studentId, day: today, n: 1 })
-        .onConflictDoUpdate({ target: [dailyScores.studentId, dailyScores.day], set: { n: sql`${dailyScores.n} + 1` } }),
-    q
-      .update(cards)
-      .set({ stage: updated.stage, memory: updated.memory })
-      .where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId))),
-    saveSession(q, studentId, done),
-    finished &&
-      q
-        .insert(days)
-        .values({ studentId, day: today, done: true, missed: 0 })
-        .onConflictDoUpdate({ target: [days.studentId, days.day], set: { done: true, missed: 0 } }),
-  ]);
+  const update = db
+    .update(cards)
+    .set({ stage: updated.stage, memory: updated.memory })
+    .where(and(eq(cards.studentId, studentId), eq(cards.formulaId, formulaId)));
+  // Points come from these daily totals, so keep them in step with the log (self-added cards earn none).
+  const score = db
+    .insert(dailyScores)
+    .values({ studentId, day: today, n: 1 })
+    .onConflictDoUpdate({ target: [dailyScores.studentId, dailyScores.day], set: { n: sql`${dailyScores.n} + 1` } });
+  const dayDone = db
+    .insert(days)
+    .values({ studentId, day: today, done: true, missed: 0 })
+    .onConflictDoUpdate({ target: [days.studentId, days.day], set: { done: true, missed: 0 } });
+  const scored = card.source !== "self" && logged;
+  // One trip to the database, all or nothing.
+  await db.batch([update, saveSession(db, studentId, done), ...(scored ? [score] : []), ...(finished ? [dayDone] : [])]);
   return { formulaName: FORMULA_BY_ID[formulaId].name, promoted, demoted, finished };
 }
 
@@ -301,17 +302,15 @@ export async function answerRecall(
     await assertPractice(studentId, formulaId);
     return { result: checkRecall(f, inputs, !typoUsed), outcome: null };
   }
-  return db.transaction(async (q) => {
-    const ctx = await context(studentId, q);
-    assertDue(ctx, formulaId);
-    if (ctx.record.cards[formulaId].stage !== "recall") throw new ReviewError("That card is in application mode.");
-    const result = checkRecall(f, inputs, !ctx.session.typoOffered.includes(formulaId));
-    if (result.status === "typo") {
-      await saveSession(q, studentId, { ...ctx.session, typoOffered: [...ctx.session.typoOffered, formulaId] });
-      return { result, outcome: null };
-    }
-    return { result, outcome: await record(q, studentId, ctx, formulaId, result.results.every(Boolean)) };
-  });
+  const ctx = await context(studentId);
+  assertDue(ctx, formulaId);
+  if (ctx.record.cards[formulaId].stage !== "recall") throw new ReviewError("That card is in application mode.");
+  const result = checkRecall(f, inputs, !ctx.session.typoOffered.includes(formulaId));
+  if (result.status === "typo") {
+    await saveSession(db, studentId, { ...ctx.session, typoOffered: [...ctx.session.typoOffered, formulaId] });
+    return { result, outcome: null };
+  }
+  return { result, outcome: await record(studentId, ctx, formulaId, result.results.every(Boolean)) };
 }
 
 async function issuedProblem(studentId: string, formulaId: string, problemId: string, mode: Mode) {
@@ -337,11 +336,9 @@ export async function answerPick(
   const problem = await issuedProblem(studentId, formulaId, problemId, mode);
   const result = checkPick(problem, picked, FORMULA_BY_ID);
   if (result.right || mode === "practice") return { result, outcome: null };
-  return db.transaction(async (q) => {
-    const ctx = await context(studentId, q);
-    assertDue(ctx, formulaId);
-    return { result, outcome: await record(q, studentId, ctx, formulaId, false, wrongPicks(problem, picked)) };
-  });
+  const ctx = await context(studentId);
+  assertDue(ctx, formulaId);
+  return { result, outcome: await record(studentId, ctx, formulaId, false, wrongPicks(problem, picked)) };
 }
 
 export async function answerSolve(
@@ -356,12 +353,10 @@ export async function answerSolve(
   const pick = checkPick(problem, picked, FORMULA_BY_ID);
   const result = checkSolve(problem, input);
   if (mode === "practice") return { result, outcome: null };
-  return db.transaction(async (q) => {
-    const ctx = await context(studentId, q);
-    assertDue(ctx, formulaId);
-    const wrong = wrongPicks(problem, picked);
-    return { result, outcome: await record(q, studentId, ctx, formulaId, pick.right && result.right, wrong.length ? wrong : undefined) };
-  });
+  const ctx = await context(studentId);
+  assertDue(ctx, formulaId);
+  const wrong = wrongPicks(problem, picked);
+  return { result, outcome: await record(studentId, ctx, formulaId, pick.right && result.right, wrong.length ? wrong : undefined) };
 }
 
 /** Mark today done when there's nothing left in the queue. */
