@@ -15,7 +15,7 @@ const VIEWS = [
     tab: "Student home",
     title: "One button a day",
     body: "Students see how many cards are due, the formulas they keep missing, and where they stand on the class leaderboard.",
-    src: "/shots/tour-student-home.png",
+    src: "/shots/nov-student-home.png",
     alt: "Student home page: today's cards with a Start button, a list of formulas to focus on, and the class leaderboard",
   },
   {
@@ -24,7 +24,7 @@ const VIEWS = [
     tab: "Assigning",
     title: "Assign this week's formulas",
     body: "Teachers pick formulas from the bank as the course covers them. Each one goes into every student's deck with one click.",
-    src: "/shots/tour-teacher-assign.png",
+    src: "/shots/nov-teacher-assign.png",
     alt: "Teacher's Assign formulas page listing algebra formulas, most marked Assigned",
   },
   {
@@ -33,7 +33,7 @@ const VIEWS = [
     tab: "Class overview",
     title: "See what the class is forgetting",
     body: "The formulas the class gets wrong most, who finished today's review, and who's falling behind, so you know what to reteach before the contest.",
-    src: "/shots/tour-teacher-overview.png",
+    src: "/shots/nov-teacher-overview.png",
     alt: "Teacher overview: what the class is forgetting, students who need attention, and this week's homework",
   },
   {
@@ -42,7 +42,7 @@ const VIEWS = [
     tab: "Student stats",
     title: "Progress students can see",
     body: "A streak, a calendar of finished days, and the formulas that need more work.",
-    src: "/shots/tour-student-stats.png",
+    src: "/shots/nov-student-stats.png",
     alt: "Student stats page: streak, cards reviewed, formulas that need work and a calendar",
   },
 ];

@@ -102,7 +102,9 @@ export function ReviewSession({
   };
 
   // ── Finished ──
-  if (doneToday || (active && !active.queue.length)) {
+  // Answering the last card marks the day done and refreshes this page, so `doneToday` can turn true
+  // while that card's result is still on screen. A review in progress finishes when its queue does.
+  if (active ? !active.queue.length : doneToday) {
     const finished = Object.keys(active?.firstTries ?? {});
     // Cards the student added themselves are extra practice: no points.
     const counted = finished.filter((id) => cards[id]?.source !== "self").length;

@@ -90,7 +90,7 @@ export function SiteFooter() {
               {CONTACT_EMAIL}
             </a>
           </p>
-          <p className="mt-1">© {new Date().getFullYear()} Lemmory</p>
+          <p className="mt-1">© 2026 Lemmory</p>
         </div>
       </div>
     </footer>
