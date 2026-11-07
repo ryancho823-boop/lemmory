@@ -6,7 +6,7 @@ import { SITE_URL } from "@lemmory/core/urls";
 import { Button } from "@lemmory/ui/ui";
 import { Field } from "@lemmory/ui/Shell";
 import { TimeZoneField } from "../TimeZoneField";
-import { noteUnder13, signup } from "../../actions";
+import { changeBirthday, noteUnder13, signup } from "../../actions";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const SELECT = "h-11 w-full min-w-0 rounded-xl border border-line bg-white px-3 text-[15px] outline-none focus:border-ink";
@@ -15,13 +15,15 @@ const SELECT = "h-11 w-full min-w-0 rounded-xl border border-line bg-white px-3 
  * `onOwn` drops the class code, for students on the individual plan. A birthday under 13 swaps the
  * form for one that asks only for a first name and a parent's email, unless a school covers the class.
  * The age question says nothing about why it's asked, and no year is left out, so it doesn't invite a fib.
+ * `answer` is the remembered under-13 answer (see noteUnder13): a slip in the year list can be fixed once.
  */
-export function JoinForm({ code, onOwn, under13 }: { code: string; onOwn?: boolean; under13?: boolean }) {
+export function JoinForm({ code, onOwn, answer }: { code: string; onOwn?: boolean; answer?: string }) {
   const [state, action, pending] = useActionState(signup, undefined);
   const v = state?.values;
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
-  const [young, setYoung] = useState(Boolean(under13));
+  const [young, setYoung] = useState(answer === "1" || answer === "2");
+  const [canChange, setCanChange] = useState(answer === "1");
   const parentStep = young && !state?.school;
 
   const pick = (m: string, y: string) => {
@@ -29,8 +31,16 @@ export function JoinForm({ code, onOwn, under13 }: { code: string; onOwn?: boole
     setYear(y);
     if (m && y && isUnder13(Number(y), Number(m))) {
       setYoung(true);
-      void noteUnder13();
+      void noteUnder13().then(setCanChange);
     }
+  };
+
+  const goBack = () => {
+    setYoung(false);
+    setCanChange(false);
+    setMonth("");
+    setYear("");
+    void changeBirthday();
   };
 
   if (state?.ok) {
@@ -91,6 +101,11 @@ export function JoinForm({ code, onOwn, under13 }: { code: string; onOwn?: boole
           <p className="text-[15px] leading-relaxed">We need a parent or guardian&apos;s OK first. We&apos;ll email them the next step.</p>
           <Field label="Your first name" name="firstName" required autoComplete="given-name" defaultValue={v?.firstName} />
           <Field label="Parent or guardian's email" name="parentEmail" type="email" required defaultValue={v?.parentEmail} />
+          {canChange && (
+            <button type="button" onClick={goBack} className="text-sm font-semibold underline underline-offset-2">
+              Wrong birthday? Go back
+            </button>
+          )}
         </>
       ) : (
         <>

@@ -13,7 +13,7 @@ export function ParentForm({ token, firstName }: { token: string; firstName: str
     return (
       <div className="space-y-4 text-[15px] leading-relaxed">
         <p>{state.ok}</p>
-        <p>We&apos;ll email you tomorrow with a link that deletes the account if you ever change your mind.</p>
+        <p>We&apos;ll email you in a day or two with a link that deletes the account if you ever change your mind.</p>
         <Button href="/login" size="lg" className="w-full">
           Go to log in
         </Button>
@@ -25,6 +25,7 @@ export function ParentForm({ token, firstName }: { token: string; firstName: str
       <Field label="Last name" name="lastName" required autoComplete="off" defaultValue={v?.lastName} />
       <Field label="Username" name="username" required autoComplete="off" autoCapitalize="none" defaultValue={v?.username} hint={`${firstName} logs in with this.`} />
       <Field label="Password" name="password" type="password" required minLength={8} autoComplete="new-password" hint="At least 8 characters." />
+      <Field label="Your full name" name="signature" required autoComplete="name" defaultValue={v?.signature} hint="Typing your name is your signature." />
       <label className="flex items-start gap-2.5 text-sm leading-snug">
         <input type="checkbox" name="agree" required className="mt-0.5 h-4 w-4 shrink-0 accent-ink" />
         <span>
@@ -36,12 +37,12 @@ export function ParentForm({ token, firstName }: { token: string; firstName: str
           <a href={`${SITE_URL}/terms`} className="underline">
             terms
           </a>
-          , and I agree to them for my child.
+          , and I agree to them for my child, including their teachers seeing their results.
         </span>
       </label>
       {state?.error && <p className="text-sm font-semibold text-bad">{state.error}</p>}
       <Button type="submit" size="lg" className="w-full" disabled={pending}>
-        {pending ? "Saving…" : "Agree and create account"}
+        {pending ? "Saving…" : "Sign and create account"}
       </Button>
     </form>
   );

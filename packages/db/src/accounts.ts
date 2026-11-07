@@ -37,7 +37,7 @@ export async function createStudent(
   password: string,
   timezone?: string,
   email?: string,
-  permission?: Pick<typeof users.$inferInsert, "consent" | "emailConfirmedAt" | "parentFollowUpAt">,
+  permission?: Pick<typeof users.$inferInsert, "consent" | "emailConfirmedAt" | "parentFollowUpAt" | "parentSignature" | "parentSignedAt">,
 ) {
   const normalized = username.trim().toLowerCase();
   if (await db.select({ id: users.id }).from(users).where(eq(users.username, normalized)).get()) return null;
@@ -292,11 +292,11 @@ const MAX_REQUESTS_PER_EMAIL = 5;
 const INACTIVE_DAYS = 365;
 
 /**
- * The FTC allows consent by email only when a child's information isn't shared. In a class, teachers
- * and classmates see some of it, so a class needs a signed form or the school's approval. Set this to
- * true only if a lawyer confirms email is enough for classes, and update the privacy page with it.
+ * Parents sign online from the emailed link, and that covers classes too. The FTC's list names signed
+ * forms sent back by mail, fax or scan, and doesn't name typed signatures. If a lawyer says this isn't
+ * enough, set this to false: class parents then get the paper form, and the privacy page needs updating.
  */
-export const EMAIL_APPROVAL_FOR_CLASSES = false;
+export const ONLINE_SIGNATURE: boolean = true;
 
 const PLAIN_USE = "We use these only to run their practice. Companies that run Lemmory for us handle this data only for that job. There are no ads, and we never sell it.";
 const CLASS_USE = "We use these only to run their practice. Their teachers see their results, and classmates see their first name, last initial and points on the class leaderboard. Companies that run Lemmory for us handle this data only for that job. There are no ads, and we never sell it.";
@@ -315,15 +315,15 @@ export async function requestParentPermission(firstName: string, parentEmail: st
   const klass = classId
     ? await db.select({ name: classes.name, code: classes.joinCode, teacher: users.name }).from(classes).innerJoin(users, eq(users.id, classes.teacherId)).where(eq(classes.id, classId)).get()
     : null;
-  const needsForm = Boolean(klass) && !signed && !EMAIL_APPROVAL_FOR_CLASSES;
+  const needsForm = Boolean(klass) && !signed && !ONLINE_SIGNATURE;
   const token = randomBytes(32).toString("base64url");
   await db.insert(parentRequests).values({ id: sha256(token), firstName, parentEmail: email, classId, timezone, signed, expiresAt: new Date(Date.now() + PARENT_LINK_DAYS * DAY_MS) });
   const where = klass ? `, for ${klass.name} with ${klass.teacher}` : "";
   const intro = `${firstName} asked to use Lemmory, daily formula practice for math contests${where}. They gave us your email so we could ask you first. Children under 13 need a parent or guardian's permission before we collect anything else.`;
-  const keep = `If you agree, we'll keep their name, a username, a password (stored scrambled), their time zone, your email, their classes and their practice results. ${klass || signed ? CLASS_USE : PLAIN_USE}`;
+  const keep = `If you agree, we'll keep their name, a username, a password (stored scrambled), their time zone, your email, their classes and their practice results. ${klass || signed || ONLINE_SIGNATURE ? CLASS_USE : PLAIN_USE}`;
   const how = needsForm
     ? `Because teachers and classmates see some of this, we need a signed form. Fill it in with the class code ${klass!.code}, then email a photo or scan to support@lemmory.com. We'll send you a link to set up their account.`
-    : "To agree, click the button and set up their account.";
+    : "To agree, click the button, sign with your name and set up their account.";
   const note = `If you don't agree, do nothing: we'll delete your email and their first name in ${PARENT_LINK_DAYS} days. If you do agree, you can see or delete their information, or stop us collecting more, at any time.`;
   const href = needsForm ? `${SITE_URL}/privacy/parent-form` : `${STUDENT_URL}/parent?token=${token}`;
   const privacy = `${SITE_URL}/privacy#children`;
@@ -334,7 +334,7 @@ export async function requestParentPermission(firstName: string, parentEmail: st
     html: mailHtml({
       title: `Permission for ${escapeHtml(firstName)}`,
       body: `<p style="${mailStyle.p}">${escapeHtml(intro)}</p><p style="${mailStyle.p}">${escapeHtml(keep)}</p><p style="${mailStyle.p}">${escapeHtml(how)}</p>`,
-      button: { href, label: needsForm ? "Open the form" : "Agree and set up" },
+      button: { href, label: needsForm ? "Open the form" : "Sign and set up" },
       note: `${escapeHtml(note)} <a href="${escapeHtml(privacy)}">Full details</a>. Lemmory, support@lemmory.com`,
     }),
   });
@@ -350,11 +350,13 @@ export const parentRequest = (token: string) =>
   db.select().from(parentRequests).where(and(eq(parentRequests.id, sha256(token)), gt(parentRequests.expiresAt, new Date()))).get();
 
 /** The parent agreed: make the account. Null if the link doesn't work, "taken" if the username isn't free. */
-export async function approveParentRequest(token: string, lastName: string, username: string, password: string) {
+export async function approveParentRequest(token: string, lastName: string, username: string, password: string, signature?: string) {
   const row = await parentRequest(token);
   if (!row) return null;
   const id = await createStudent(`${row.firstName} ${lastName}`, username, password, row.timezone ?? undefined, row.parentEmail, {
-    consent: row.signed ? "signed" : "parent",
+    consent: row.signed || ONLINE_SIGNATURE ? "signed" : "parent",
+    parentSignature: signature,
+    parentSignedAt: signature ? new Date() : undefined,
     emailConfirmedAt: new Date(),
     parentFollowUpAt: new Date(Date.now() + FOLLOW_UP_DAYS * DAY_MS),
   });
@@ -379,12 +381,12 @@ export async function removeByParent(token: string) {
 async function sendParentFollowUp(child: { id: string; name: string; username: string | null; recoveryEmail: string | null; consent: string | null }) {
   if (!child.recoveryEmail) return false;
   const href = `${STUDENT_URL}/parent/remove?token=${await issueToken(child.id, "remove", REMOVE_LINK_DAYS * 24 * 60)}`;
-  const intro = `You agreed that ${child.name} can use Lemmory, with the username ${child.username}. If that was you, there's nothing more to do.`;
-  const repeat = `We keep their name, username, a scrambled password, time zone, your email, classes and practice results. ${child.consent === "signed" || EMAIL_APPROVAL_FOR_CLASSES ? CLASS_USE : PLAIN_USE}`;
+  const intro = `You signed to let ${child.name} use Lemmory, with the username ${child.username}. If that was you, there's nothing more to do.`;
+  const repeat = `We keep their name, username, a scrambled password, time zone, your email, classes and practice results. ${child.consent === "signed" ? CLASS_USE : PLAIN_USE}`;
   const revoke = "If it wasn't you, or you change your mind, this link deletes the account and everything in it. Keep this email: the link keeps working. To see what we hold, reply to this email.";
   return sendMail({
     to: child.recoveryEmail,
-    subject: `You agreed to ${child.name} using Lemmory`,
+    subject: `You signed for ${child.name} to use Lemmory`,
     text: `${intro}\n\n${repeat}\n\n${revoke}\n${href}`,
     html: mailHtml({
       title: "Your permission",

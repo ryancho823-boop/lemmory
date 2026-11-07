@@ -38,6 +38,9 @@ export const users = sqliteTable("users", {
   consent: text("consent", { enum: ["parent", "signed", "school"] }),
   /** When the parent is due their follow-up email, the second step of email consent. Cleared once sent. */
   parentFollowUpAt: integer("parent_follow_up_at", { mode: "timestamp_ms" }),
+  /** The full name a parent typed to sign online, and when. Deleted with the account. */
+  parentSignature: text("parent_signature"),
+  parentSignedAt: integer("parent_signed_at", { mode: "timestamp_ms" }),
   createdAt: createdAt(),
 });
 
@@ -77,7 +80,7 @@ export const parentRequests = sqliteTable(
     parentEmail: text("parent_email").notNull(),
     classId: text("class_id").references(() => classes.id, { onDelete: "cascade" }),
     timezone: text("timezone"),
-    /** We have the parent's signed form, so the account can be in a class. */
+    /** We already have this parent's paper form, so they don't sign again online. */
     signed: integer("signed", { mode: "boolean" }).notNull().default(false),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
   },
