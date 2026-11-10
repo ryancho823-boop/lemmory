@@ -1,5 +1,4 @@
 import { isoDate } from "@lemmory/core/days";
-import { SITE_URL } from "@lemmory/core/urls";
 import { PageHeader, Panel } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { ConfirmForm } from "@lemmory/ui/ConfirmForm";
@@ -7,6 +6,7 @@ import { deleteClassAction, updateClassAction } from "../../../../actions";
 import { ClassForm } from "../../../ClassForm";
 import { JoinCode } from "../JoinCode";
 import { NewCodeButton } from "./NewCodeButton";
+import { UnderThirteen } from "../UnderThirteen";
 
 export const metadata = { title: "Class settings · Lemmory for teachers" };
 
@@ -36,17 +36,7 @@ export default async function Settings({ params }: PageProps<"/c/[classId]/setti
           <NewCodeButton classId={classId} />
         </div>
         <p className="mt-4 border-t border-line pt-4 text-sm text-ink/55">
-          {klass.schoolApprovedAt ? (
-            "Your school approved this class, so students under 13 can join with the code."
-          ) : (
-            <>
-              Students under 13 need a parent to sign online, which we set up by email. A school can approve a whole class with the{" "}
-              <a href={`${SITE_URL}/privacy/school-form`} className="underline">
-                school form
-              </a>
-              .
-            </>
-          )}
+          <UnderThirteen schoolApproved={Boolean(klass.schoolApprovedAt)} />
         </p>
       </Panel>
       <ConfirmForm

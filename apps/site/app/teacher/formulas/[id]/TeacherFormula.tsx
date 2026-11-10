@@ -65,7 +65,7 @@ export function TeacherFormula({ id }: { id: string }) {
         ]}
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
+      <div className="grid items-start gap-6 xl:grid-cols-[1.6fr_1fr]">
         <Panel>
           <PanelHeader title="Students" info="Sorted by lowest predicted recall first." />
           <div className="hidden grid-cols-[1fr_100px_90px_120px] gap-x-4 px-5 pt-3 text-xs font-semibold text-ink/55 sm:grid">

@@ -67,7 +67,7 @@ export function InfoTip({ title, children, align = "right", className }: { title
         }}
         aria-label={title ? `About: ${title}` : "More info"}
         aria-expanded={open}
-        className={cx("px-1 font-sans text-[13px] font-normal text-link hover:underline", open && "underline")}
+        className={cx("-my-2 px-1.5 py-2 font-sans text-[13px] font-normal text-link hover:underline", open && "underline")}
       >
         [?]
       </button>

@@ -46,7 +46,7 @@ export default async function FormulaAnalytics({ params, searchParams }: PagePro
               <tr>
                 {SORTS.map((s) => (
                   <th key={s.key} aria-sort={sort === s.key ? "ascending" : undefined} className={`${s.className} py-3 font-semibold`}>
-                    <Link href={`?sort=${s.key}`} className={sort === s.key ? "text-ink underline" : "hover:text-ink"}>
+                    <Link href={`?sort=${s.key}`} className={`-my-2 inline-block py-2 ${sort === s.key ? "text-ink underline" : "hover:text-ink"}`}>
                       {s.label}
                     </Link>
                   </th>

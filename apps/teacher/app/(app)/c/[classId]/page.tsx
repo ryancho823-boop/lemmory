@@ -9,6 +9,7 @@ const FORGETTING = 0.8;
 import { Button, PageHeader, Panel, PanelHeader, pct } from "@lemmory/ui/ui";
 import { getClass, studentUrl } from "@/lib/session";
 import { JoinCode } from "./JoinCode";
+import { UnderThirteen } from "./UnderThirteen";
 import { topicOf } from "@lemmory/core/formulas";
 
 export default async function Overview({ params }: PageProps<"/c/[classId]">) {
@@ -76,7 +77,9 @@ export default async function Overview({ params }: PageProps<"/c/[classId]">) {
       {students.length < 3 && (
         <Panel className="p-5">
           <h2 className="text-[15px] font-bold">{students.length ? "Invite the rest of your class" : "Invite your students"}</h2>
-          <p className="mb-4 mt-0.5">They sign up with a username, a password, and an email, theirs or a parent&apos;s.</p>
+          <p className="mb-4 mt-0.5">
+            They sign up with a username, a password, and an email, theirs or a parent&apos;s. <UnderThirteen schoolApproved={Boolean(klass.schoolApprovedAt)} />
+          </p>
           <JoinCode code={klass.joinCode} url={studentUrl} />
         </Panel>
       )}

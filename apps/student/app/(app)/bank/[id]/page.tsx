@@ -13,7 +13,7 @@ import { DeckButton } from "../../DeckButtons";
 
 export async function generateMetadata({ params }: PageProps<"/bank/[id]">) {
   const f = FORMULA_BY_ID[(await params).id];
-  return { title: f ? `${f.name} · Lemmory` : "Lemmory" };
+  return { title: f ? `${f.name} · Lemmory` : "Page not found · Lemmory" };
 }
 
 export default async function FormulaPage({ params }: PageProps<"/bank/[id]">) {

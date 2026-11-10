@@ -15,7 +15,7 @@ export function EmailNotice({ email, action }: { email: string; action: (state: 
       {state?.ok || state?.error ? (
         <span className={`font-semibold ${state.error ? "text-bad" : "text-good"}`}>{state.error ?? state.ok}</span>
       ) : (
-        <button type="submit" disabled={pending} className="font-semibold underline underline-offset-2 hover:no-underline">
+        <button type="submit" disabled={pending} className="-my-1.5 py-1.5 font-semibold underline underline-offset-2 hover:no-underline">
           {pending ? "Sending…" : "Send it again"}
         </button>
       )}
