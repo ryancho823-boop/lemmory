@@ -45,7 +45,7 @@ export default function FormulaAnalyticsIndex() {
             <tr>
               {SORTS.map((s) => (
                 <th key={s.key} aria-sort={sort === s.key ? "ascending" : undefined} className={`${s.className} py-3 font-semibold`}>
-                  <button onClick={() => setSort(s.key)} className={sort === s.key ? "text-ink underline" : "hover:text-ink"}>
+                  <button onClick={() => setSort(s.key)} className={`-my-2 py-2 ${sort === s.key ? "text-ink underline" : "hover:text-ink"}`}>
                     {s.label}
                   </button>
                 </th>

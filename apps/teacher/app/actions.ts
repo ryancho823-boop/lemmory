@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
-import { isTimeZone, parseDate } from "@lemmory/core/days";
+import { dayInZone, isTimeZone, parseDate } from "@lemmory/core/days";
 import { changeEmail, changePassword, checkLogin, createTeacher, deleteAccount, requestPasswordReset, resetPasswordWithToken, sendConfirmation } from "@lemmory/db/accounts";
 import { setWeeklyReport, unsubscribe } from "@lemmory/db/report";
 import { currentUser, endSession, requester, startSession, trialSource } from "@lemmory/db/auth";
@@ -254,6 +254,9 @@ function settings(fd: FormData): { settings: ClassSettings } | { error: string }
   const contestDay = contestDate ? parseDate(contestDate) : null;
   if (contestDate && contestDay === null) return { error: "Pick a valid contest date." };
   if (!isTimeZone(timezone)) return { error: "Pick a time zone." };
+  // A past date is fine if it's the one already saved: the teacher may only be renaming the class.
+  const unchanged = contestDate === field(fd, "savedContestDate");
+  if (contestDay !== null && !unchanged && contestDay < dayInZone(timezone)) return { error: "That contest date has passed. Pick the next contest, or clear the date." };
   return { settings: { name, contestName: contestName || null, contestDay, timezone } };
 }
 

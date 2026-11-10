@@ -167,7 +167,7 @@ export function Shell({
     it.exact ? path === it.href || !!it.also?.includes(path) : path === it.href || path.startsWith(it.href + "/");
   const logout = (
     <form action={onLogout}>
-      <button className="text-sm font-semibold text-ink/60 hover:text-ink">Log out</button>
+      <button className="-my-2 py-2 text-sm font-semibold text-ink/60 hover:text-ink">Log out</button>
     </form>
   );
 

@@ -8,7 +8,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/student/bank/[id]">) {
   const f = FORMULA_BY_ID[(await params).id];
-  return { title: f ? `${f.name} · Lemmory` : "Lemmory" };
+  return { title: f ? `${f.name} · Lemmory` : "Page not found · Lemmory" };
 }
 
 export default async function Page({ params }: PageProps<"/student/bank/[id]">) {

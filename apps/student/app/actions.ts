@@ -97,6 +97,7 @@ export async function login(_: FormState, fd: FormData): Promise<FormState> {
   }
   const tz = zoneField(fd);
   if (tz) await setTimezone(id, tz);
+  await forgetAge();
   await startSession(id, "student");
   redirect("/");
 }
@@ -117,6 +118,9 @@ export async function noteUnder13() {
   await setUnder13(now);
   return now === "1";
 }
+/** A finished sign-up, a login or a logout ends the age check, so the next person on this device starts fresh. */
+const forgetAge = async () => (await cookies()).delete(UNDER_13_COOKIE);
+
 export async function changeBirthday() {
   if ((await under13Answer()) === "1") await setUnder13("back");
 }
@@ -183,6 +187,7 @@ export async function signup(_: FormState, fd: FormData): Promise<FormState> {
   await noteAttempt("signup", device);
   await noteAttempt("signupNetwork", ip);
   if (klass) await joinClass(id, klass.id);
+  await forgetAge();
   await startSession(id, "student");
   redirect(klass ? "/" : "/class");
 }
@@ -324,6 +329,7 @@ export async function resetPassword(token: string, _: FormState, fd: FormData): 
   if (password !== String(fd.get("confirm") ?? "")) return { error: "Those two passwords don't match." };
   const id = await resetPasswordWithToken(str(token), "student", password);
   if (!id) return { error: "This link doesn't work anymore. Ask for a new one." };
+  await forgetAge();
   await startSession(id, "student");
   redirect("/");
 }
@@ -360,6 +366,7 @@ export async function deleteMyAccount(_: FormState, fd: FormData): Promise<FormS
 }
 
 export async function logout() {
+  await forgetAge();
   await endSession("student");
   redirect("/login");
 }

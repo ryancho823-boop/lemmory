@@ -13,12 +13,15 @@ export function JoinCode({ code, url }: { code: string; url: string }) {
         <p className="text-xs font-semibold text-ink/50">Class code</p>
         <p className="font-mono text-3xl font-bold tracking-[0.2em]">{code}</p>
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[15rem] flex-1">
         <p className="text-xs font-semibold text-ink/50">Or send this link</p>
         <div className="mt-1 flex items-center gap-2">
           <code className="min-w-0 flex-1 truncate rounded-lg bg-canvas px-2.5 py-1.5 text-sm">{link}</code>
           <button
-            onClick={() => navigator.clipboard.writeText(link).then(() => setCopied(true))}
+            onClick={() => navigator.clipboard.writeText(link).then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            })}
             className="flex shrink-0 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm font-semibold hover:border-ink/30"
           >
             {copied ? <Check size={14} className="text-good" /> : <Copy size={14} />}

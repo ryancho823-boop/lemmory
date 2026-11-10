@@ -83,6 +83,7 @@ export function ClassForm({
 
   return (
     <form action={formAction} className="space-y-4">
+      <input type="hidden" name="savedContestDate" value={initial?.contestDate ?? ""} />
       <Field label="Class name" name="name" required defaultValue={v.name} placeholder="Long-Term AMC 10 Course" />
       <fieldset>
         <legend className="text-sm font-semibold">Contest details (optional)</legend>
