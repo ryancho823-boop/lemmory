@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
@@ -28,6 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${serif.variable} ${sourceSans.variable} h-full`}>
       <body className="min-h-full font-sans">
         <StoreProvider>{children}</StoreProvider>
+        {/* Visit counts for the main website only: no cookies, nothing that identifies a visitor. The student
+            and teacher apps don't load it. See the privacy page. */}
+        <Analytics />
       </body>
     </html>
   );

@@ -7,7 +7,7 @@ export const metadata = { title: "Privacy · Lemmory" };
 // Keep this in step with what the code actually stores (packages/db/src/schema.ts).
 export default function Privacy() {
   return (
-    <DocPage title="Privacy" updated="November 7, 2026">
+    <DocPage title="Privacy" updated="November 14, 2026">
       <p>
         Lemmory is daily formula practice for math competition classes. This page says what we keep, why, who can see it, and how to have it deleted.
         The short version: we keep only what the app needs to work, we don&apos;t show ads, and we don&apos;t sell anyone&apos;s information.
@@ -48,7 +48,11 @@ export default function Privacy() {
         <ul>
           <li>A student&apos;s teachers see that student&apos;s practice results in their classes.</li>
           <li>Classmates see each other&apos;s names and points on the class leaderboard, never anyone&apos;s answers or results. For a student under 13, that&apos;s a first name and last initial.</li>
-          <li>No one else using Lemmory. There are no ads, no analytics or tracking scripts, and nothing is sold.</li>
+          <li>
+            No one else using Lemmory. There are no ads, and nothing is sold. The student and teacher apps have no analytics or tracking
+            scripts. This main website, including the demo, counts visits with Vercel Web Analytics: which page, the referring site, country,
+            and browser and device type. It uses no cookies, and nothing it keeps identifies a visitor.
+          </li>
         </ul>
         <p>
           A few companies run parts of Lemmory for us and only handle what that job needs: Turso (the database) and Vercel (hosting), Resend (sends

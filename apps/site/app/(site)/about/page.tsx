@@ -10,7 +10,7 @@ export const metadata = { title: "About · Lemmory" };
 const FACTS = [
   { value: TOTAL_FORMULAS, label: "formulas, each with its own problems" },
   { value: 7, label: "topics, from algebra to calculus rounds" },
-  { value: 0, label: "ads or tracking scripts" },
+  { value: 0, label: "ads or trackers in the student app" },
 ];
 
 const BELIEFS = [

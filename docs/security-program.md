@@ -13,7 +13,7 @@ Student names, usernames, password hashes, contact emails, parents' emails, clas
 - Login, class code, sign-up and email sending are rate limited.
 - Secrets live in Vercel and a git-ignored file, never in the repo.
 - The `main` branch is protected, and checks run on every pull request.
-- There are no ads, analytics or tracking scripts.
+- There are no ads. The student and teacher apps have no analytics or tracking scripts. The main website uses cookieless Vercel Web Analytics for visit counts.
 - Production data is reachable only through the database token. Anyone who leaves the project loses it, and the token is rotated.
 
 ## Service companies
